@@ -1,11 +1,11 @@
 import Link from 'next/link'
-import { PROJECTS, ALL_TASKS, USERS, getProjectTasks, getUser } from '@/lib/mock-data'
+import { PROJECTS, ALL_TASKS, USERS, getProjectTasks, getUser, APPROVALS, ISSUES, CHANGES, RISK_REGISTER, MEETINGS, MEETING_ACTIONS } from '@/lib/mock-data'
 import { calculateRisks, calculateHealth, calculateCompletion, calculateStageCompletion } from '@/lib/risk-engine'
 import { ProjectSummary, RiskAlert, RIBA_STAGES } from '@/lib/types'
 import { KPICard } from '@/components/KPICard'
 import { ProjectHealthTable } from '@/components/ProjectHealthTable'
 import { RiskAlertCard } from '@/components/RiskAlertCard'
-import { isOverdue } from '@/lib/utils'
+import { isOverdue, approvalStatusColor, formatDate, cn } from '@/lib/utils'
 
 export default function PracticeDashboard() {
   // Build project summaries
@@ -133,6 +133,85 @@ export default function PracticeDashboard() {
                 ))}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Phase 2: Approvals + Alerts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Pending Approvals */}
+        <div className="bg-white rounded-xl border border-slate-200 p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-slate-900">Pending Approvals</h2>
+            <Link href="/approvals" className="text-xs text-brand-600 hover:text-brand-700 font-medium">View all →</Link>
+          </div>
+          {(() => {
+            const pending = APPROVALS.filter(a => a.status === 'pending')
+            if (pending.length === 0) {
+              return <p className="text-xs text-slate-400">No items awaiting review.</p>
+            }
+            return (
+              <div className="space-y-2">
+                {pending.slice(0, 4).map(a => {
+                  const project = PROJECTS.find(p => p.id === a.project_id)
+                  const submitter = getUser(a.submitted_by_user_id)
+                  return (
+                    <div key={a.id} className="flex items-center justify-between p-2.5 rounded-lg bg-amber-50 border border-amber-100">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium text-slate-800 truncate">{a.item_title}</p>
+                        <p className="text-[11px] text-slate-400">
+                          {project?.name} · {submitter?.name} · {formatDate(a.submitted_at)}
+                        </p>
+                      </div>
+                      <span className="text-[10px] font-bold text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded uppercase shrink-0 ml-2">
+                        {a.item_type}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })()}
+        </div>
+
+        {/* Projects Needing Attention */}
+        <div className="bg-white rounded-xl border border-slate-200 p-5">
+          <h2 className="text-sm font-semibold text-slate-900 mb-3">Projects Needing Attention</h2>
+          {(() => {
+            const alerts: { projectName: string; projectId: string; reason: string; color: string }[] = []
+
+            PROJECTS.filter(p => p.status === 'active').forEach(p => {
+              const pIssues = ISSUES.filter(i => i.project_id === p.id && (i.status === 'open' || i.status === 'in_progress'))
+              const pChanges = CHANGES.filter(c => c.project_id === p.id && (c.approval_status === 'raised' || c.approval_status === 'under_review'))
+              const pRisks = RISK_REGISTER.filter(r => r.project_id === p.id && r.status === 'open' && r.probability === 'high')
+              const pOverdueActions = MEETING_ACTIONS.filter(a => {
+                const meeting = MEETINGS.find(m => m.id === a.meeting_id)
+                return meeting?.project_id === p.id && a.status === 'overdue'
+              })
+
+              if (pRisks.length > 0) alerts.push({ projectName: p.name, projectId: p.id, reason: `${pRisks.length} high-probability risk${pRisks.length > 1 ? 's' : ''}`, color: 'text-red-600' })
+              if (pIssues.length > 0) alerts.push({ projectName: p.name, projectId: p.id, reason: `${pIssues.length} open issue${pIssues.length > 1 ? 's' : ''}`, color: 'text-amber-600' })
+              if (pOverdueActions.length > 0) alerts.push({ projectName: p.name, projectId: p.id, reason: `${pOverdueActions.length} overdue action${pOverdueActions.length > 1 ? 's' : ''}`, color: 'text-red-600' })
+            })
+
+            if (alerts.length === 0) {
+              return <p className="text-xs text-slate-400">All projects look healthy.</p>
+            }
+
+            return (
+              <div className="space-y-2">
+                {alerts.slice(0, 6).map((alert, i) => (
+                  <Link
+                    key={`${alert.projectId}-${i}`}
+                    href={`/projects/${alert.projectId}`}
+                    className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
+                  >
+                    <span className="text-xs font-medium text-slate-800">{alert.projectName}</span>
+                    <span className={cn('text-[11px] font-medium', alert.color)}>{alert.reason}</span>
+                  </Link>
+                ))}
+              </div>
+            )
+          })()}
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import './globals.css'
 import { Sidebar } from '@/components/Sidebar'
 
 export const metadata: Metadata = {
-  title: 'PracticePilot — Project Control for Architecture Practices',
+  title: 'ArchitectOps — Project Control for Architecture Practices',
   description: 'RIBA stage tracking, risk detection and project dashboards for architecture offices.',
 }
 

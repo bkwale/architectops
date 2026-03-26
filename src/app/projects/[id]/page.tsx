@@ -1,13 +1,13 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { PROJECTS, getProjectTasks, getUser } from '@/lib/mock-data'
+import { PROJECTS, getProjectTasks, getUser, getProjectApprovals, getProjectIssues, getProjectChanges, getProjectRisks, getProjectMeetings, getMeetingActions, getProjectDesignRisks, getProjectContractEvents, getProjectSiteQueries } from '@/lib/mock-data'
 import { calculateRisks, calculateHealth, calculateCompletion, calculateStageCompletion } from '@/lib/risk-engine'
 import { RIBA_STAGES, RIBAStage, TaskStatus } from '@/lib/types'
 import { StageBadge } from '@/components/StageBadge'
 import { ProgressBar } from '@/components/ProgressBar'
 import { RiskAlertCard } from '@/components/RiskAlertCard'
 import { TaskList } from '@/components/TaskList'
-import { cn, isOverdue, statusLabel, formatDate, healthColor } from '@/lib/utils'
+import { cn, isOverdue, statusLabel, formatDate, healthColor, approvalStatusColor, approvalStatusLabel, meetingTypeLabel, meetingTypeColor, actionStatusColor } from '@/lib/utils'
 
 export function generateStaticParams() {
   return PROJECTS.map(p => ({ id: p.id }))
@@ -195,6 +195,35 @@ export default function ProjectDashboard({ params }: { params: { id: string } })
         </div>
       </div>
 
+      {/* Phase 2: Warning Chips */}
+      <Phase2Warnings projectId={project.id} />
+
+      {/* Project Workspaces Grid */}
+      <div>
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Workspaces</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { href: `/projects/${project.id}/registers`, label: 'Registers', sub: 'Issues, Changes & Risks' },
+            { href: `/projects/${project.id}/meetings`, label: 'Meetings', sub: 'Meetings & Actions' },
+            { href: `/projects/${project.id}/design-risks`, label: 'Design Risk', sub: 'Risk Workspace' },
+            { href: `/projects/${project.id}/contract-admin`, label: 'Contract', sub: 'Administration' },
+            { href: `/projects/${project.id}/planning`, label: 'Planning', sub: 'Site Context' },
+            { href: `/projects/${project.id}/tender`, label: 'Tender', sub: 'ITT & Evaluation' },
+            { href: `/projects/${project.id}/site-queries`, label: 'Site Queries', sub: 'Site-to-Office' },
+            { href: '/approvals', label: 'Approvals', sub: 'Review Queue' },
+          ].map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="bg-white rounded-xl border border-slate-200 p-3.5 hover:border-brand-200 hover:bg-brand-50/30 transition-all group"
+            >
+              <p className="text-sm font-semibold text-slate-900 group-hover:text-brand-700 transition-colors">{link.label}</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{link.sub}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+
       {/* Task List */}
       <TaskList tasks={tasks} currentStage={project.current_stage} groupByStage />
 
@@ -212,6 +241,52 @@ export default function ProjectDashboard({ params }: { params: { id: string } })
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+// ── Phase 2: Warning Chips Component ────────────────────────
+
+function Phase2Warnings({ projectId }: { projectId: string }) {
+  const approvals = getProjectApprovals(projectId)
+  const issues = getProjectIssues(projectId)
+  const changes = getProjectChanges(projectId)
+  const riskRegister = getProjectRisks(projectId)
+  const meetings = getProjectMeetings(projectId)
+  const allActions = meetings.flatMap(m => getMeetingActions(m.id))
+  const designRisks = getProjectDesignRisks(projectId)
+  const contractEvents = getProjectContractEvents(projectId)
+  const siteQueries = getProjectSiteQueries(projectId)
+
+  const pendingApprovals = approvals.filter(a => a.status === 'pending').length
+  const openIssues = issues.filter(i => i.status === 'open' || i.status === 'in_progress').length
+  const openChanges = changes.filter(c => c.approval_status === 'raised' || c.approval_status === 'under_review').length
+  const highRisks = riskRegister.filter(r => r.status === 'open' && (r.probability === 'high' || r.impact === 'high')).length
+  const overdueActions = allActions.filter(a => a.status === 'overdue').length
+  const openDesignRisks = designRisks.filter(r => r.review_status === 'open').length
+  const overdueContractEvents = contractEvents.filter(e => e.status === 'overdue').length
+  const openSiteQueries = siteQueries.filter(q => q.status === 'open').length
+
+  const chips: { label: string; count: number; color: string }[] = []
+  if (pendingApprovals > 0) chips.push({ label: 'Pending Approvals', count: pendingApprovals, color: 'bg-amber-100 text-amber-700 border-amber-200' })
+  if (openIssues > 0) chips.push({ label: 'Open Issues', count: openIssues, color: 'bg-red-100 text-red-700 border-red-200' })
+  if (openChanges > 0) chips.push({ label: 'Open Changes', count: openChanges, color: 'bg-blue-100 text-blue-700 border-blue-200' })
+  if (highRisks > 0) chips.push({ label: 'High-Priority Risks', count: highRisks, color: 'bg-red-100 text-red-700 border-red-200' })
+  if (overdueActions > 0) chips.push({ label: 'Overdue Actions', count: overdueActions, color: 'bg-red-100 text-red-700 border-red-200' })
+  if (openDesignRisks > 0) chips.push({ label: 'Open Design Risks', count: openDesignRisks, color: 'bg-violet-100 text-violet-700 border-violet-200' })
+  if (overdueContractEvents > 0) chips.push({ label: 'Overdue CA Events', count: overdueContractEvents, color: 'bg-red-100 text-red-700 border-red-200' })
+  if (openSiteQueries > 0) chips.push({ label: 'Open Site Queries', count: openSiteQueries, color: 'bg-amber-100 text-amber-700 border-amber-200' })
+
+  if (chips.length === 0) return null
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {chips.map(chip => (
+        <span key={chip.label} className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium', chip.color)}>
+          <span className="font-bold">{chip.count}</span>
+          {chip.label}
+        </span>
+      ))}
     </div>
   )
 }

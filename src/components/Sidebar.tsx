@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 const NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: GridIcon },
   { href: '/projects', label: 'Projects', icon: FolderIcon },
+  { href: '/approvals', label: 'Approvals', icon: CheckCircleIcon },
   { href: '/projects/new', label: 'New Project', icon: PlusIcon },
 ]
 
@@ -45,10 +46,10 @@ export function Sidebar() {
         <div className="p-6 border-b border-slate-100">
           <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
             <div className="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">PP</span>
+              <span className="text-white font-bold text-sm">AO</span>
             </div>
             <div>
-              <h1 className="text-base font-semibold text-slate-900 leading-tight">PracticePilot</h1>
+              <h1 className="text-base font-semibold text-slate-900 leading-tight">ArchitectOps</h1>
               <p className="text-[11px] text-slate-400 font-medium tracking-wide uppercase">Project Control</p>
             </div>
           </Link>
@@ -107,6 +108,14 @@ function FolderIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
       <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+    </svg>
+  )
+}
+
+function CheckCircleIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   )
 }
