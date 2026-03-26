@@ -9,22 +9,27 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ value, size = 'md', color, label, showPercent = true }: ProgressBarProps) {
-  const barColor = color || (value >= 80 ? 'bg-emerald-500' : value >= 50 ? 'bg-brand-500' : value >= 25 ? 'bg-amber-500' : 'bg-slate-300')
+  const barColor = color || (
+    value >= 80 ? 'bg-status-green' :
+    value >= 50 ? 'bg-accent-500' :
+    value >= 25 ? 'bg-status-amber' :
+    'bg-ink-200'
+  )
 
   return (
     <div>
       {(label || showPercent) && (
-        <div className="flex items-center justify-between mb-1.5">
-          {label && <span className="text-xs font-medium text-slate-500">{label}</span>}
-          {showPercent && <span className="text-xs font-semibold text-slate-700">{value}%</span>}
+        <div className="flex items-center justify-between mb-2">
+          {label && <span className="text-[11px] font-medium text-ink-500">{label}</span>}
+          {showPercent && <span className="text-[11px] font-semibold text-ink-700 tabular-nums">{value}%</span>}
         </div>
       )}
       <div className={cn(
-        'w-full rounded-full bg-slate-100 overflow-hidden',
-        size === 'sm' ? 'h-1.5' : 'h-2.5'
+        'w-full rounded-full bg-surface-200 overflow-hidden',
+        size === 'sm' ? 'h-1' : 'h-2'
       )}>
         <div
-          className={cn('h-full rounded-full transition-all duration-500', barColor)}
+          className={cn('h-full rounded-full transition-all duration-700 ease-out', barColor)}
           style={{ width: `${Math.min(value, 100)}%` }}
         />
       </div>

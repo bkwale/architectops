@@ -1,11 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { PROJECTS, getProjectSiteQueries, getUser } from '@/lib/mock-data'
 import { SiteQueryStatus } from '@/lib/types'
 import { cn, siteQueryStatusColor, formatDate, isOverdue } from '@/lib/utils'
+import { Breadcrumb } from '@/components/Breadcrumb'
+import { SummaryCard } from '@/components/SummaryCard'
+import { TabBar } from '@/components/TabBar'
+import { StatusBadge } from '@/components/StatusBadge'
+import { EmptyState } from '@/components/EmptyState'
 
 type FilterTab = SiteQueryStatus | 'all'
 
@@ -14,7 +18,7 @@ export default function SiteQueriesPage() {
   const project = PROJECTS.find(p => p.id === params.id)
   const [activeTab, setActiveTab] = useState<FilterTab>('all')
 
-  if (!project) return <div className="p-8 text-center text-slate-400">Project not found.</div>
+  if (!project) return <EmptyState text="Project not found." />
 
   const queries = getProjectSiteQueries(project.id)
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -34,36 +38,24 @@ export default function SiteQueriesPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      <div className="flex items-center gap-2 text-xs text-slate-400">
-        <Link href="/" className="hover:text-brand-600 transition-colors">Dashboard</Link>
-        <span>/</span>
-        <Link href={`/projects/${project.id}`} className="hover:text-brand-600 transition-colors">{project.name}</Link>
-        <span>/</span>
-        <span className="text-slate-600 font-medium">Site Queries</span>
-      </div>
+      <Breadcrumb items={[
+        { label: 'Dashboard', href: '/' },
+        { label: project.name, href: `/projects/${project.id}` },
+        { label: 'Site Queries' },
+      ]} />
 
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Site Queries</h1>
         <p className="text-sm text-slate-500 mt-1">{project.name} — site-to-office workflow</p>
       </div>
 
-      {/* Summary */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-red-700">{openCount}</p>
-          <p className="text-xs text-red-600 font-medium mt-1">Open</p>
-        </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-blue-700">{respondedCount}</p>
-          <p className="text-xs text-blue-600 font-medium mt-1">Responded</p>
-        </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-amber-700">{overdueCount}</p>
-          <p className="text-xs text-amber-600 font-medium mt-1">Overdue</p>
-        </div>
+        <SummaryCard value={openCount} label="Open" bgColor="bg-red-50" borderColor="border-red-200" textColor="text-red-700" labelColor="text-red-600" />
+        <SummaryCard value={respondedCount} label="Responded" bgColor="bg-blue-50" borderColor="border-blue-200" textColor="text-blue-700" labelColor="text-blue-600" />
+        <SummaryCard value={overdueCount} label="Overdue" bgColor="bg-amber-50" borderColor="border-amber-200" textColor="text-amber-700" labelColor="text-amber-600" />
       </div>
 
-      {/* Quick-add form (mobile-friendly) */}
+      {/* Quick-add form */}
       <div className="bg-white rounded-xl border border-slate-200 p-5">
         <h2 className="text-sm font-semibold text-slate-900 mb-3">Raise a Query</h2>
         <div className="space-y-3">
@@ -89,36 +81,11 @@ export default function SiteQueriesPage() {
         </div>
       </div>
 
-      {/* Tab Filter */}
-      <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
-        {tabs.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              'flex-1 px-3 py-2 text-xs font-medium rounded-md transition-colors',
-              activeTab === tab.key
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
-            )}
-          >
-            {tab.label}
-            <span className={cn(
-              'ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold',
-              activeTab === tab.key ? 'bg-brand-100 text-brand-700' : 'bg-slate-200 text-slate-500'
-            )}>
-              {tab.count}
-            </span>
-          </button>
-        ))}
-      </div>
+      <TabBar tabs={tabs} activeKey={activeTab} onSelect={(key) => setActiveTab(key as FilterTab)} />
 
-      {/* Query List */}
       <div className="space-y-3">
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
-            <p className="text-sm text-slate-400">No queries in this category.</p>
-          </div>
+          <EmptyState text="No queries in this category." />
         ) : (
           filtered.map(query => {
             const raisedBy = getUser(query.raised_by_user_id)
@@ -131,9 +98,7 @@ export default function SiteQueriesPage() {
                 overdue ? 'border-red-200' : 'border-slate-200'
               )}>
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className={cn('px-2 py-0.5 rounded text-[10px] font-bold uppercase', siteQueryStatusColor(query.status))}>
-                    {query.status}
-                  </span>
+                  <StatusBadge label={query.status} colorClass={siteQueryStatusColor(query.status)} />
                   {overdue && (
                     <span className="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">OVERDUE</span>
                   )}

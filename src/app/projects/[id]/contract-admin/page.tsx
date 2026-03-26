@@ -1,15 +1,18 @@
 'use client'
 
-import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { PROJECTS, getProjectContractAdmin, getProjectContractEvents, getUser } from '@/lib/mock-data'
 import { cn, contractEventStatusColor, formatDate, isOverdue } from '@/lib/utils'
+import { Breadcrumb } from '@/components/Breadcrumb'
+import { SummaryCard } from '@/components/SummaryCard'
+import { StatusBadge } from '@/components/StatusBadge'
+import { EmptyState } from '@/components/EmptyState'
 
 export default function ContractAdminPage() {
   const params = useParams()
   const project = PROJECTS.find(p => p.id === params.id)
 
-  if (!project) return <div className="p-8 text-center text-slate-400">Project not found.</div>
+  if (!project) return <EmptyState text="Project not found." />
 
   const contractAdmin = getProjectContractAdmin(project.id)
   const events = getProjectContractEvents(project.id)
@@ -20,13 +23,11 @@ export default function ContractAdminPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      <div className="flex items-center gap-2 text-xs text-slate-400">
-        <Link href="/" className="hover:text-brand-600 transition-colors">Dashboard</Link>
-        <span>/</span>
-        <Link href={`/projects/${project.id}`} className="hover:text-brand-600 transition-colors">{project.name}</Link>
-        <span>/</span>
-        <span className="text-slate-600 font-medium">Contract Admin</span>
-      </div>
+      <Breadcrumb items={[
+        { label: 'Dashboard', href: '/' },
+        { label: project.name, href: `/projects/${project.id}` },
+        { label: 'Contract Admin' },
+      ]} />
 
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Contract Administration</h1>
@@ -56,7 +57,6 @@ export default function ContractAdminPage() {
             </div>
           </div>
 
-          {/* Key Dates */}
           {(() => {
             try {
               const dates = JSON.parse(contractAdmin.key_dates_json)
@@ -88,27 +88,11 @@ export default function ContractAdminPage() {
         </div>
       )}
 
-      {/* Warning if missing info */}
-      {contractAdmin && !contractAdmin.procurement_route && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700">
-          Procurement route missing — please update contract details.
-        </div>
-      )}
-
       {/* Event Stats */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-slate-900">{events.length}</p>
-          <p className="text-xs text-slate-500 font-medium mt-1">Total Events</p>
-        </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-blue-600">{openEvents}</p>
-          <p className="text-xs text-slate-500 font-medium mt-1">Open</p>
-        </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-red-600">{overdueEvents}</p>
-          <p className="text-xs text-slate-500 font-medium mt-1">Overdue</p>
-        </div>
+        <SummaryCard value={events.length} label="Total Events" />
+        <SummaryCard value={openEvents} label="Open" textColor="text-blue-600" />
+        <SummaryCard value={overdueEvents} label="Overdue" textColor="text-red-600" />
       </div>
 
       {/* Contract Events Register */}
@@ -130,9 +114,7 @@ export default function ContractAdminPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <span className={cn('px-2 py-0.5 rounded text-[10px] font-bold uppercase', contractEventStatusColor(event.status))}>
-                          {event.status}
-                        </span>
+                        <StatusBadge label={event.status} colorClass={contractEventStatusColor(event.status)} />
                         <span className="text-[10px] font-bold text-slate-400">{event.event_ref}</span>
                         <span className="text-[10px] font-medium text-slate-400">{event.event_type}</span>
                       </div>

@@ -1,45 +1,37 @@
 'use client'
 
-import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { PROJECTS, getProjectPlanningRecords, getProjectSiteConstraints } from '@/lib/mock-data'
 import { cn, formatDate, severityColor, severityDot } from '@/lib/utils'
-import { RIBA_STAGES } from '@/lib/types'
+import { Breadcrumb } from '@/components/Breadcrumb'
+import { SummaryCard } from '@/components/SummaryCard'
+import { EmptyState } from '@/components/EmptyState'
 
 export default function PlanningPage() {
   const params = useParams()
   const project = PROJECTS.find(p => p.id === params.id)
 
-  if (!project) return <div className="p-8 text-center text-slate-400">Project not found.</div>
+  if (!project) return <EmptyState text="Project not found." />
 
   const records = getProjectPlanningRecords(project.id)
   const constraints = getProjectSiteConstraints(project.id)
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      <div className="flex items-center gap-2 text-xs text-slate-400">
-        <Link href="/" className="hover:text-brand-600 transition-colors">Dashboard</Link>
-        <span>/</span>
-        <Link href={`/projects/${project.id}`} className="hover:text-brand-600 transition-colors">{project.name}</Link>
-        <span>/</span>
-        <span className="text-slate-600 font-medium">Planning</span>
-      </div>
+      <Breadcrumb items={[
+        { label: 'Dashboard', href: '/' },
+        { label: project.name, href: `/projects/${project.id}` },
+        { label: 'Planning' },
+      ]} />
 
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Planning & Site Context</h1>
         <p className="text-sm text-slate-500 mt-1">{project.name} — {project.client}</p>
       </div>
 
-      {/* Summary */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-slate-900">{records.length}</p>
-          <p className="text-xs text-slate-500 font-medium mt-1">Planning Records</p>
-        </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-slate-900">{constraints.length}</p>
-          <p className="text-xs text-slate-500 font-medium mt-1">Site Constraints</p>
-        </div>
+        <SummaryCard value={records.length} label="Planning Records" />
+        <SummaryCard value={constraints.length} label="Site Constraints" />
       </div>
 
       {/* Planning Records */}

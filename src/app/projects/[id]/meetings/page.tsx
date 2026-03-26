@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { PROJECTS, getProjectMeetings, getMeetingActions, getUser } from '@/lib/mock-data'
 import { Meeting } from '@/lib/types'
 import { cn, meetingTypeLabel, meetingTypeColor, actionStatusColor, formatDate } from '@/lib/utils'
+import { Breadcrumb } from '@/components/Breadcrumb'
+import { SummaryCard } from '@/components/SummaryCard'
 
 export default function ProjectMeetingsPage() {
   const params = useParams()
@@ -22,7 +23,6 @@ export default function ProjectMeetingsPage() {
   const upcomingMeetings = meetings.filter(m => new Date(m.meeting_date) >= new Date())
   const pastMeetings = meetings.filter(m => new Date(m.meeting_date) < new Date())
 
-  // All actions across all meetings for this project
   const allActions = meetings.flatMap(m => getMeetingActions(m.id))
   const openActions = allActions.filter(a => a.status === 'open')
   const overdueActions = allActions.filter(a => a.status === 'overdue')
@@ -32,48 +32,29 @@ export default function ProjectMeetingsPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs text-slate-400">
-        <Link href="/" className="hover:text-brand-600 transition-colors">Dashboard</Link>
-        <span>/</span>
-        <Link href="/projects" className="hover:text-brand-600 transition-colors">Projects</Link>
-        <span>/</span>
-        <Link href={`/projects/${project.id}`} className="hover:text-brand-600 transition-colors">{project.name}</Link>
-        <span>/</span>
-        <span className="text-slate-600 font-medium">Meetings</span>
-      </div>
+      <Breadcrumb items={[
+        { label: 'Dashboard', href: '/' },
+        { label: 'Projects', href: '/projects' },
+        { label: project.name, href: `/projects/${project.id}` },
+        { label: 'Meetings' },
+      ]} />
 
-      {/* Header */}
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Meetings & Actions</h1>
         <p className="text-sm text-slate-500 mt-1">{project.name} — {project.client}</p>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-slate-900">{meetings.length}</p>
-          <p className="text-xs text-slate-500 font-medium mt-1">Total Meetings</p>
-        </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-brand-600">{upcomingMeetings.length}</p>
-          <p className="text-xs text-slate-500 font-medium mt-1">Upcoming</p>
-        </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-blue-600">{openActions.length}</p>
-          <p className="text-xs text-slate-500 font-medium mt-1">Open Actions</p>
-        </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-red-600">{overdueActions.length}</p>
-          <p className="text-xs text-slate-500 font-medium mt-1">Overdue Actions</p>
-        </div>
+        <SummaryCard value={meetings.length} label="Total Meetings" />
+        <SummaryCard value={upcomingMeetings.length} label="Upcoming" textColor="text-brand-600" />
+        <SummaryCard value={openActions.length} label="Open Actions" textColor="text-blue-600" />
+        <SummaryCard value={overdueActions.length} label="Overdue Actions" textColor="text-red-600" />
       </div>
 
       {/* Two-column layout: Meeting List + Detail Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Meeting List */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Upcoming */}
           {upcomingMeetings.length > 0 && (
             <div>
               <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Upcoming</h2>
@@ -91,7 +72,6 @@ export default function ProjectMeetingsPage() {
             </div>
           )}
 
-          {/* Past */}
           {pastMeetings.length > 0 && (
             <div>
               <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Past Meetings</h2>
@@ -137,7 +117,6 @@ export default function ProjectMeetingsPage() {
                 </div>
               )}
 
-              {/* Actions */}
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">
                 Actions ({activeMeetingActions.length})
               </h3>

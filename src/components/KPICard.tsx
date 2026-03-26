@@ -5,30 +5,58 @@ interface KPICardProps {
   value: string | number
   sublabel?: string
   accent?: 'blue' | 'green' | 'amber' | 'red' | 'slate'
+  icon?: React.ReactNode
 }
 
-const accentColors = {
-  blue: 'border-brand-200 bg-brand-50/50',
-  green: 'border-emerald-200 bg-emerald-50/50',
-  amber: 'border-amber-200 bg-amber-50/50',
-  red: 'border-red-200 bg-red-50/50',
-  slate: 'border-slate-200 bg-white',
+const accentMap = {
+  blue: {
+    border: 'border-accent-100',
+    dot: 'bg-accent-500',
+    value: 'text-accent-700',
+  },
+  green: {
+    border: 'border-emerald-100',
+    dot: 'bg-status-green',
+    value: 'text-status-green',
+  },
+  amber: {
+    border: 'border-amber-100',
+    dot: 'bg-status-amber',
+    value: 'text-status-amber',
+  },
+  red: {
+    border: 'border-red-100',
+    dot: 'bg-status-red',
+    value: 'text-status-red',
+  },
+  slate: {
+    border: 'border-surface-200',
+    dot: 'bg-ink-300',
+    value: 'text-ink-900',
+  },
 }
 
-const valueColors = {
-  blue: 'text-brand-700',
-  green: 'text-emerald-700',
-  amber: 'text-amber-700',
-  red: 'text-red-700',
-  slate: 'text-slate-900',
-}
+export function KPICard({ label, value, sublabel, accent = 'slate', icon }: KPICardProps) {
+  const a = accentMap[accent]
 
-export function KPICard({ label, value, sublabel, accent = 'slate' }: KPICardProps) {
   return (
-    <div className={cn('rounded-xl border p-4 sm:p-5', accentColors[accent])}>
-      <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{label}</p>
-      <p className={cn('text-2xl sm:text-3xl font-bold mt-1', valueColors[accent])}>{value}</p>
-      {sublabel && <p className="text-xs text-slate-400 mt-1">{sublabel}</p>}
+    <div className={cn(
+      'bg-white rounded-2xl border p-5 sm:p-6 shadow-card card-hover',
+      a.border
+    )}>
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <span className={cn('w-1.5 h-1.5 rounded-full', a.dot)} />
+            <p className="text-[11px] font-medium text-ink-400 uppercase tracking-[0.08em]">{label}</p>
+          </div>
+          <p className={cn('text-3xl sm:text-4xl font-light tracking-tight', a.value)}>{value}</p>
+          {sublabel && <p className="text-[11px] text-ink-400 mt-1.5">{sublabel}</p>}
+        </div>
+        {icon && (
+          <div className="text-ink-200">{icon}</div>
+        )}
+      </div>
     </div>
   )
 }

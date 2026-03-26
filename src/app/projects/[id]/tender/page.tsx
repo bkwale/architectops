@@ -1,18 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { PROJECTS, getProjectTenders, getTenderReturns, getTenderEvaluations } from '@/lib/mock-data'
-import { TenderRecord } from '@/lib/types'
 import { cn, tenderStatusColor, formatDate } from '@/lib/utils'
+import { Breadcrumb } from '@/components/Breadcrumb'
+import { StatusBadge } from '@/components/StatusBadge'
+import { EmptyState } from '@/components/EmptyState'
 
 export default function TenderPage() {
   const params = useParams()
   const project = PROJECTS.find(p => p.id === params.id)
   const [selectedTender, setSelectedTender] = useState<string | null>(null)
 
-  if (!project) return <div className="p-8 text-center text-slate-400">Project not found.</div>
+  if (!project) return <EmptyState text="Project not found." />
 
   const tenders = getProjectTenders(project.id)
   const activeTender = selectedTender ? tenders.find(t => t.id === selectedTender) : tenders[0] || null
@@ -20,13 +21,11 @@ export default function TenderPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      <div className="flex items-center gap-2 text-xs text-slate-400">
-        <Link href="/" className="hover:text-brand-600 transition-colors">Dashboard</Link>
-        <span>/</span>
-        <Link href={`/projects/${project.id}`} className="hover:text-brand-600 transition-colors">{project.name}</Link>
-        <span>/</span>
-        <span className="text-slate-600 font-medium">Tender</span>
-      </div>
+      <Breadcrumb items={[
+        { label: 'Dashboard', href: '/' },
+        { label: project.name, href: `/projects/${project.id}` },
+        { label: 'Tender' },
+      ]} />
 
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Tender Workspace</h1>
@@ -34,9 +33,7 @@ export default function TenderPage() {
       </div>
 
       {tenders.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
-          <p className="text-sm text-slate-400">No tender records for this project.</p>
-        </div>
+        <EmptyState text="No tender records for this project." />
       ) : (
         <>
           {/* Tender Selector */}
@@ -64,9 +61,7 @@ export default function TenderPage() {
               {/* Tender Summary */}
               <div className="bg-white rounded-xl border border-slate-200 p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className={cn('px-2 py-0.5 rounded text-[10px] font-bold uppercase', tenderStatusColor(activeTender.status))}>
-                    {activeTender.status}
-                  </span>
+                  <StatusBadge label={activeTender.status} colorClass={tenderStatusColor(activeTender.status)} />
                 </div>
                 <h2 className="text-base font-bold text-slate-900">{activeTender.tender_name}</h2>
 
@@ -125,12 +120,11 @@ export default function TenderPage() {
                               <td className="px-5 py-3 text-sm font-medium text-slate-900">{ret.bidder_name}</td>
                               <td className="px-5 py-3 text-xs text-slate-600">{formatDate(ret.return_date)}</td>
                               <td className="px-5 py-3">
-                                <span className={cn(
-                                  'px-2 py-0.5 rounded text-[10px] font-bold',
-                                  ret.compliance_status === 'Compliant' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
-                                )}>
-                                  {ret.compliance_status}
-                                </span>
+                                <StatusBadge
+                                  label={ret.compliance_status}
+                                  colorClass={ret.compliance_status === 'Compliant' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}
+                                  uppercase={false}
+                                />
                               </td>
                               <td className="px-5 py-3 text-sm font-bold text-slate-900">{ret.price_summary}</td>
                               <td className="px-5 py-3">
@@ -155,10 +149,11 @@ export default function TenderPage() {
                         <div key={ret.id} className="p-4">
                           <div className="flex items-center justify-between mb-2">
                             <h3 className="text-sm font-semibold text-slate-900">{ret.bidder_name}</h3>
-                            <span className={cn(
-                              'px-2 py-0.5 rounded text-[10px] font-bold',
-                              ret.compliance_status === 'Compliant' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
-                            )}>{ret.compliance_status}</span>
+                            <StatusBadge
+                              label={ret.compliance_status}
+                              colorClass={ret.compliance_status === 'Compliant' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}
+                              uppercase={false}
+                            />
                           </div>
                           <div className="flex items-center gap-4 text-xs text-slate-500">
                             <span className="font-bold text-slate-900">{ret.price_summary}</span>

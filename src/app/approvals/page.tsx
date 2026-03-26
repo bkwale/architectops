@@ -3,8 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { APPROVALS, getUser, getProject } from '@/lib/mock-data'
-import { ApprovalStatus } from '@/lib/types'
 import { cn, approvalStatusColor, approvalStatusLabel, formatDate } from '@/lib/utils'
+import { Breadcrumb } from '@/components/Breadcrumb'
+import { SummaryCard } from '@/components/SummaryCard'
+import { TabBar } from '@/components/TabBar'
+import { StatusBadge } from '@/components/StatusBadge'
+import { EmptyState } from '@/components/EmptyState'
 
 type FilterTab = 'pending' | 'returned' | 'approved' | 'all'
 
@@ -22,7 +26,6 @@ export default function ApprovalsQueuePage() {
     ? APPROVALS
     : APPROVALS.filter(a => a.status === activeTab)
 
-  // Sort: pending first (by date), then returned, then approved
   const sorted = [...filtered].sort((a, b) => {
     if (a.status === 'pending' && b.status !== 'pending') return -1
     if (a.status !== 'pending' && b.status === 'pending') return 1
@@ -31,65 +34,27 @@ export default function ApprovalsQueuePage() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs text-slate-400">
-        <Link href="/" className="hover:text-brand-600 transition-colors">Dashboard</Link>
-        <span>/</span>
-        <span className="text-slate-600 font-medium">Approvals</span>
-      </div>
+      <Breadcrumb items={[
+        { label: 'Dashboard', href: '/' },
+        { label: 'Approvals' },
+      ]} />
 
-      {/* Header */}
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Approvals Queue</h1>
         <p className="text-sm text-slate-500 mt-1">Tasks and documents awaiting your review</p>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-amber-700">{tabs[0].count}</p>
-          <p className="text-xs text-amber-600 font-medium mt-1">Pending</p>
-        </div>
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-red-700">{tabs[1].count}</p>
-          <p className="text-xs text-red-600 font-medium mt-1">Returned</p>
-        </div>
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-emerald-700">{tabs[2].count}</p>
-          <p className="text-xs text-emerald-600 font-medium mt-1">Approved</p>
-        </div>
+        <SummaryCard value={tabs[0].count} label="Pending" bgColor="bg-amber-50" borderColor="border-amber-200" textColor="text-amber-700" labelColor="text-amber-600" />
+        <SummaryCard value={tabs[1].count} label="Returned" bgColor="bg-red-50" borderColor="border-red-200" textColor="text-red-700" labelColor="text-red-600" />
+        <SummaryCard value={tabs[2].count} label="Approved" bgColor="bg-emerald-50" borderColor="border-emerald-200" textColor="text-emerald-700" labelColor="text-emerald-600" />
       </div>
 
-      {/* Tab Filter */}
-      <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
-        {tabs.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              'flex-1 px-3 py-2 text-xs font-medium rounded-md transition-colors',
-              activeTab === tab.key
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
-            )}
-          >
-            {tab.label}
-            <span className={cn(
-              'ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold',
-              activeTab === tab.key ? 'bg-brand-100 text-brand-700' : 'bg-slate-200 text-slate-500'
-            )}>
-              {tab.count}
-            </span>
-          </button>
-        ))}
-      </div>
+      <TabBar tabs={tabs} activeKey={activeTab} onSelect={(key) => setActiveTab(key as FilterTab)} />
 
-      {/* Approval Items */}
       <div className="space-y-3">
         {sorted.length === 0 ? (
-          <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
-            <p className="text-sm text-slate-400">No items in this category.</p>
-          </div>
+          <EmptyState text="No items in this category." />
         ) : (
           sorted.map(approval => {
             const submitter = getUser(approval.submitted_by_user_id)
@@ -109,9 +74,7 @@ export default function ApprovalsQueuePage() {
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1.5">
-                      <span className={cn('px-2 py-0.5 rounded text-[10px] font-bold uppercase', approvalStatusColor(approval.status))}>
-                        {approvalStatusLabel(approval.status)}
-                      </span>
+                      <StatusBadge label={approvalStatusLabel(approval.status)} colorClass={approvalStatusColor(approval.status)} />
                       <span className="text-[10px] font-medium text-slate-400 uppercase">
                         {approval.item_type}
                       </span>
