@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ProjectSummary, RIBA_STAGES } from '@/lib/types'
+import { ProjectSummary } from '@/lib/types'
 import { StageBadge } from './StageBadge'
 import { ProgressBar } from './ProgressBar'
 import { healthDot, cn } from '@/lib/utils'
@@ -12,64 +12,60 @@ interface ProjectHealthTableProps {
 
 export function ProjectHealthTable({ projects }: ProjectHealthTableProps) {
   return (
-    <div className="bg-white rounded-2xl border border-surface-200 shadow-card overflow-hidden">
-      <div className="px-6 py-5 border-b border-surface-200">
-        <h2 className="text-[13px] font-semibold text-ink-900 tracking-tight">Project Health</h2>
-      </div>
-
-      {/* Desktop table */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-sm">
+    <div>
+      {/* Desktop table — no card wrapper, just clean lines */}
+      <div className="hidden md:block">
+        <table className="w-full">
           <thead>
-            <tr className="border-b border-surface-200 text-left">
-              <th className="px-6 py-3.5 font-medium text-ink-400 text-[10px] uppercase tracking-[0.1em]">Project</th>
-              <th className="px-6 py-3.5 font-medium text-ink-400 text-[10px] uppercase tracking-[0.1em]">Client</th>
-              <th className="px-6 py-3.5 font-medium text-ink-400 text-[10px] uppercase tracking-[0.1em]">Stage</th>
-              <th className="px-6 py-3.5 font-medium text-ink-400 text-[10px] uppercase tracking-[0.1em] w-36">Progress</th>
-              <th className="px-6 py-3.5 font-medium text-ink-400 text-[10px] uppercase tracking-[0.1em] text-center">Risks</th>
-              <th className="px-6 py-3.5 font-medium text-ink-400 text-[10px] uppercase tracking-[0.1em] text-center">Overdue</th>
-              <th className="px-6 py-3.5 font-medium text-ink-400 text-[10px] uppercase tracking-[0.1em]">Status</th>
+            <tr className="border-b border-surface-300">
+              <th className="pb-3 pr-6 text-left text-[10px] font-semibold text-ink-400 uppercase tracking-[0.12em]">Project</th>
+              <th className="pb-3 pr-6 text-left text-[10px] font-semibold text-ink-400 uppercase tracking-[0.12em]">Stage</th>
+              <th className="pb-3 pr-6 text-left text-[10px] font-semibold text-ink-400 uppercase tracking-[0.12em] w-32">Progress</th>
+              <th className="pb-3 pr-6 text-center text-[10px] font-semibold text-ink-400 uppercase tracking-[0.12em]">Risks</th>
+              <th className="pb-3 text-center text-[10px] font-semibold text-ink-400 uppercase tracking-[0.12em]">Overdue</th>
             </tr>
           </thead>
           <tbody>
-            {projects.map(ps => (
-              <tr key={ps.project.id} className="border-b border-surface-100 hover:bg-surface-50 transition-colors">
-                <td className="px-6 py-4">
-                  <Link href={`/projects/${ps.project.id}`} className="font-medium text-ink-900 hover:text-accent-600 transition-colors">
-                    <div className="flex items-center gap-2.5">
+            {projects.map((ps, i) => (
+              <tr
+                key={ps.project.id}
+                className={cn(
+                  'group',
+                  i < projects.length - 1 && 'border-b border-surface-200/60'
+                )}
+              >
+                <td className="py-5 pr-6">
+                  <Link href={`/projects/${ps.project.id}`} className="group/link">
+                    <div className="flex items-center gap-3">
                       <span className={cn('w-2 h-2 rounded-full shrink-0', healthDot(ps.health))} />
-                      {ps.project.name}
+                      <div>
+                        <p className="text-[13px] font-medium text-ink-900 group-hover/link:text-accent-600 transition-colors">
+                          {ps.project.name}
+                        </p>
+                        <p className="text-[11px] text-ink-400 mt-0.5">{ps.project.client}</p>
+                      </div>
                     </div>
                   </Link>
                 </td>
-                <td className="px-6 py-4 text-ink-500 text-[13px]">{ps.project.client}</td>
-                <td className="px-6 py-4"><StageBadge stage={ps.project.current_stage} size="sm" /></td>
-                <td className="px-6 py-4">
+                <td className="py-5 pr-6">
+                  <StageBadge stage={ps.project.current_stage} size="sm" />
+                </td>
+                <td className="py-5 pr-6">
                   <ProgressBar value={ps.completion} size="sm" showPercent={true} />
                 </td>
-                <td className="px-6 py-4 text-center">
+                <td className="py-5 pr-6 text-center">
                   {ps.open_risks > 0 ? (
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-status-red-light text-status-red text-[11px] font-bold">{ps.open_risks}</span>
+                    <span className="text-[13px] font-semibold text-red-600">{ps.open_risks}</span>
                   ) : (
                     <span className="text-ink-200">—</span>
                   )}
                 </td>
-                <td className="px-6 py-4 text-center">
+                <td className="py-5 text-center">
                   {ps.overdue_tasks > 0 ? (
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-status-amber-light text-status-amber text-[11px] font-bold">{ps.overdue_tasks}</span>
+                    <span className="text-[13px] font-semibold text-amber-600">{ps.overdue_tasks}</span>
                   ) : (
                     <span className="text-ink-200">—</span>
                   )}
-                </td>
-                <td className="px-6 py-4">
-                  <span className={cn(
-                    'inline-block px-2.5 py-1 rounded-lg text-[11px] font-medium capitalize',
-                    ps.project.status === 'active' ? 'bg-status-green-light text-status-green' :
-                    ps.project.status === 'paused' ? 'bg-status-amber-light text-status-amber' :
-                    'bg-surface-100 text-ink-400'
-                  )}>
-                    {ps.project.status}
-                  </span>
                 </td>
               </tr>
             ))}
@@ -78,21 +74,25 @@ export function ProjectHealthTable({ projects }: ProjectHealthTableProps) {
       </div>
 
       {/* Mobile cards */}
-      <div className="md:hidden divide-y divide-surface-100">
+      <div className="md:hidden space-y-3">
         {projects.map(ps => (
-          <Link key={ps.project.id} href={`/projects/${ps.project.id}`} className="block p-5 hover:bg-surface-50 transition-colors">
-            <div className="flex items-start justify-between mb-2.5">
+          <Link
+            key={ps.project.id}
+            href={`/projects/${ps.project.id}`}
+            className="block p-5 bg-white rounded-2xl border border-surface-200 hover:border-surface-300 transition-colors"
+          >
+            <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2.5">
                 <span className={cn('w-2 h-2 rounded-full shrink-0', healthDot(ps.health))} />
-                <span className="font-medium text-ink-900 text-sm">{ps.project.name}</span>
+                <span className="font-medium text-ink-900 text-[13px]">{ps.project.name}</span>
               </div>
               <StageBadge stage={ps.project.current_stage} size="sm" />
             </div>
-            <p className="text-xs text-ink-400 mb-3">{ps.project.client}</p>
+            <p className="text-[11px] text-ink-400 mb-3">{ps.project.client}</p>
             <ProgressBar value={ps.completion} size="sm" />
-            <div className="flex items-center gap-4 mt-2.5 text-xs">
-              {ps.open_risks > 0 && <span className="text-status-red font-medium">{ps.open_risks} risks</span>}
-              {ps.overdue_tasks > 0 && <span className="text-status-amber font-medium">{ps.overdue_tasks} overdue</span>}
+            <div className="flex items-center gap-4 mt-3 text-[11px]">
+              {ps.open_risks > 0 && <span className="text-red-600 font-semibold">{ps.open_risks} risks</span>}
+              {ps.overdue_tasks > 0 && <span className="text-amber-600 font-semibold">{ps.overdue_tasks} overdue</span>}
             </div>
           </Link>
         ))}
