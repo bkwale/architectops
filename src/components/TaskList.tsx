@@ -19,7 +19,7 @@ export function TaskList({ tasks, currentStage, groupByStage = false }: TaskList
     : tasks
 
   // Group by stage
-  const stages = [...new Set(displayed.map(t => t.stage))].sort((a, b) => a - b)
+  const stages = Array.from(new Set(displayed.map(t => t.stage))).sort((a, b) => a - b)
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
