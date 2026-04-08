@@ -288,6 +288,450 @@ export interface SiteQuery {
   updated_at: string
 }
 
+// ── Phase 2 Wave 3: Building Regulations Types ────────────────
+export type BuildingRegStatus = 'not_submitted' | 'submitted' | 'in_progress' | 'approved' | 'rejected' | 'conditional'
+export type BuildingRegRoute = 'full_plans' | 'building_notice' | 'initial_notice' | 'regularisation'
+
+export interface BuildingRegRecord {
+  id: string
+  project_id: string
+  submission_route: BuildingRegRoute
+  reference: string
+  title: string
+  description: string
+  submitted_date?: string
+  decision_date?: string
+  status: BuildingRegStatus
+  inspector_name?: string
+  inspection_notes?: string
+  conditions?: string
+  created_at: string
+  updated_at: string
+}
+
+export type InspectionStatus = 'scheduled' | 'passed' | 'failed' | 'requires_revisit'
+
+export interface BuildingInspection {
+  id: string
+  building_reg_id: string
+  project_id: string
+  inspection_type: string
+  scheduled_date: string
+  completed_date?: string
+  status: InspectionStatus
+  inspector_notes?: string
+  follow_up_required: boolean
+}
+
+// ── Phase 2 Wave 3: BRPD / Dutyholder Coordination Types ─────
+export type DutyholderRole = 'client' | 'principal_designer' | 'principal_contractor' | 'designer' | 'contractor'
+export type ComplianceStatus = 'compliant' | 'non_compliant' | 'pending_review' | 'not_applicable'
+
+export interface DutyholderRecord {
+  id: string
+  project_id: string
+  role: DutyholderRole
+  organisation_name: string
+  contact_name: string
+  contact_email?: string
+  appointed_date: string
+  competence_evidence?: string
+  compliance_status: ComplianceStatus
+  notes?: string
+}
+
+export interface BRPDGateway {
+  id: string
+  project_id: string
+  gateway_number: 1 | 2 | 3
+  title: string
+  description: string
+  target_date: string
+  completed_date?: string
+  status: 'not_started' | 'in_progress' | 'submitted' | 'passed' | 'failed'
+  evidence_notes?: string
+}
+
+// ── Phase 2 Wave 3: Enhanced Documents Types ──────────────────
+export type DocumentCategory = 'drawing' | 'specification' | 'report' | 'correspondence' | 'certificate' | 'schedule' | 'other'
+export type DocumentStatus = 'draft' | 'for_review' | 'approved' | 'superseded' | 'archived'
+
+export interface DocumentRecord {
+  id: string
+  project_id: string
+  title: string
+  document_ref: string
+  category: DocumentCategory
+  status: DocumentStatus
+  revision: string
+  stage: RIBAStage
+  uploaded_by_user_id: string
+  file_url?: string
+  description?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface DocumentTransmittal {
+  id: string
+  project_id: string
+  transmittal_ref: string
+  recipient: string
+  issued_date: string
+  document_ids: string[]
+  purpose: 'for_information' | 'for_approval' | 'for_construction' | 'for_comment' | 'as_built'
+  notes?: string
+  status: 'draft' | 'issued' | 'acknowledged'
+}
+
+// ── Phase 3: Knowledge Base Types ────────────────────────────
+export type KnowledgeCategory = 'lessons_learned' | 'office_procedure' | 'checklist' | 'reference_note' | 'fee_clause' | 'template' | 'guidance'
+
+export interface KnowledgeArticle {
+  id: string
+  organisation_id: string
+  title: string
+  summary: string
+  body_markdown: string
+  category: KnowledgeCategory
+  tags: string[]
+  related_stage?: RIBAStage
+  related_sector?: string
+  related_contract_type?: string
+  owner_user_id: string
+  published_flag: boolean
+  created_at: string
+  updated_at: string
+}
+
+// ── Phase 3: CPD & Competence Types ──────────────────────────
+export interface CPDRecord {
+  id: string
+  user_id: string
+  title: string
+  provider: string
+  cpd_topic: string
+  hours: number
+  completion_date: string
+  evidence_url?: string
+  mandatory_flag: boolean
+  notes?: string
+}
+
+export interface Competency {
+  id: string
+  organisation_id: string
+  name: string
+  category: string
+  description: string
+}
+
+export interface UserCompetency {
+  id: string
+  user_id: string
+  competency_id: string
+  proficiency_level: 'none' | 'basic' | 'intermediate' | 'advanced' | 'expert'
+  evidence_url?: string
+  last_reviewed_at: string
+}
+
+export interface TrainingPlan {
+  id: string
+  user_id: string
+  title: string
+  objective: string
+  due_date: string
+  status: 'not_started' | 'in_progress' | 'completed' | 'overdue'
+  manager_notes?: string
+}
+
+// ── Phase 3: Internationalisation Types ──────────────────────
+export interface JurisdictionPack {
+  id: string
+  country: string
+  region?: string
+  language: string
+  currency: string
+  units: 'metric' | 'imperial'
+  date_format: string
+  stage_labels: Record<RIBAStage, string>
+  terminology_notes?: string
+  reference_guidance_notes?: string
+}
+
+export interface OrganisationSettings {
+  id: string
+  organisation_id: string
+  default_currency: string
+  default_units: 'metric' | 'imperial'
+  date_format: string
+  jurisdiction_pack_id?: string
+  project_number_template?: string
+  terminology_overrides?: Record<string, string>
+}
+
+// ── Phase 3: Admin Controls Types ────────────────────────────
+export type AISourceCategory = 'project_data' | 'project_documents' | 'knowledge_base' | 'reference_uploads' | 'fee_data'
+
+export interface AISourcePermission {
+  id: string
+  organisation_id: string
+  source_category: AISourceCategory
+  enabled: boolean
+  updated_at: string
+}
+
+export interface AILog {
+  id: string
+  organisation_id: string
+  user_id: string
+  project_id?: string
+  prompt: string
+  response_summary: string
+  source_categories_used: AISourceCategory[]
+  confidence_level: 'high' | 'medium' | 'low'
+  created_at: string
+}
+
+// ── Phase 3 Wave 2: Drawing Issue Intelligence Types ────────
+export type DrawingIssueType = 'planning' | 'sketch' | 'working' | 'as_built' | 'tender' | 'construction' | 'custom'
+
+export interface DrawingIssueRecord {
+  id: string
+  project_id: string
+  drawing_ref: string
+  drawing_title: string
+  issue_type: DrawingIssueType
+  stage: RIBAStage
+  issued_date: string
+  issued_to: string
+  revision: string
+  supersedes?: string
+  notes?: string
+  created_by_user_id: string
+}
+
+// ── Phase 3 Wave 2: Commercial Reporting Types ──────────────
+export type CommercialHealthFlag = 'healthy' | 'watch' | 'at_risk' | 'critical'
+
+export interface ProjectCommercial {
+  id: string
+  project_id: string
+  agreed_fee: number
+  fee_invoiced: number
+  fee_paid: number
+  wip_value: number
+  expenses: number
+  time_logged_hours: number
+  estimated_hours_remaining: number
+  approved_variations: number
+  current_margin_percent: number
+  forecast_margin_percent: number
+  stage_overspend_flag: boolean
+  health_flag: CommercialHealthFlag
+  last_updated: string
+}
+
+export interface CashflowForecast {
+  id: string
+  organisation_id: string
+  month: string
+  projected_income: number
+  projected_expenses: number
+  actual_income?: number
+  actual_expenses?: number
+  pipeline_value: number
+}
+
+// ── Phase 3 Wave 2: Staffing & Utilisation Types ────────────
+export interface StaffAllocation {
+  id: string
+  user_id: string
+  project_id: string
+  stage: RIBAStage
+  hours_per_week: number
+  start_date: string
+  end_date: string
+  role_on_project: string
+}
+
+export interface StaffCapacity {
+  user_id: string
+  name: string
+  role: string
+  weekly_capacity_hours: number
+  allocated_hours: number
+  utilisation_percent: number
+  status: 'under' | 'optimal' | 'over'
+}
+
+export type UtilisationStatus = 'under' | 'optimal' | 'over'
+
+// ── Phase 3 Wave 3: Fee Recommendation Types ────────────────
+export interface FeeRecommendation {
+  id: string
+  organisation_id: string
+  project_type: string
+  sector: string
+  scale_estimate: number
+  procurement_route: string
+  complexity: 'low' | 'medium' | 'high'
+  stage_scope: string
+  staffing_mix_notes: string
+  overhead_percent: number
+  margin_percent: number
+  recommended_fee_low: number
+  recommended_fee_high: number
+  recommended_stage_split: Record<string, number>
+  confidence_level: 'high' | 'medium' | 'low'
+  similar_project_ids: string[]
+  notes?: string
+  created_at: string
+  created_by_user_id: string
+}
+
+// ── Phase 3 Wave 3: Fee Quote Types ─────────────────────────
+export type FeeQuoteStatus = 'draft' | 'issued' | 'revised' | 'accepted' | 'superseded'
+
+export interface FeeQuoteRecord {
+  id: string
+  organisation_id: string
+  related_project_id?: string
+  related_opportunity_id?: string
+  quote_reference: string
+  status: FeeQuoteStatus
+  fee_basis: string
+  total_fee: number
+  exclusions_text: string
+  terms_text: string
+  issued_date?: string
+  valid_until?: string
+  created_by_user_id: string
+  updated_at: string
+}
+
+export interface FeeQuoteLineItem {
+  id: string
+  fee_quote_record_id: string
+  sort_order: number
+  line_type: 'stage' | 'service' | 'expense' | 'discount'
+  title: string
+  description: string
+  quantity?: number
+  unit?: string
+  rate?: number
+  amount: number
+  related_stage?: RIBAStage
+}
+
+// ── Phase 3 Wave 3: Opportunities / Proposals Types ─────────
+export type OpportunityStatus = 'lead' | 'qualifying' | 'proposal_sent' | 'negotiation' | 'won' | 'lost' | 'dormant'
+
+export interface Opportunity {
+  id: string
+  organisation_id: string
+  title: string
+  client_name: string
+  sector: string
+  estimated_value: number
+  status: OpportunityStatus
+  expected_start_date?: string
+  likelihood_percentage: number
+  owner_user_id: string
+  notes?: string
+  linked_quote_ids: string[]
+  created_at: string
+  updated_at: string
+}
+
+// ── Phase 3 Wave 4: AI Teammate Types ─────────────────────
+export type AIMessageRole = 'user' | 'assistant' | 'system'
+
+export interface AIConversation {
+  id: string
+  organisation_id: string
+  project_id?: string // null = global, set = project-scoped
+  title: string
+  started_by_user_id: string
+  messages: AIMessage[]
+  created_at: string
+  updated_at: string
+}
+
+export interface AIMessage {
+  id: string
+  conversation_id: string
+  role: AIMessageRole
+  content: string
+  sources?: AISource[]
+  timestamp: string
+}
+
+export interface AISource {
+  type: 'project' | 'task' | 'document' | 'knowledge' | 'risk' | 'regulation'
+  title: string
+  reference_id: string
+  url?: string
+}
+
+export interface AISuggestedPrompt {
+  id: string
+  label: string
+  prompt: string
+  scope: 'global' | 'project'
+  category: string
+}
+
+// ── Phase 3 Wave 4: Integrations Types ────────────────────
+export type IntegrationProvider = 'xero' | 'quickbooks' | 'outlook' | 'google_calendar' | 'sharepoint' | 'dropbox'
+export type IntegrationStatus = 'connected' | 'disconnected' | 'error' | 'syncing'
+
+export interface Integration {
+  id: string
+  organisation_id: string
+  provider: IntegrationProvider
+  display_name: string
+  description: string
+  status: IntegrationStatus
+  connected_by_user_id?: string
+  connected_at?: string
+  last_sync_at?: string
+  sync_frequency_minutes?: number
+  config: Record<string, string>
+  category: 'accounting' | 'calendar' | 'storage'
+}
+
+// ── Phase 3 Wave 4: External Collaboration Portal Types ───
+export type PortalAccessLevel = 'view_only' | 'comment' | 'approve'
+
+export interface PortalInvite {
+  id: string
+  project_id: string
+  email: string
+  name: string
+  organisation: string
+  role: string // e.g. 'Client', 'Structural Engineer', 'Planning Consultant'
+  access_level: PortalAccessLevel
+  invited_by_user_id: string
+  accepted: boolean
+  invited_at: string
+  last_accessed_at?: string
+}
+
+export interface PortalSharedItem {
+  id: string
+  project_id: string
+  item_type: 'document' | 'approval' | 'drawing' | 'report' | 'meeting_minutes'
+  item_id: string
+  title: string
+  shared_at: string
+  shared_by_user_id: string
+  visible_to_portal_invite_ids: string[]
+  requires_sign_off: boolean
+  signed_off_by?: string
+  signed_off_at?: string
+}
+
 // ── Computed / Dashboard Types ──────────────────────────────
 
 export interface ProjectDashboard {

@@ -209,6 +209,10 @@ export default function ProjectDashboard({ params }: { params: { id: string } })
             { href: `/projects/${project.id}/planning`, label: 'Planning', sub: 'Site Context' },
             { href: `/projects/${project.id}/tender`, label: 'Tender', sub: 'ITT & Evaluation' },
             { href: `/projects/${project.id}/site-queries`, label: 'Site Queries', sub: 'Site-to-Office' },
+            { href: `/projects/${project.id}/building-regs`, label: 'Building Regs', sub: 'Submissions & Inspections' },
+            { href: `/projects/${project.id}/brpd`, label: 'BRPD', sub: 'Dutyholders & Gateways' },
+            { href: `/projects/${project.id}/documents`, label: 'Documents', sub: 'Register & Transmittals' },
+            { href: `/projects/${project.id}/ai`, label: 'AI Teammate', sub: 'Ask About This Project' },
             { href: '/approvals', label: 'Approvals', sub: 'Review Queue' },
           ].map(link => (
             <Link

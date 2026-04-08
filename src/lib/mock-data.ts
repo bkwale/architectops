@@ -1,4 +1,4 @@
-import { User, Project, Task, RIBAStage, ApprovalRequest, Issue, Change, RiskRegisterItem, Meeting, MeetingAction, DesignRisk, ContractAdminRecord, ContractEvent, PlanningRecord, SiteConstraint, TenderRecord, TenderReturn, TenderEvaluation, SiteQuery } from './types'
+import { User, Project, Task, RIBAStage, ApprovalRequest, Issue, Change, RiskRegisterItem, Meeting, MeetingAction, DesignRisk, ContractAdminRecord, ContractEvent, PlanningRecord, SiteConstraint, TenderRecord, TenderReturn, TenderEvaluation, SiteQuery, BuildingRegRecord, BuildingInspection, DutyholderRecord, BRPDGateway, DocumentRecord, DocumentTransmittal, KnowledgeArticle, CPDRecord, Competency, UserCompetency, TrainingPlan, JurisdictionPack, OrganisationSettings, AISourcePermission, AILog, DrawingIssueRecord, ProjectCommercial, CashflowForecast, StaffAllocation, StaffCapacity, FeeRecommendation, FeeQuoteRecord, FeeQuoteLineItem, Opportunity, AISuggestedPrompt, AIConversation, AIMessage, AISource, Integration, PortalInvite, PortalSharedItem } from './types'
 import { STAGE_TEMPLATES } from './stage-templates'
 
 // ── Demo Users ──────────────────────────────────────────────
@@ -740,6 +740,428 @@ export const SITE_QUERIES: SiteQuery[] = [
   },
 ]
 
+// ── Phase 2 Wave 3: Building Regulations Data ─────────────
+
+export const BUILDING_REG_RECORDS: BuildingRegRecord[] = [
+  {
+    id: 'br1', project_id: 'p1', submission_route: 'full_plans', reference: 'BC/2025/4821',
+    title: 'Full Plans Application — Rear Extension', description: 'Structural alterations, thermal upgrades, and drainage modifications for two-storey rear extension.',
+    submitted_date: '2025-12-15', decision_date: '2026-02-10', status: 'conditional',
+    inspector_name: 'David Hargreaves', conditions: 'Fire stopping details required before commencement. Acoustic test results needed at completion.',
+    created_at: '2025-12-15', updated_at: '2026-02-10'
+  },
+  {
+    id: 'br2', project_id: 'p3', submission_route: 'full_plans', reference: 'BC/2025/3156',
+    title: 'Full Plans — School Internal Refurbishment', description: 'Fire compartmentation, structural alterations, M&E upgrades, and accessibility improvements.',
+    submitted_date: '2025-10-01', decision_date: '2025-11-20', status: 'approved',
+    inspector_name: 'Rachel Ford',
+    created_at: '2025-10-01', updated_at: '2025-11-20'
+  },
+  {
+    id: 'br3', project_id: 'p5', submission_route: 'building_notice', reference: 'BN/2025/8934',
+    title: 'Building Notice — Garden Studio', description: 'Detached ancillary garden building under building notice procedure.',
+    submitted_date: '2025-11-01', status: 'in_progress',
+    inspector_name: 'David Hargreaves',
+    created_at: '2025-11-01', updated_at: '2026-01-15'
+  },
+  {
+    id: 'br4', project_id: 'p2', submission_route: 'full_plans', reference: 'BC/2026/0412',
+    title: 'Full Plans — Mixed-Use New Build', description: 'Full building control application for 12-unit residential with commercial ground floor.',
+    status: 'not_submitted',
+    created_at: '2026-02-01', updated_at: '2026-02-01'
+  },
+]
+
+export const BUILDING_INSPECTIONS: BuildingInspection[] = [
+  { id: 'bi1', building_reg_id: 'br1', project_id: 'p1', inspection_type: 'Foundation', scheduled_date: '2026-04-20', status: 'scheduled', follow_up_required: false },
+  { id: 'bi2', building_reg_id: 'br2', project_id: 'p3', inspection_type: 'Structural Frame', scheduled_date: '2026-01-15', completed_date: '2026-01-15', status: 'passed', inspector_notes: 'Steel frame connections verified. Fire protection to steelwork satisfactory.', follow_up_required: false },
+  { id: 'bi3', building_reg_id: 'br2', project_id: 'p3', inspection_type: 'Fire Compartmentation', scheduled_date: '2026-02-20', completed_date: '2026-02-20', status: 'requires_revisit', inspector_notes: 'Fire stopping to service penetrations in corridor ceiling incomplete. Revisit required.', follow_up_required: true },
+  { id: 'bi4', building_reg_id: 'br2', project_id: 'p3', inspection_type: 'Completion', scheduled_date: '2026-04-10', status: 'scheduled', follow_up_required: false },
+  { id: 'bi5', building_reg_id: 'br3', project_id: 'p5', inspection_type: 'Foundation', scheduled_date: '2026-01-20', completed_date: '2026-01-20', status: 'passed', inspector_notes: 'Pad foundations cast to correct depth. Ground bearing confirmed.', follow_up_required: false },
+  { id: 'bi6', building_reg_id: 'br3', project_id: 'p5', inspection_type: 'Structural Envelope', scheduled_date: '2026-03-01', completed_date: '2026-03-01', status: 'passed', follow_up_required: false },
+]
+
+// ── Phase 2 Wave 3: BRPD / Dutyholder Data ────────────────
+
+export const DUTYHOLDER_RECORDS: DutyholderRecord[] = [
+  { id: 'dh1', project_id: 'p1', role: 'client', organisation_name: 'Harris Family Trust', contact_name: 'William Harris', contact_email: 'w.harris@harrisfamily.co.uk', appointed_date: '2025-09-01', compliance_status: 'compliant', notes: 'Client duties briefing completed.' },
+  { id: 'dh2', project_id: 'p1', role: 'principal_designer', organisation_name: 'Studio Mitchell', contact_name: 'Sarah Mitchell', contact_email: 'sarah@studiomitchell.co.uk', appointed_date: '2025-09-15', competence_evidence: 'ARB registered. 15 years practice. PD training certificate 2025.', compliance_status: 'compliant' },
+  { id: 'dh3', project_id: 'p3', role: 'client', organisation_name: 'Surrey County Council', contact_name: 'Helen Price', contact_email: 'h.price@surreycc.gov.uk', appointed_date: '2025-06-01', compliance_status: 'compliant' },
+  { id: 'dh4', project_id: 'p3', role: 'principal_designer', organisation_name: 'Studio Mitchell', contact_name: 'James Chen', appointed_date: '2025-06-15', competence_evidence: 'ARB registered. CDM awareness + PD training.', compliance_status: 'compliant' },
+  { id: 'dh5', project_id: 'p3', role: 'principal_contractor', organisation_name: 'Westfield Construction', contact_name: 'Mark Thomas', contact_email: 'm.thomas@westfield.co.uk', appointed_date: '2025-08-01', competence_evidence: 'SSIP accredited. CSCS Gold Card.', compliance_status: 'pending_review' },
+  { id: 'dh6', project_id: 'p2', role: 'client', organisation_name: 'Meridian Developments', contact_name: 'Paul Kensington', contact_email: 'pk@meridiandev.co.uk', appointed_date: '2025-11-15', compliance_status: 'compliant' },
+  { id: 'dh7', project_id: 'p2', role: 'principal_designer', organisation_name: 'Studio Mitchell', contact_name: 'Priya Sharma', appointed_date: '2025-12-01', compliance_status: 'compliant' },
+]
+
+export const BRPD_GATEWAYS: BRPDGateway[] = [
+  { id: 'gw1', project_id: 'p2', gateway_number: 1, title: 'Gateway 1 — Planning', description: 'Pre-construction gateway before planning application.', target_date: '2026-06-01', status: 'not_started' },
+  { id: 'gw2', project_id: 'p2', gateway_number: 2, title: 'Gateway 2 — Before Construction', description: 'Approval to commence construction works.', target_date: '2027-01-01', status: 'not_started' },
+  { id: 'gw3', project_id: 'p2', gateway_number: 3, title: 'Gateway 3 — Completion', description: 'Final certificate and registration.', target_date: '2027-09-01', status: 'not_started' },
+]
+
+// ── Phase 2 Wave 3: Enhanced Documents Data ───────────────
+
+export const DOCUMENT_RECORDS: DocumentRecord[] = [
+  { id: 'doc1', project_id: 'p1', title: 'General Arrangement Plans', document_ref: 'P1-SM-XX-ZZ-DR-A-0100', category: 'drawing', status: 'approved', revision: 'P03', stage: 3, uploaded_by_user_id: 'u2', description: 'Ground and first floor GA plans at 1:50.', created_at: '2026-01-10', updated_at: '2026-03-05' },
+  { id: 'doc2', project_id: 'p1', title: 'Structural Engineers Report', document_ref: 'P1-BWB-XX-ZZ-RP-S-0001', category: 'report', status: 'approved', revision: 'V2', stage: 3, uploaded_by_user_id: 'u4', description: 'Structural appraisal and beam schedule.', created_at: '2025-12-20', updated_at: '2026-02-14' },
+  { id: 'doc3', project_id: 'p1', title: 'Outline Specification', document_ref: 'P1-SM-XX-ZZ-SP-A-0001', category: 'specification', status: 'for_review', revision: 'D01', stage: 3, uploaded_by_user_id: 'u2', description: 'NBS-based outline spec for Stage 3 issue.', created_at: '2026-03-01', updated_at: '2026-03-10' },
+  { id: 'doc4', project_id: 'p3', title: 'Construction Issue Drawings', document_ref: 'P3-SM-XX-ZZ-DR-A-0200', category: 'drawing', status: 'approved', revision: 'C01', stage: 4, uploaded_by_user_id: 'u2', description: 'Full set of construction issue drawings.', created_at: '2026-02-01', updated_at: '2026-02-20' },
+  { id: 'doc5', project_id: 'p3', title: 'Asbestos Management Plan', document_ref: 'P3-EXP-XX-ZZ-RP-H-0001', category: 'report', status: 'approved', revision: 'V1', stage: 4, uploaded_by_user_id: 'u4', description: 'R&D survey results and management plan.', created_at: '2025-09-15', updated_at: '2025-10-01' },
+  { id: 'doc6', project_id: 'p5', title: 'Planning Drawings', document_ref: 'P5-SM-XX-ZZ-DR-A-0100', category: 'drawing', status: 'approved', revision: 'P02', stage: 3, uploaded_by_user_id: 'u2', description: 'Planning submission drawings for garden studio.', created_at: '2025-11-01', updated_at: '2025-11-15' },
+  { id: 'doc7', project_id: 'p1', title: 'Client Brief Confirmation', document_ref: 'P1-SM-XX-ZZ-CO-A-0001', category: 'correspondence', status: 'approved', revision: 'V1', stage: 1, uploaded_by_user_id: 'u1', created_at: '2025-09-15', updated_at: '2025-09-15' },
+  { id: 'doc8', project_id: 'p2', title: 'Concept Design Report', document_ref: 'P2-SM-XX-ZZ-RP-A-0001', category: 'report', status: 'draft', revision: 'D01', stage: 2, uploaded_by_user_id: 'u3', description: 'Stage 2 concept design report with options.', created_at: '2026-03-01', updated_at: '2026-03-12' },
+]
+
+export const DOCUMENT_TRANSMITTALS: DocumentTransmittal[] = [
+  { id: 'dt1', project_id: 'p1', transmittal_ref: 'TN-P1-001', recipient: 'Harris Family Trust', issued_date: '2026-03-05', document_ids: ['doc1', 'doc2'], purpose: 'for_approval', notes: 'Stage 3 spatial coordination issue for client review.', status: 'issued' },
+  { id: 'dt2', project_id: 'p3', transmittal_ref: 'TN-P3-005', recipient: 'Westfield Construction', issued_date: '2026-02-20', document_ids: ['doc4'], purpose: 'for_construction', notes: 'Construction issue drawings — full set.', status: 'acknowledged' },
+  { id: 'dt3', project_id: 'p1', transmittal_ref: 'TN-P1-002', recipient: 'BWB Consulting', issued_date: '2026-03-10', document_ids: ['doc3'], purpose: 'for_comment', notes: 'Draft specification for structural review.', status: 'draft' },
+]
+
+// ── Phase 3: Knowledge Base Data ──────────────────────────
+
+export const KNOWLEDGE_ARTICLES: KnowledgeArticle[] = [
+  {
+    id: 'ka1', organisation_id: 'org1', title: 'Party Wall Act — Key Considerations',
+    summary: 'Essential guidance on Party Wall procedures for residential extensions and conversions.',
+    body_markdown: '# Party Wall Act — Key Considerations\n\nWhen a project involves work to a shared boundary or party wall, the Party Wall etc. Act 1996 applies.\n\n## When Does It Apply?\n- Building on or at the boundary\n- Cutting into a party wall\n- Excavating near neighbouring buildings\n\n## Key Steps\n1. Serve notice at least 2 months before work\n2. Obtain agreement or appoint surveyors\n3. Prepare a schedule of condition\n4. Ensure award is in place before starting\n\n## Common Pitfalls\n- Starting work before notices served\n- Assuming verbal agreement is sufficient\n- Forgetting about excavation notices',
+    category: 'guidance', tags: ['party-wall', 'residential', 'legal'], related_stage: 3,
+    related_sector: 'residential', owner_user_id: 'u1', published_flag: true,
+    created_at: '2025-08-01', updated_at: '2025-08-01'
+  },
+  {
+    id: 'ka2', organisation_id: 'org1', title: 'Stage 2 Client Presentation Checklist',
+    summary: 'Standard checklist for preparing and delivering concept design presentations.',
+    body_markdown: '# Stage 2 Client Presentation Checklist\n\n## Before the Meeting\n- [ ] Concept options finalised (min. 2)\n- [ ] Cost estimates received from QS\n- [ ] Planning risk assessment updated\n- [ ] Presentation boards/slides prepared\n- [ ] Model/3D views rendered\n\n## During Presentation\n- [ ] Brief recap of Stage 1 outcomes\n- [ ] Present options with pros/cons\n- [ ] Discuss budget implications\n- [ ] Record client preferences\n- [ ] Confirm next steps and timeline\n\n## After the Meeting\n- [ ] Issue meeting minutes within 48 hours\n- [ ] Update project brief with decisions\n- [ ] Confirm preferred option in writing',
+    category: 'checklist', tags: ['stage-2', 'client', 'presentation'], related_stage: 2,
+    owner_user_id: 'u1', published_flag: true,
+    created_at: '2025-06-15', updated_at: '2025-10-20'
+  },
+  {
+    id: 'ka3', organisation_id: 'org1', title: 'Lessons Learned — Weybridge School Phasing',
+    summary: 'Key takeaways from phased construction in occupied school environment.',
+    body_markdown: '# Lessons Learned — Weybridge School Phasing\n\n## Context\nPhased summer works to an occupied primary school required careful coordination.\n\n## What Went Well\n- Early engagement with school leadership\n- Phasing plan aligned with term dates\n- Contractor pre-start meeting covered safeguarding\n\n## What Could Improve\n- Allow more float between phases (2 weeks minimum)\n- DBS checks for all site personnel should be confirmed 4 weeks before, not 2\n- Temporary signage and wayfinding needs its own budget line\n\n## Recommendations\n- For any education project, start safeguarding planning at Stage 2\n- Include phasing as a design risk item from Stage 3',
+    category: 'lessons_learned', tags: ['education', 'phasing', 'school'], related_stage: 5,
+    related_sector: 'education', owner_user_id: 'u2', published_flag: true,
+    created_at: '2026-02-01', updated_at: '2026-02-01'
+  },
+  {
+    id: 'ka4', organisation_id: 'org1', title: 'Standard Fee Exclusions — Residential',
+    summary: 'Reusable exclusions text for residential project fee proposals.',
+    body_markdown: '# Standard Fee Exclusions — Residential\n\nThe following are typically excluded from our fee proposals for residential projects:\n\n- Party wall surveyor fees and notices\n- Specialist surveys (structural, drainage, ecological, arboricultural)\n- Planning application fees\n- Building control submission fees\n- CDM Principal Designer fees (quoted separately where applicable)\n- Interior design, furniture, and fittings\n- Landscape design beyond immediate curtilage\n- Rights of light assessments\n- Section 106 / CIL payments\n- VAT',
+    category: 'fee_clause', tags: ['fees', 'residential', 'exclusions'],
+    owner_user_id: 'u1', published_flag: true,
+    created_at: '2025-05-01', updated_at: '2026-01-15'
+  },
+  {
+    id: 'ka5', organisation_id: 'org1', title: 'Office QA Procedure — Drawing Issue',
+    summary: 'Standard office procedure for quality checking and issuing drawings.',
+    body_markdown: '# Office QA Procedure — Drawing Issue\n\n## Before Issue\n1. Self-check against brief and previous revision\n2. Peer review by another team member\n3. Check title block, revision, date, status\n4. Confirm correct file naming convention\n5. Run clash check against consultant drawings where available\n\n## Issue Process\n1. Update document register\n2. Prepare transmittal note\n3. Issue via agreed platform (email/Asite/BIM360)\n4. File confirmation of receipt\n\n## After Issue\n1. Update project dashboard\n2. Note any comments received\n3. Log any required revisions',
+    category: 'office_procedure', tags: ['qa', 'drawings', 'process'],
+    owner_user_id: 'u1', published_flag: true,
+    created_at: '2025-04-01', updated_at: '2025-11-01'
+  },
+]
+
+// ── Phase 3: CPD & Competence Data ────────────────────────
+
+export const CPD_RECORDS: CPDRecord[] = [
+  { id: 'cpd1', user_id: 'u1', title: 'Building Safety Act — PD Responsibilities', provider: 'RIBA', cpd_topic: 'Building Safety', hours: 4, completion_date: '2025-11-15', mandatory_flag: true, notes: 'Annual mandatory CPD on BSA.' },
+  { id: 'cpd2', user_id: 'u1', title: 'Fire Safety in Residential Design', provider: 'RIBA', cpd_topic: 'Fire Safety', hours: 3, completion_date: '2025-09-20', mandatory_flag: true },
+  { id: 'cpd3', user_id: 'u2', title: 'NEC4 Contract Administration', provider: 'ICE', cpd_topic: 'Contract Administration', hours: 8, completion_date: '2026-01-10', mandatory_flag: false },
+  { id: 'cpd4', user_id: 'u2', title: 'Passivhaus Design Principles', provider: 'PHI', cpd_topic: 'Sustainability', hours: 16, completion_date: '2025-06-01', mandatory_flag: false },
+  { id: 'cpd5', user_id: 'u3', title: 'Building Safety Act — PD Responsibilities', provider: 'RIBA', cpd_topic: 'Building Safety', hours: 4, completion_date: '2025-11-20', mandatory_flag: true },
+  { id: 'cpd6', user_id: 'u4', title: 'CDM Awareness for Designers', provider: 'CITB', cpd_topic: 'Health & Safety', hours: 8, completion_date: '2025-07-15', mandatory_flag: true },
+  { id: 'cpd7', user_id: 'u5', title: 'Revit Advanced Detailing', provider: 'Autodesk', cpd_topic: 'Digital Skills', hours: 12, completion_date: '2026-02-01', mandatory_flag: false },
+  { id: 'cpd8', user_id: 'u3', title: 'Part L 2021 — Conservation of Fuel & Power', provider: 'RIBA', cpd_topic: 'Building Regulations', hours: 3, completion_date: '2025-10-05', mandatory_flag: true },
+]
+
+export const COMPETENCIES: Competency[] = [
+  { id: 'comp1', organisation_id: 'org1', name: 'Residential Design', category: 'Design', description: 'Experience designing residential projects from brief through to completion.' },
+  { id: 'comp2', organisation_id: 'org1', name: 'Conservation & Listed Buildings', category: 'Design', description: 'Knowledge of heritage regulations, listed building consent procedures.' },
+  { id: 'comp3', organisation_id: 'org1', name: 'Contract Administration', category: 'Management', description: 'Ability to administer building contracts (JCT, NEC).' },
+  { id: 'comp4', organisation_id: 'org1', name: 'Principal Designer (CDM)', category: 'Compliance', description: 'Competence to fulfil PD role under CDM/Building Safety Act.' },
+  { id: 'comp5', organisation_id: 'org1', name: 'BIM / Digital Delivery', category: 'Digital', description: 'Proficiency in BIM workflows, Revit, and digital coordination.' },
+  { id: 'comp6', organisation_id: 'org1', name: 'Planning Applications', category: 'Management', description: 'Experience preparing and managing planning applications.' },
+  { id: 'comp7', organisation_id: 'org1', name: 'Sustainability & Part L', category: 'Technical', description: 'Knowledge of energy performance, Part L compliance, sustainability strategies.' },
+  { id: 'comp8', organisation_id: 'org1', name: 'Education Sector', category: 'Sector', description: 'Experience with school and education facility design.' },
+]
+
+export const USER_COMPETENCIES: UserCompetency[] = [
+  { id: 'uc1', user_id: 'u1', competency_id: 'comp1', proficiency_level: 'expert', last_reviewed_at: '2025-12-01' },
+  { id: 'uc2', user_id: 'u1', competency_id: 'comp2', proficiency_level: 'advanced', last_reviewed_at: '2025-12-01' },
+  { id: 'uc3', user_id: 'u1', competency_id: 'comp3', proficiency_level: 'advanced', last_reviewed_at: '2025-12-01' },
+  { id: 'uc4', user_id: 'u1', competency_id: 'comp4', proficiency_level: 'expert', last_reviewed_at: '2025-12-01' },
+  { id: 'uc5', user_id: 'u2', competency_id: 'comp1', proficiency_level: 'advanced', last_reviewed_at: '2025-11-15' },
+  { id: 'uc6', user_id: 'u2', competency_id: 'comp3', proficiency_level: 'intermediate', last_reviewed_at: '2025-11-15' },
+  { id: 'uc7', user_id: 'u2', competency_id: 'comp5', proficiency_level: 'advanced', last_reviewed_at: '2025-11-15' },
+  { id: 'uc8', user_id: 'u2', competency_id: 'comp8', proficiency_level: 'advanced', last_reviewed_at: '2025-11-15' },
+  { id: 'uc9', user_id: 'u3', competency_id: 'comp1', proficiency_level: 'intermediate', last_reviewed_at: '2025-10-01' },
+  { id: 'uc10', user_id: 'u3', competency_id: 'comp6', proficiency_level: 'advanced', last_reviewed_at: '2025-10-01' },
+  { id: 'uc11', user_id: 'u3', competency_id: 'comp7', proficiency_level: 'advanced', last_reviewed_at: '2025-10-01' },
+  { id: 'uc12', user_id: 'u4', competency_id: 'comp5', proficiency_level: 'intermediate', last_reviewed_at: '2026-01-01' },
+  { id: 'uc13', user_id: 'u4', competency_id: 'comp4', proficiency_level: 'basic', evidence_url: 'https://example.com/cdm-cert', last_reviewed_at: '2025-12-15' },
+  { id: 'uc14', user_id: 'u5', competency_id: 'comp5', proficiency_level: 'advanced', last_reviewed_at: '2026-02-01' },
+  { id: 'uc15', user_id: 'u5', competency_id: 'comp1', proficiency_level: 'basic', last_reviewed_at: '2026-02-01' },
+]
+
+export const TRAINING_PLANS: TrainingPlan[] = [
+  { id: 'tp1', user_id: 'u4', title: 'CDM Principal Designer Competence', objective: 'Complete RIBA PD training course and 2 supervised PD appointments.', due_date: '2026-06-30', status: 'in_progress', manager_notes: 'Tom to shadow Sarah on Riverside project PD duties.' },
+  { id: 'tp2', user_id: 'u5', title: 'Contract Administration Foundation', objective: 'Complete ICE NEC4 course and assist on one contract admin role.', due_date: '2026-09-01', status: 'not_started', manager_notes: 'Amara interested in broadening into CA. Book for next available course.' },
+  { id: 'tp3', user_id: 'u3', title: 'Conservation & Heritage Skills', objective: 'RIBA Conservation course + supervised listed building project.', due_date: '2026-12-01', status: 'not_started' },
+  { id: 'tp4', user_id: 'u2', title: 'Part L 2021 Compliance Update', objective: 'Complete RIBA Part L CPD. Already strong on sustainability — formalise.', due_date: '2026-04-30', status: 'overdue' },
+]
+
+// ── Phase 3: Internationalisation Data ────────────────────
+
+export const JURISDICTION_PACKS: JurisdictionPack[] = [
+  {
+    id: 'jp1', country: 'United Kingdom', region: 'England & Wales', language: 'en',
+    currency: 'GBP', units: 'metric', date_format: 'DD/MM/YYYY',
+    stage_labels: { 0: 'Strategic Definition', 1: 'Preparation & Briefing', 2: 'Concept Design', 3: 'Spatial Coordination', 4: 'Technical Design', 5: 'Manufacturing & Construction', 6: 'Handover', 7: 'Use' },
+    terminology_notes: 'Uses RIBA Plan of Work 2020 stage names.',
+    reference_guidance_notes: 'Building Regulations England & Wales. Planning (Town & Country Planning Act). CDM 2015. Building Safety Act 2022.'
+  },
+  {
+    id: 'jp2', country: 'United Kingdom', region: 'Scotland', language: 'en',
+    currency: 'GBP', units: 'metric', date_format: 'DD/MM/YYYY',
+    stage_labels: { 0: 'Strategic Definition', 1: 'Preparation & Briefing', 2: 'Concept Design', 3: 'Spatial Coordination', 4: 'Technical Design', 5: 'Manufacturing & Construction', 6: 'Handover', 7: 'Use' },
+    terminology_notes: 'Uses RIBA stages. Building Standards (Scotland) differ from England.',
+    reference_guidance_notes: 'Building (Scotland) Act 2003. Town & Country Planning (Scotland) Act 1997.'
+  },
+]
+
+export const ORGANISATION_SETTINGS: OrganisationSettings[] = [
+  {
+    id: 'os1', organisation_id: 'org1', default_currency: 'GBP', default_units: 'metric',
+    date_format: 'DD/MM/YYYY', jurisdiction_pack_id: 'jp1',
+    project_number_template: '{YEAR}-{SEQ:3}',
+    terminology_overrides: {}
+  },
+]
+
+// ── Phase 3: Admin Controls Data ──────────────────────────
+
+export const AI_SOURCE_PERMISSIONS: AISourcePermission[] = [
+  { id: 'asp1', organisation_id: 'org1', source_category: 'project_data', enabled: true, updated_at: '2026-01-01' },
+  { id: 'asp2', organisation_id: 'org1', source_category: 'project_documents', enabled: true, updated_at: '2026-01-01' },
+  { id: 'asp3', organisation_id: 'org1', source_category: 'knowledge_base', enabled: true, updated_at: '2026-01-01' },
+  { id: 'asp4', organisation_id: 'org1', source_category: 'reference_uploads', enabled: false, updated_at: '2026-01-01' },
+  { id: 'asp5', organisation_id: 'org1', source_category: 'fee_data', enabled: false, updated_at: '2026-01-01' },
+]
+
+export const AI_LOGS: AILog[] = [
+  { id: 'al1', organisation_id: 'org1', user_id: 'u2', project_id: 'p1', prompt: 'What are the open risks on Riverside House?', response_summary: 'Identified 3 open risks: overdue required task in Stage 3, fire stopping condition from building control, and party wall notice pending.', source_categories_used: ['project_data'], confidence_level: 'high', created_at: '2026-03-15' },
+  { id: 'al2', organisation_id: 'org1', user_id: 'u1', prompt: 'What does our office procedure say about drawing issue QA?', response_summary: 'Referenced Office QA Procedure — Drawing Issue article. Outlined 5-step pre-issue check and 3-step post-issue process.', source_categories_used: ['knowledge_base'], confidence_level: 'high', created_at: '2026-03-16' },
+  { id: 'al3', organisation_id: 'org1', user_id: 'u3', project_id: 'p2', prompt: 'Are there any similar mixed-use projects we can learn from?', response_summary: 'No direct match in completed projects. Suggested reviewing Brixton Workspace Conversion for commercial conversion lessons.', source_categories_used: ['project_data', 'knowledge_base'], confidence_level: 'medium', created_at: '2026-03-18' },
+]
+
+// ── Phase 3 Wave 2: Drawing Issue Intelligence Data ───────
+
+export const DRAWING_ISSUE_RECORDS: DrawingIssueRecord[] = [
+  { id: 'di1', project_id: 'p1', drawing_ref: 'P1-SM-XX-00-DR-A-0100', drawing_title: 'Ground Floor GA', issue_type: 'planning', stage: 2, issued_date: '2025-12-01', issued_to: 'LB Richmond Planning', revision: 'P01', created_by_user_id: 'u2' },
+  { id: 'di2', project_id: 'p1', drawing_ref: 'P1-SM-XX-00-DR-A-0100', drawing_title: 'Ground Floor GA', issue_type: 'planning', stage: 2, issued_date: '2026-01-10', issued_to: 'LB Richmond Planning', revision: 'P02', supersedes: 'P01', notes: 'Updated to address planner comments on rear elevation setback.', created_by_user_id: 'u2' },
+  { id: 'di3', project_id: 'p1', drawing_ref: 'P1-SM-XX-00-DR-A-0100', drawing_title: 'Ground Floor GA', issue_type: 'working', stage: 3, issued_date: '2026-02-15', issued_to: 'BWB Consulting', revision: 'W01', created_by_user_id: 'u2' },
+  { id: 'di4', project_id: 'p1', drawing_ref: 'P1-SM-XX-01-DR-A-0101', drawing_title: 'First Floor GA', issue_type: 'planning', stage: 2, issued_date: '2025-12-01', issued_to: 'LB Richmond Planning', revision: 'P01', created_by_user_id: 'u2' },
+  { id: 'di5', project_id: 'p1', drawing_ref: 'P1-SM-XX-ZZ-DR-A-0200', drawing_title: 'Elevations Sheet 1', issue_type: 'planning', stage: 2, issued_date: '2025-12-01', issued_to: 'LB Richmond Planning', revision: 'P01', created_by_user_id: 'u2' },
+  { id: 'di6', project_id: 'p1', drawing_ref: 'P1-SM-XX-ZZ-DR-A-0200', drawing_title: 'Elevations Sheet 1', issue_type: 'planning', stage: 2, issued_date: '2026-01-10', issued_to: 'LB Richmond Planning', revision: 'P02', supersedes: 'P01', created_by_user_id: 'u2' },
+  { id: 'di7', project_id: 'p3', drawing_ref: 'P3-SM-XX-00-DR-A-0100', drawing_title: 'Ground Floor Demolition', issue_type: 'tender', stage: 4, issued_date: '2025-11-01', issued_to: 'Tender Package', revision: 'T01', created_by_user_id: 'u2' },
+  { id: 'di8', project_id: 'p3', drawing_ref: 'P3-SM-XX-00-DR-A-0100', drawing_title: 'Ground Floor Demolition', issue_type: 'construction', stage: 4, issued_date: '2026-01-15', issued_to: 'Westfield Construction', revision: 'C01', notes: 'Construction issue. Minor amendments from tender.', created_by_user_id: 'u2' },
+  { id: 'di9', project_id: 'p3', drawing_ref: 'P3-SM-XX-00-DR-A-0101', drawing_title: 'Ground Floor Proposed', issue_type: 'construction', stage: 4, issued_date: '2026-01-15', issued_to: 'Westfield Construction', revision: 'C01', created_by_user_id: 'u2' },
+  { id: 'di10', project_id: 'p3', drawing_ref: 'P3-SM-XX-00-DR-A-0101', drawing_title: 'Ground Floor Proposed', issue_type: 'construction', stage: 4, issued_date: '2026-03-01', issued_to: 'Westfield Construction', revision: 'C02', supersedes: 'C01', notes: 'Re-issue: updated classroom layout per client change request.', created_by_user_id: 'u2' },
+  { id: 'di11', project_id: 'p5', drawing_ref: 'P5-SM-XX-00-DR-A-0100', drawing_title: 'Floor Plan & Roof Plan', issue_type: 'planning', stage: 3, issued_date: '2025-11-01', issued_to: 'LB Southwark Planning', revision: 'P01', created_by_user_id: 'u2' },
+  { id: 'di12', project_id: 'p5', drawing_ref: 'P5-SM-XX-00-DR-A-0100', drawing_title: 'Floor Plan & Roof Plan', issue_type: 'construction', stage: 5, issued_date: '2026-02-01', issued_to: 'TBC Builders', revision: 'C01', created_by_user_id: 'u2' },
+  { id: 'di13', project_id: 'p2', drawing_ref: 'P2-SM-XX-00-DR-A-0100', drawing_title: 'Typical Floor Plan', issue_type: 'sketch', stage: 2, issued_date: '2026-02-01', issued_to: 'Meridian Developments', revision: 'SK01', created_by_user_id: 'u3' },
+  { id: 'di14', project_id: 'p2', drawing_ref: 'P2-SM-XX-ZZ-DR-A-0200', drawing_title: 'Street Elevation', issue_type: 'sketch', stage: 2, issued_date: '2026-02-01', issued_to: 'Meridian Developments', revision: 'SK01', created_by_user_id: 'u3' },
+]
+
+// ── Phase 3 Wave 2: Commercial Reporting Data ─────────────
+
+export const PROJECT_COMMERCIALS: ProjectCommercial[] = [
+  { id: 'pc1', project_id: 'p1', agreed_fee: 48000, fee_invoiced: 32000, fee_paid: 28000, wip_value: 6500, expenses: 1200, time_logged_hours: 420, estimated_hours_remaining: 180, approved_variations: 2500, current_margin_percent: 22, forecast_margin_percent: 18, stage_overspend_flag: false, health_flag: 'healthy', last_updated: '2026-03-18' },
+  { id: 'pc2', project_id: 'p2', agreed_fee: 165000, fee_invoiced: 28000, fee_paid: 28000, wip_value: 14000, expenses: 3500, time_logged_hours: 310, estimated_hours_remaining: 1200, approved_variations: 0, current_margin_percent: 25, forecast_margin_percent: 20, stage_overspend_flag: false, health_flag: 'healthy', last_updated: '2026-03-15' },
+  { id: 'pc3', project_id: 'p3', agreed_fee: 72000, fee_invoiced: 65000, fee_paid: 58000, wip_value: 4200, expenses: 2800, time_logged_hours: 680, estimated_hours_remaining: 120, approved_variations: 5000, current_margin_percent: 12, forecast_margin_percent: 8, stage_overspend_flag: true, health_flag: 'watch', last_updated: '2026-03-10' },
+  { id: 'pc4', project_id: 'p4', agreed_fee: 195000, fee_invoiced: 12000, fee_paid: 12000, wip_value: 8000, expenses: 500, time_logged_hours: 95, estimated_hours_remaining: 1800, approved_variations: 0, current_margin_percent: 30, forecast_margin_percent: 28, stage_overspend_flag: false, health_flag: 'healthy', last_updated: '2026-03-01' },
+  { id: 'pc5', project_id: 'p5', agreed_fee: 18000, fee_invoiced: 16000, fee_paid: 14000, wip_value: 1800, expenses: 400, time_logged_hours: 195, estimated_hours_remaining: 25, approved_variations: 0, current_margin_percent: 15, forecast_margin_percent: 12, stage_overspend_flag: true, health_flag: 'at_risk', last_updated: '2026-03-19' },
+  { id: 'pc6', project_id: 'p6', agreed_fee: 85000, fee_invoiced: 35000, fee_paid: 30000, wip_value: 0, expenses: 1800, time_logged_hours: 380, estimated_hours_remaining: 550, approved_variations: 0, current_margin_percent: 18, forecast_margin_percent: -5, stage_overspend_flag: false, health_flag: 'critical', last_updated: '2025-12-10' },
+]
+
+export const CASHFLOW_FORECASTS: CashflowForecast[] = [
+  { id: 'cf1', organisation_id: 'org1', month: '2026-01', projected_income: 42000, projected_expenses: 35000, actual_income: 45000, actual_expenses: 33000, pipeline_value: 15000 },
+  { id: 'cf2', organisation_id: 'org1', month: '2026-02', projected_income: 38000, projected_expenses: 34000, actual_income: 36000, actual_expenses: 35500, pipeline_value: 22000 },
+  { id: 'cf3', organisation_id: 'org1', month: '2026-03', projected_income: 52000, projected_expenses: 36000, actual_income: 48000, actual_expenses: 37000, pipeline_value: 28000 },
+  { id: 'cf4', organisation_id: 'org1', month: '2026-04', projected_income: 45000, projected_expenses: 36000, pipeline_value: 35000 },
+  { id: 'cf5', organisation_id: 'org1', month: '2026-05', projected_income: 50000, projected_expenses: 37000, pipeline_value: 40000 },
+  { id: 'cf6', organisation_id: 'org1', month: '2026-06', projected_income: 55000, projected_expenses: 38000, pipeline_value: 45000 },
+  { id: 'cf7', organisation_id: 'org1', month: '2026-07', projected_income: 40000, projected_expenses: 35000, pipeline_value: 30000 },
+  { id: 'cf8', organisation_id: 'org1', month: '2026-08', projected_income: 30000, projected_expenses: 32000, pipeline_value: 25000 },
+  { id: 'cf9', organisation_id: 'org1', month: '2026-09', projected_income: 48000, projected_expenses: 36000, pipeline_value: 50000 },
+]
+
+// ── Phase 3 Wave 2: Staffing & Utilisation Data ───────────
+
+export const STAFF_ALLOCATIONS: StaffAllocation[] = [
+  { id: 'sa1', user_id: 'u2', project_id: 'p1', stage: 3, hours_per_week: 16, start_date: '2026-01-06', end_date: '2026-04-30', role_on_project: 'Project Lead' },
+  { id: 'sa2', user_id: 'u2', project_id: 'p3', stage: 4, hours_per_week: 12, start_date: '2025-10-01', end_date: '2026-04-15', role_on_project: 'Project Lead' },
+  { id: 'sa3', user_id: 'u2', project_id: 'p5', stage: 5, hours_per_week: 4, start_date: '2026-01-01', end_date: '2026-05-01', role_on_project: 'Project Lead' },
+  { id: 'sa4', user_id: 'u3', project_id: 'p2', stage: 2, hours_per_week: 20, start_date: '2025-12-01', end_date: '2026-06-30', role_on_project: 'Project Lead' },
+  { id: 'sa5', user_id: 'u3', project_id: 'p4', stage: 1, hours_per_week: 12, start_date: '2026-01-10', end_date: '2026-04-30', role_on_project: 'Project Lead' },
+  { id: 'sa6', user_id: 'u4', project_id: 'p1', stage: 3, hours_per_week: 24, start_date: '2026-02-01', end_date: '2026-05-30', role_on_project: 'Architect' },
+  { id: 'sa7', user_id: 'u4', project_id: 'p3', stage: 4, hours_per_week: 8, start_date: '2025-11-01', end_date: '2026-04-15', role_on_project: 'Architect' },
+  { id: 'sa8', user_id: 'u5', project_id: 'p2', stage: 2, hours_per_week: 28, start_date: '2026-01-01', end_date: '2026-06-30', role_on_project: 'Architectural Assistant' },
+  { id: 'sa9', user_id: 'u5', project_id: 'p4', stage: 1, hours_per_week: 8, start_date: '2026-02-01', end_date: '2026-05-30', role_on_project: 'Architectural Assistant' },
+  { id: 'sa10', user_id: 'u1', project_id: 'p1', stage: 3, hours_per_week: 2, start_date: '2025-09-01', end_date: '2026-06-30', role_on_project: 'Practice Lead / Review' },
+  { id: 'sa11', user_id: 'u1', project_id: 'p2', stage: 2, hours_per_week: 3, start_date: '2025-11-15', end_date: '2027-03-01', role_on_project: 'Practice Lead / Review' },
+  { id: 'sa12', user_id: 'u1', project_id: 'p4', stage: 1, hours_per_week: 4, start_date: '2026-01-10', end_date: '2026-06-30', role_on_project: 'Practice Lead / Client' },
+]
+
+export const STAFF_CAPACITIES: StaffCapacity[] = [
+  { user_id: 'u1', name: 'Sarah Mitchell', role: 'Practice Owner', weekly_capacity_hours: 20, allocated_hours: 9, utilisation_percent: 45, status: 'under' },
+  { user_id: 'u2', name: 'James Chen', role: 'Project Lead', weekly_capacity_hours: 37.5, allocated_hours: 32, utilisation_percent: 85, status: 'optimal' },
+  { user_id: 'u3', name: 'Priya Sharma', role: 'Project Lead', weekly_capacity_hours: 37.5, allocated_hours: 32, utilisation_percent: 85, status: 'optimal' },
+  { user_id: 'u4', name: 'Tom Davies', role: 'Architect', weekly_capacity_hours: 37.5, allocated_hours: 32, utilisation_percent: 85, status: 'optimal' },
+  { user_id: 'u5', name: 'Amara Okafor', role: 'Architectural Assistant', weekly_capacity_hours: 37.5, allocated_hours: 36, utilisation_percent: 96, status: 'over' },
+]
+
+// ── Phase 3 Wave 3: Fee Recommendation Data ───────────────
+
+export const FEE_RECOMMENDATIONS: FeeRecommendation[] = [
+  {
+    id: 'fr1', organisation_id: 'org1', project_type: 'Residential Extension', sector: 'residential',
+    scale_estimate: 350000, procurement_route: 'traditional', complexity: 'medium',
+    stage_scope: 'Stages 1-5 + 6', staffing_mix_notes: '1 project lead (60%), 1 architect (40%)',
+    overhead_percent: 15, margin_percent: 20,
+    recommended_fee_low: 42000, recommended_fee_high: 55000,
+    recommended_stage_split: { '1': 8, '2': 15, '3': 20, '4': 25, '5': 25, '6': 7 },
+    confidence_level: 'high', similar_project_ids: ['p1', 'p5'],
+    notes: 'Based on 2 similar residential projects. Extension complexity is typical for listed property work.',
+    created_at: '2026-03-01', created_by_user_id: 'u1'
+  },
+  {
+    id: 'fr2', organisation_id: 'org1', project_type: 'Mixed-Use New Build', sector: 'mixed_use',
+    scale_estimate: 8500000, procurement_route: 'design_and_build', complexity: 'high',
+    stage_scope: 'Stages 0-4', staffing_mix_notes: '1 practice lead (10%), 1 project lead (50%), 2 architects (40%)',
+    overhead_percent: 18, margin_percent: 22,
+    recommended_fee_low: 145000, recommended_fee_high: 195000,
+    recommended_stage_split: { '0': 5, '1': 10, '2': 25, '3': 30, '4': 30 },
+    confidence_level: 'medium', similar_project_ids: ['p2'],
+    notes: 'Limited comparable data. Only 1 similar mixed-use project in portfolio. D&B novation adds coordination cost.',
+    created_at: '2026-02-15', created_by_user_id: 'u1'
+  },
+  {
+    id: 'fr3', organisation_id: 'org1', project_type: 'Education Refurbishment', sector: 'education',
+    scale_estimate: 2200000, procurement_route: 'traditional', complexity: 'high',
+    stage_scope: 'Stages 2-5 + 6', staffing_mix_notes: '1 project lead (50%), 1 architect (50%)',
+    overhead_percent: 15, margin_percent: 18,
+    recommended_fee_low: 65000, recommended_fee_high: 80000,
+    recommended_stage_split: { '2': 15, '3': 20, '4': 25, '5': 30, '6': 10 },
+    confidence_level: 'high', similar_project_ids: ['p3'],
+    notes: 'Good match with Weybridge School. Phased works in occupied buildings add 10-15% coordination overhead.',
+    created_at: '2026-01-20', created_by_user_id: 'u1'
+  },
+]
+
+// ── Phase 3 Wave 3: Fee Quote Data ────────────────────────
+
+export const FEE_QUOTE_RECORDS: FeeQuoteRecord[] = [
+  {
+    id: 'fq1', organisation_id: 'org1', related_project_id: 'p1', quote_reference: 'FQ-2025-001',
+    status: 'accepted', fee_basis: 'Fixed fee by stage', total_fee: 48000,
+    exclusions_text: 'Party wall surveyor fees, structural surveys, planning fees, building control fees, CDM PD fees (quoted separately), VAT.',
+    terms_text: 'Invoiced monthly on account. Payment due within 30 days. Fee based on RIBA PSC Stage services.',
+    issued_date: '2025-09-10', valid_until: '2025-10-10',
+    created_by_user_id: 'u1', updated_at: '2025-09-15'
+  },
+  {
+    id: 'fq2', organisation_id: 'org1', related_project_id: 'p2', quote_reference: 'FQ-2025-008',
+    status: 'issued', fee_basis: 'Fixed fee by stage', total_fee: 165000,
+    exclusions_text: 'Specialist surveys, planning fees, S106/CIL, building control fees, landscape design, interior design, VAT.',
+    terms_text: 'Invoiced monthly. Payment due within 30 days. Subject to client confirmation of Stage 2 concept option.',
+    issued_date: '2025-11-20', valid_until: '2026-01-20',
+    created_by_user_id: 'u1', updated_at: '2025-11-20'
+  },
+  {
+    id: 'fq3', organisation_id: 'org1', related_project_id: 'p3', quote_reference: 'FQ-2025-003',
+    status: 'accepted', fee_basis: 'Fixed fee by stage with provisional items', total_fee: 72000,
+    exclusions_text: 'Asbestos surveys (by others), structural surveys, specialist M&E design, VAT.',
+    terms_text: 'Monthly invoicing. Phasing uplift of 10% applied for summer holiday constraints.',
+    issued_date: '2025-06-05', valid_until: '2025-07-05',
+    created_by_user_id: 'u1', updated_at: '2025-06-10'
+  },
+  {
+    id: 'fq4', organisation_id: 'org1', related_opportunity_id: 'opp2', quote_reference: 'FQ-2026-012',
+    status: 'draft', fee_basis: 'Percentage of construction cost', total_fee: 0,
+    exclusions_text: '', terms_text: '',
+    created_by_user_id: 'u3', updated_at: '2026-03-20'
+  },
+]
+
+export const FEE_QUOTE_LINE_ITEMS: FeeQuoteLineItem[] = [
+  { id: 'fqli1', fee_quote_record_id: 'fq1', sort_order: 1, line_type: 'stage', title: 'Stage 1 — Preparation & Briefing', description: 'Site appraisal, client brief, project programme.', amount: 3840, related_stage: 1 },
+  { id: 'fqli2', fee_quote_record_id: 'fq1', sort_order: 2, line_type: 'stage', title: 'Stage 2 — Concept Design', description: 'Design options, planning strategy, outline costing.', amount: 7200, related_stage: 2 },
+  { id: 'fqli3', fee_quote_record_id: 'fq1', sort_order: 3, line_type: 'stage', title: 'Stage 3 — Spatial Coordination', description: 'Coordinated design, consultant coordination, specification.', amount: 9600, related_stage: 3 },
+  { id: 'fqli4', fee_quote_record_id: 'fq1', sort_order: 4, line_type: 'stage', title: 'Stage 4 — Technical Design', description: 'Technical detailing, building control submission, tender package.', amount: 12000, related_stage: 4 },
+  { id: 'fqli5', fee_quote_record_id: 'fq1', sort_order: 5, line_type: 'stage', title: 'Stage 5 — Construction', description: 'Site inspections, queries, progress monitoring.', amount: 12000, related_stage: 5 },
+  { id: 'fqli6', fee_quote_record_id: 'fq1', sort_order: 6, line_type: 'stage', title: 'Stage 6 — Handover', description: 'Final inspection, defects period, handover documentation.', amount: 3360, related_stage: 6 },
+  { id: 'fqli7', fee_quote_record_id: 'fq2', sort_order: 1, line_type: 'stage', title: 'Stage 0 — Strategic Definition', description: 'Project objectives, constraints, procurement strategy.', amount: 8250, related_stage: 0 },
+  { id: 'fqli8', fee_quote_record_id: 'fq2', sort_order: 2, line_type: 'stage', title: 'Stage 1 — Preparation & Briefing', description: 'Detailed brief, site surveys, feasibility.', amount: 16500, related_stage: 1 },
+  { id: 'fqli9', fee_quote_record_id: 'fq2', sort_order: 3, line_type: 'stage', title: 'Stage 2 — Concept Design', description: 'Concept options, massing, pre-app discussion.', amount: 41250, related_stage: 2 },
+  { id: 'fqli10', fee_quote_record_id: 'fq2', sort_order: 4, line_type: 'stage', title: 'Stage 3 — Spatial Coordination', description: 'Coordinated design, planning application, consultant coordination.', amount: 49500, related_stage: 3 },
+  { id: 'fqli11', fee_quote_record_id: 'fq2', sort_order: 5, line_type: 'stage', title: 'Stage 4 — Technical Design', description: 'Technical design to D&B novation.', amount: 49500, related_stage: 4 },
+  { id: 'fqli12', fee_quote_record_id: 'fq3', sort_order: 1, line_type: 'stage', title: 'Stage 2 — Concept Design', description: 'Refurbishment concept and phasing strategy.', amount: 10800, related_stage: 2 },
+  { id: 'fqli13', fee_quote_record_id: 'fq3', sort_order: 2, line_type: 'stage', title: 'Stage 3 — Spatial Coordination', description: 'Classroom layouts, M&E coordination.', amount: 14400, related_stage: 3 },
+  { id: 'fqli14', fee_quote_record_id: 'fq3', sort_order: 3, line_type: 'stage', title: 'Stage 4 — Technical Design', description: 'Construction details, tender package.', amount: 18000, related_stage: 4 },
+  { id: 'fqli15', fee_quote_record_id: 'fq3', sort_order: 4, line_type: 'stage', title: 'Stage 5 — Construction', description: 'Phased summer works site administration.', amount: 21600, related_stage: 5 },
+  { id: 'fqli16', fee_quote_record_id: 'fq3', sort_order: 5, line_type: 'stage', title: 'Stage 6 — Handover', description: 'Snagging, handover, defects.', amount: 7200, related_stage: 6 },
+]
+
+// ── Phase 3 Wave 3: Opportunities Data ────────────────────
+
+export const OPPORTUNITIES: Opportunity[] = [
+  {
+    id: 'opp1', organisation_id: 'org1', title: 'Bermondsey Loft Conversion',
+    client_name: 'Chen Family', sector: 'residential', estimated_value: 22000,
+    status: 'won', expected_start_date: '2026-05-01', likelihood_percentage: 100,
+    owner_user_id: 'u2', notes: 'Referral from Harris Family Trust. Small loft conversion. Quick turnaround.',
+    linked_quote_ids: [], created_at: '2026-03-01', updated_at: '2026-03-20'
+  },
+  {
+    id: 'opp2', organisation_id: 'org1', title: 'Hackney Arts Centre Extension',
+    client_name: 'LB Hackney', sector: 'public', estimated_value: 120000,
+    status: 'proposal_sent', expected_start_date: '2026-09-01', likelihood_percentage: 40,
+    owner_user_id: 'u3', notes: 'Public competition entry. Strong concept but competitive field.',
+    linked_quote_ids: ['fq4'], created_at: '2026-02-15', updated_at: '2026-03-18'
+  },
+  {
+    id: 'opp3', organisation_id: 'org1', title: 'Richmond Riverside Apartments',
+    client_name: 'Thames Vista Developments', sector: 'residential', estimated_value: 210000,
+    status: 'qualifying', expected_start_date: '2026-11-01', likelihood_percentage: 25,
+    owner_user_id: 'u1', notes: 'Early stage enquiry. 24-unit riverside scheme. Need to confirm planning viability.',
+    linked_quote_ids: [], created_at: '2026-03-10', updated_at: '2026-03-15'
+  },
+  {
+    id: 'opp4', organisation_id: 'org1', title: 'Peckham Community Kitchen',
+    client_name: 'Peckham Food Co-op', sector: 'community', estimated_value: 35000,
+    status: 'negotiation', expected_start_date: '2026-07-01', likelihood_percentage: 70,
+    owner_user_id: 'u3', notes: 'Grant-funded community project. Fee negotiation in progress — reduced rate discussed.',
+    linked_quote_ids: [], created_at: '2026-01-20', updated_at: '2026-03-12'
+  },
+  {
+    id: 'opp5', organisation_id: 'org1', title: 'Battersea Office Fitout',
+    client_name: 'Ark Studios', sector: 'commercial', estimated_value: 55000,
+    status: 'lost', likelihood_percentage: 0,
+    owner_user_id: 'u2', notes: 'Lost to competitor on price. Client chose lower fee with less experienced practice.',
+    linked_quote_ids: [], created_at: '2025-11-01', updated_at: '2026-02-01'
+  },
+  {
+    id: 'opp6', organisation_id: 'org1', title: 'Greenwich School Extension',
+    client_name: 'RB Greenwich', sector: 'education', estimated_value: 95000,
+    status: 'lead', expected_start_date: '2027-01-01', likelihood_percentage: 15,
+    owner_user_id: 'u1', notes: 'Early enquiry via framework. Need to confirm scope and timeline.',
+    linked_quote_ids: [], created_at: '2026-03-18', updated_at: '2026-03-18'
+  },
+]
+
 // ── Lookup Helpers ──────────────────────────────────────────
 
 export function getProjectTasks(projectId: string): Task[] {
@@ -812,4 +1234,558 @@ export function getTenderEvaluations(tenderReturnId: string): TenderEvaluation[]
 
 export function getProjectSiteQueries(projectId: string): SiteQuery[] {
   return SITE_QUERIES.filter(q => q.project_id === projectId)
+}
+
+// ── Phase 2 Wave 3 Helpers ──────────────────────────────────
+
+export function getProjectBuildingRegs(projectId: string): BuildingRegRecord[] {
+  return BUILDING_REG_RECORDS.filter(r => r.project_id === projectId)
+}
+
+export function getBuildingInspections(buildingRegId: string): BuildingInspection[] {
+  return BUILDING_INSPECTIONS.filter(i => i.building_reg_id === buildingRegId)
+}
+
+export function getProjectInspections(projectId: string): BuildingInspection[] {
+  return BUILDING_INSPECTIONS.filter(i => i.project_id === projectId)
+}
+
+export function getProjectDutyholders(projectId: string): DutyholderRecord[] {
+  return DUTYHOLDER_RECORDS.filter(d => d.project_id === projectId)
+}
+
+export function getProjectGateways(projectId: string): BRPDGateway[] {
+  return BRPD_GATEWAYS.filter(g => g.project_id === projectId)
+}
+
+export function getProjectDocuments(projectId: string): DocumentRecord[] {
+  return DOCUMENT_RECORDS.filter(d => d.project_id === projectId)
+}
+
+export function getProjectTransmittals(projectId: string): DocumentTransmittal[] {
+  return DOCUMENT_TRANSMITTALS.filter(t => t.project_id === projectId)
+}
+
+// ── Phase 3 Helpers ─────────────────────────────────────────
+
+export function getKnowledgeArticles(): KnowledgeArticle[] {
+  return KNOWLEDGE_ARTICLES.filter(a => a.published_flag)
+}
+
+export function getKnowledgeArticlesByCategory(category: string): KnowledgeArticle[] {
+  return KNOWLEDGE_ARTICLES.filter(a => a.published_flag && a.category === category)
+}
+
+export function getKnowledgeArticle(id: string): KnowledgeArticle | undefined {
+  return KNOWLEDGE_ARTICLES.find(a => a.id === id)
+}
+
+export function getUserCPDRecords(userId: string): CPDRecord[] {
+  return CPD_RECORDS.filter(r => r.user_id === userId)
+}
+
+export function getAllCPDRecords(): CPDRecord[] {
+  return CPD_RECORDS
+}
+
+export function getUserCompetencies(userId: string): UserCompetency[] {
+  return USER_COMPETENCIES.filter(c => c.user_id === userId)
+}
+
+export function getCompetency(id: string): Competency | undefined {
+  return COMPETENCIES.find(c => c.id === id)
+}
+
+export function getAllCompetencies(): Competency[] {
+  return COMPETENCIES
+}
+
+export function getUserTrainingPlans(userId: string): TrainingPlan[] {
+  return TRAINING_PLANS.filter(p => p.user_id === userId)
+}
+
+export function getAllTrainingPlans(): TrainingPlan[] {
+  return TRAINING_PLANS
+}
+
+export function getOrganisationSettings(): OrganisationSettings {
+  return ORGANISATION_SETTINGS[0]
+}
+
+export function getJurisdictionPacks(): JurisdictionPack[] {
+  return JURISDICTION_PACKS
+}
+
+export function getAISourcePermissions(): AISourcePermission[] {
+  return AI_SOURCE_PERMISSIONS
+}
+
+export function getAILogs(): AILog[] {
+  return AI_LOGS
+}
+
+// ── Phase 3 Wave 2 Helpers ──────────────────────────────────
+
+export function getProjectDrawingIssues(projectId: string): DrawingIssueRecord[] {
+  return DRAWING_ISSUE_RECORDS.filter(r => r.project_id === projectId)
+}
+
+export function getAllDrawingIssues(): DrawingIssueRecord[] {
+  return DRAWING_ISSUE_RECORDS
+}
+
+export function getProjectCommercial(projectId: string): ProjectCommercial | undefined {
+  return PROJECT_COMMERCIALS.find(c => c.project_id === projectId)
+}
+
+export function getAllProjectCommercials(): ProjectCommercial[] {
+  return PROJECT_COMMERCIALS
+}
+
+export function getCashflowForecasts(): CashflowForecast[] {
+  return CASHFLOW_FORECASTS
+}
+
+export function getStaffAllocations(): StaffAllocation[] {
+  return STAFF_ALLOCATIONS
+}
+
+export function getUserAllocations(userId: string): StaffAllocation[] {
+  return STAFF_ALLOCATIONS.filter(a => a.user_id === userId)
+}
+
+export function getProjectAllocations(projectId: string): StaffAllocation[] {
+  return STAFF_ALLOCATIONS.filter(a => a.project_id === projectId)
+}
+
+export function getStaffCapacities(): StaffCapacity[] {
+  return STAFF_CAPACITIES
+}
+
+// ── Phase 3 Wave 3 Helpers ──────────────────────────────────
+
+export function getFeeRecommendations(): FeeRecommendation[] {
+  return FEE_RECOMMENDATIONS
+}
+
+export function getFeeRecommendation(id: string): FeeRecommendation | undefined {
+  return FEE_RECOMMENDATIONS.find(r => r.id === id)
+}
+
+export function getFeeQuoteRecords(): FeeQuoteRecord[] {
+  return FEE_QUOTE_RECORDS
+}
+
+export function getFeeQuoteRecord(id: string): FeeQuoteRecord | undefined {
+  return FEE_QUOTE_RECORDS.find(r => r.id === id)
+}
+
+export function getFeeQuoteLineItems(quoteId: string): FeeQuoteLineItem[] {
+  return FEE_QUOTE_LINE_ITEMS.filter(i => i.fee_quote_record_id === quoteId).sort((a, b) => a.sort_order - b.sort_order)
+}
+
+export function getProjectFeeQuotes(projectId: string): FeeQuoteRecord[] {
+  return FEE_QUOTE_RECORDS.filter(q => q.related_project_id === projectId)
+}
+
+export function getOpportunities(): Opportunity[] {
+  return OPPORTUNITIES
+}
+
+export function getOpportunity(id: string): Opportunity | undefined {
+  return OPPORTUNITIES.find(o => o.id === id)
+}
+
+export function getOpportunityQuotes(opportunityId: string): FeeQuoteRecord[] {
+  return FEE_QUOTE_RECORDS.filter(q => q.related_opportunity_id === opportunityId)
+}
+
+// ── Phase 3 Wave 4: AI Teammate Mock Data ──────────────────
+
+const AI_SUGGESTED_PROMPTS: AISuggestedPrompt[] = [
+  { id: 'sp-1', label: 'Portfolio risk summary', prompt: 'What are the top risks across my active projects?', scope: 'global', category: 'Risk' },
+  { id: 'sp-2', label: 'Overdue tasks', prompt: 'Which tasks are overdue across all projects?', scope: 'global', category: 'Tasks' },
+  { id: 'sp-3', label: 'Staffing gaps', prompt: 'Are there any staffing conflicts or over-allocations this month?', scope: 'global', category: 'Staffing' },
+  { id: 'sp-4', label: 'Upcoming deadlines', prompt: 'What key milestones are coming up in the next 2 weeks?', scope: 'global', category: 'Planning' },
+  { id: 'sp-5', label: 'Compliance check', prompt: 'Are all building reg submissions on track?', scope: 'global', category: 'Compliance' },
+  { id: 'sp-6', label: 'Stage progress', prompt: 'What is the current stage progress and what tasks remain?', scope: 'project', category: 'Progress' },
+  { id: 'sp-7', label: 'Project risks', prompt: 'What are the active risks and design risks on this project?', scope: 'project', category: 'Risk' },
+  { id: 'sp-8', label: 'Contract dates', prompt: 'What are the key contract dates and upcoming deadlines?', scope: 'project', category: 'Contract' },
+  { id: 'sp-9', label: 'Budget status', prompt: 'What is the current fee position and any commercial risks?', scope: 'project', category: 'Commercial' },
+  { id: 'sp-10', label: 'Meeting actions', prompt: 'What outstanding actions are there from recent meetings?', scope: 'project', category: 'Meetings' },
+]
+
+const AI_CONVERSATIONS: AIConversation[] = [
+  {
+    id: 'conv-1',
+    organisation_id: 'org-1',
+    project_id: undefined,
+    title: 'Portfolio risk overview',
+    started_by_user_id: 'user-1',
+    messages: [
+      {
+        id: 'msg-1',
+        conversation_id: 'conv-1',
+        role: 'user',
+        content: 'What are the top risks across my active projects?',
+        timestamp: '2025-01-15T09:00:00Z',
+      },
+      {
+        id: 'msg-2',
+        conversation_id: 'conv-1',
+        role: 'assistant',
+        content: 'Based on the current portfolio, I can see 3 key risk areas:\n\n1. **Riverside House Extension** — Stage 4 has 2 overdue required tasks (structural specification review and M&E coordination). The project lead James Chen flagged a resource conflict with the Clapham scheme.\n\n2. **Clapham Mixed-Use** — Planning condition discharge is 5 days overdue. There are outstanding design risk items around the party wall with No. 14 that need resolution before Stage 5 can commence.\n\n3. **Weybridge School Refurb** — Building regulations submission was returned with queries on fire strategy compartmentation. The re-submission deadline is in 8 days.\n\nWould you like me to drill into any of these?',
+        sources: [
+          { type: 'project', title: 'Riverside House Extension', reference_id: 'proj-1' },
+          { type: 'project', title: 'Clapham Mixed-Use', reference_id: 'proj-2' },
+          { type: 'risk', title: 'Fire strategy queries', reference_id: 'proj-3' },
+        ],
+        timestamp: '2025-01-15T09:00:05Z',
+      },
+      {
+        id: 'msg-3',
+        conversation_id: 'conv-1',
+        role: 'user',
+        content: 'Tell me more about the Clapham party wall issue.',
+        timestamp: '2025-01-15T09:01:00Z',
+      },
+      {
+        id: 'msg-4',
+        conversation_id: 'conv-1',
+        role: 'assistant',
+        content: 'The party wall issue on Clapham Mixed-Use relates to the shared boundary with No. 14 Clapham High Street. Here are the details:\n\n- **Design Risk DR-002**: Party wall notice was served but the adjoining owner has appointed a surveyor who is requesting additional structural details about the proposed steel frame connection.\n- **Impact**: This is blocking the Stage 5 technical sign-off. The structural engineer needs to provide calculations showing load transfer won\'t affect the party wall.\n- **Timeline**: The Party Wall Act requires a 14-day response period. If not resolved, it could delay construction start by 3-4 weeks.\n- **Action Required**: Priya Sharma (project lead) needs to coordinate between the structural engineer and the adjoining owner\'s surveyor.\n\nI\'d recommend raising this at the next project review meeting scheduled for Friday.',
+        sources: [
+          { type: 'risk', title: 'Party wall — No. 14 boundary', reference_id: 'dr-2' },
+          { type: 'project', title: 'Clapham Mixed-Use', reference_id: 'proj-2' },
+        ],
+        timestamp: '2025-01-15T09:01:05Z',
+      },
+    ],
+    created_at: '2025-01-15T09:00:00Z',
+    updated_at: '2025-01-15T09:01:05Z',
+  },
+  {
+    id: 'conv-2',
+    organisation_id: 'org-1',
+    project_id: 'proj-1',
+    title: 'Riverside stage progress',
+    started_by_user_id: 'user-2',
+    messages: [
+      {
+        id: 'msg-5',
+        conversation_id: 'conv-2',
+        role: 'user',
+        content: 'What is the current stage progress for Riverside?',
+        timestamp: '2025-01-14T14:30:00Z',
+      },
+      {
+        id: 'msg-6',
+        conversation_id: 'conv-2',
+        role: 'assistant',
+        content: 'Riverside House Extension is currently at **RIBA Stage 4 — Technical Design** with the following progress:\n\n- **Overall completion**: 68% (across all stages)\n- **Stage 4 completion**: 45% (9 of 20 tasks complete)\n- **Overdue tasks**: 2 (structural spec review, M&E coordination drawing)\n- **Blocked tasks**: 1 (waiting on structural engineer response)\n\nKey upcoming milestones:\n- Building regs submission — due in 12 days\n- Stage 4 sign-off meeting — scheduled 22 Jan\n- Client design freeze confirmation — awaiting\n\nThe main bottleneck is the structural specification, which is blocking 3 downstream tasks.',
+        sources: [
+          { type: 'project', title: 'Riverside House Extension', reference_id: 'proj-1' },
+          { type: 'task', title: 'Structural spec review', reference_id: 'task-4-1' },
+        ],
+        timestamp: '2025-01-14T14:30:05Z',
+      },
+    ],
+    created_at: '2025-01-14T14:30:00Z',
+    updated_at: '2025-01-14T14:30:05Z',
+  },
+  {
+    id: 'conv-3',
+    organisation_id: 'org-1',
+    project_id: undefined,
+    title: 'Staffing conflicts check',
+    started_by_user_id: 'user-1',
+    messages: [
+      {
+        id: 'msg-7',
+        conversation_id: 'conv-3',
+        role: 'user',
+        content: 'Are there any staffing conflicts this month?',
+        timestamp: '2025-01-13T11:00:00Z',
+      },
+      {
+        id: 'msg-8',
+        conversation_id: 'conv-3',
+        role: 'assistant',
+        content: 'I can see two staffing concerns for January:\n\n1. **James Chen** is allocated at 110% capacity — he\'s splitting time between Riverside House (60%) and Weybridge School (50%). This is unsustainable and likely contributing to the overdue tasks on Riverside.\n\n2. **Tom Davies** has a gap from 20 Jan — his Dulwich Garden Studio project reaches Stage 6 handover, and he doesn\'t have a new project allocation lined up. Good opportunity to reassign him to help with the Clapham Stage 5 push.\n\nNo conflicts for Priya Sharma or Amara Okafor — both are at healthy utilisation levels (75-85%).',
+        sources: [
+          { type: 'project', title: 'Staff allocations overview', reference_id: 'staffing' },
+        ],
+        timestamp: '2025-01-13T11:00:05Z',
+      },
+    ],
+    created_at: '2025-01-13T11:00:00Z',
+    updated_at: '2025-01-13T11:00:05Z',
+  },
+]
+
+// ── Phase 3 Wave 4: Integrations Mock Data ─────────────────
+
+const INTEGRATIONS: Integration[] = [
+  {
+    id: 'int-1',
+    organisation_id: 'org-1',
+    provider: 'xero',
+    display_name: 'Xero',
+    description: 'Accounting & invoicing. Syncs fee invoices, purchase orders, and expense claims with project commercial data.',
+    status: 'connected',
+    connected_by_user_id: 'user-1',
+    connected_at: '2024-11-01T10:00:00Z',
+    last_sync_at: '2025-01-15T08:30:00Z',
+    sync_frequency_minutes: 60,
+    config: { company_name: 'Mitchell Architecture Ltd', tax_scheme: 'standard' },
+    category: 'accounting',
+  },
+  {
+    id: 'int-2',
+    organisation_id: 'org-1',
+    provider: 'quickbooks',
+    display_name: 'QuickBooks',
+    description: 'Alternative accounting integration. Syncs invoices, time tracking, and expense data.',
+    status: 'disconnected',
+    config: {},
+    category: 'accounting',
+  },
+  {
+    id: 'int-3',
+    organisation_id: 'org-1',
+    provider: 'outlook',
+    display_name: 'Microsoft Outlook',
+    description: 'Calendar & email. Syncs project meetings, deadlines, and milestone reminders to team calendars.',
+    status: 'connected',
+    connected_by_user_id: 'user-1',
+    connected_at: '2024-10-15T09:00:00Z',
+    last_sync_at: '2025-01-15T09:00:00Z',
+    sync_frequency_minutes: 15,
+    config: { calendar_name: 'Practice Calendar', sync_meetings: 'true', sync_deadlines: 'true' },
+    category: 'calendar',
+  },
+  {
+    id: 'int-4',
+    organisation_id: 'org-1',
+    provider: 'google_calendar',
+    display_name: 'Google Calendar',
+    description: 'Calendar sync for practices using Google Workspace. Syncs meetings and deadlines.',
+    status: 'disconnected',
+    config: {},
+    category: 'calendar',
+  },
+  {
+    id: 'int-5',
+    organisation_id: 'org-1',
+    provider: 'sharepoint',
+    display_name: 'SharePoint',
+    description: 'Document storage. Links project documents to SharePoint libraries for version control and collaboration.',
+    status: 'error',
+    connected_by_user_id: 'user-1',
+    connected_at: '2024-12-01T14:00:00Z',
+    last_sync_at: '2025-01-10T06:00:00Z',
+    sync_frequency_minutes: 30,
+    config: { site_url: 'https://mitchellarch.sharepoint.com', error_message: 'Authentication token expired. Please reconnect.' },
+    category: 'storage',
+  },
+  {
+    id: 'int-6',
+    organisation_id: 'org-1',
+    provider: 'dropbox',
+    display_name: 'Dropbox Business',
+    description: 'Cloud storage integration for drawing files, specifications, and project archives.',
+    status: 'disconnected',
+    config: {},
+    category: 'storage',
+  },
+]
+
+// ── Phase 3 Wave 4: Portal Mock Data ───────────────────────
+
+const PORTAL_INVITES: PortalInvite[] = [
+  {
+    id: 'pinv-1',
+    project_id: 'proj-1',
+    email: 'david.thornton@gmail.com',
+    name: 'David Thornton',
+    organisation: 'Private Client',
+    role: 'Client',
+    access_level: 'approve',
+    invited_by_user_id: 'user-2',
+    accepted: true,
+    invited_at: '2024-11-20T10:00:00Z',
+    last_accessed_at: '2025-01-14T16:30:00Z',
+  },
+  {
+    id: 'pinv-2',
+    project_id: 'proj-1',
+    email: 'mark.webb@webbstructural.co.uk',
+    name: 'Mark Webb',
+    organisation: 'Webb Structural Engineers',
+    role: 'Structural Engineer',
+    access_level: 'comment',
+    invited_by_user_id: 'user-2',
+    accepted: true,
+    invited_at: '2024-11-20T10:05:00Z',
+    last_accessed_at: '2025-01-12T09:15:00Z',
+  },
+  {
+    id: 'pinv-3',
+    project_id: 'proj-2',
+    email: 'sarah.green@claphamdevs.com',
+    name: 'Sarah Green',
+    organisation: 'Clapham Developments Ltd',
+    role: 'Client',
+    access_level: 'approve',
+    invited_by_user_id: 'user-3',
+    accepted: true,
+    invited_at: '2024-10-01T08:00:00Z',
+    last_accessed_at: '2025-01-15T11:00:00Z',
+  },
+  {
+    id: 'pinv-4',
+    project_id: 'proj-2',
+    email: 'raj.patel@lambethplanning.gov.uk',
+    name: 'Raj Patel',
+    organisation: 'Lambeth Planning',
+    role: 'Planning Consultant',
+    access_level: 'view_only',
+    invited_by_user_id: 'user-3',
+    accepted: false,
+    invited_at: '2025-01-10T14:00:00Z',
+  },
+  {
+    id: 'pinv-5',
+    project_id: 'proj-3',
+    email: 'helen.morris@surreycountycouncil.gov.uk',
+    name: 'Helen Morris',
+    organisation: 'Surrey County Council',
+    role: 'Client',
+    access_level: 'approve',
+    invited_by_user_id: 'user-1',
+    accepted: true,
+    invited_at: '2024-09-15T10:00:00Z',
+    last_accessed_at: '2025-01-08T14:45:00Z',
+  },
+]
+
+const PORTAL_SHARED_ITEMS: PortalSharedItem[] = [
+  {
+    id: 'psi-1',
+    project_id: 'proj-1',
+    item_type: 'document',
+    item_id: 'doc-1',
+    title: 'Stage 3 Design Report',
+    shared_at: '2025-01-05T10:00:00Z',
+    shared_by_user_id: 'user-2',
+    visible_to_portal_invite_ids: ['pinv-1', 'pinv-2'],
+    requires_sign_off: true,
+    signed_off_by: 'David Thornton',
+    signed_off_at: '2025-01-07T16:00:00Z',
+  },
+  {
+    id: 'psi-2',
+    project_id: 'proj-1',
+    item_type: 'drawing',
+    item_id: 'dwg-1',
+    title: 'Ground Floor GA Drawing Rev C',
+    shared_at: '2025-01-10T09:30:00Z',
+    shared_by_user_id: 'user-2',
+    visible_to_portal_invite_ids: ['pinv-1', 'pinv-2'],
+    requires_sign_off: false,
+  },
+  {
+    id: 'psi-3',
+    project_id: 'proj-1',
+    item_type: 'approval',
+    item_id: 'appr-1',
+    title: 'Stage 4 Client Design Approval',
+    shared_at: '2025-01-12T11:00:00Z',
+    shared_by_user_id: 'user-2',
+    visible_to_portal_invite_ids: ['pinv-1'],
+    requires_sign_off: true,
+  },
+  {
+    id: 'psi-4',
+    project_id: 'proj-2',
+    item_type: 'report',
+    item_id: 'rpt-1',
+    title: 'Planning Application Pack',
+    shared_at: '2025-01-08T14:00:00Z',
+    shared_by_user_id: 'user-3',
+    visible_to_portal_invite_ids: ['pinv-3', 'pinv-4'],
+    requires_sign_off: true,
+    signed_off_by: 'Sarah Green',
+    signed_off_at: '2025-01-09T10:30:00Z',
+  },
+  {
+    id: 'psi-5',
+    project_id: 'proj-2',
+    item_type: 'meeting_minutes',
+    item_id: 'mm-1',
+    title: 'Design Team Meeting #12 Minutes',
+    shared_at: '2025-01-14T17:00:00Z',
+    shared_by_user_id: 'user-3',
+    visible_to_portal_invite_ids: ['pinv-3'],
+    requires_sign_off: false,
+  },
+  {
+    id: 'psi-6',
+    project_id: 'proj-3',
+    item_type: 'document',
+    item_id: 'doc-3',
+    title: 'Feasibility Study & Options Appraisal',
+    shared_at: '2024-12-20T10:00:00Z',
+    shared_by_user_id: 'user-1',
+    visible_to_portal_invite_ids: ['pinv-5'],
+    requires_sign_off: true,
+    signed_off_by: 'Helen Morris',
+    signed_off_at: '2024-12-22T09:00:00Z',
+  },
+]
+
+// ── Phase 3 Wave 4 Helpers ─────────────────────────────────
+
+export function getAISuggestedPrompts(scope?: 'global' | 'project'): AISuggestedPrompt[] {
+  if (scope) return AI_SUGGESTED_PROMPTS.filter(p => p.scope === scope)
+  return AI_SUGGESTED_PROMPTS
+}
+
+export function getAIConversations(projectId?: string): AIConversation[] {
+  if (projectId) return AI_CONVERSATIONS.filter(c => c.project_id === projectId)
+  return AI_CONVERSATIONS.filter(c => !c.project_id)
+}
+
+export function getAIConversation(id: string): AIConversation | undefined {
+  return AI_CONVERSATIONS.find(c => c.id === id)
+}
+
+export function getAllAIConversations(): AIConversation[] {
+  return AI_CONVERSATIONS
+}
+
+export function getIntegrations(): Integration[] {
+  return INTEGRATIONS
+}
+
+export function getIntegration(id: string): Integration | undefined {
+  return INTEGRATIONS.find(i => i.id === id)
+}
+
+export function getIntegrationsByCategory(category: 'accounting' | 'calendar' | 'storage'): Integration[] {
+  return INTEGRATIONS.filter(i => i.category === category)
+}
+
+export function getPortalInvites(projectId?: string): PortalInvite[] {
+  if (projectId) return PORTAL_INVITES.filter(i => i.project_id === projectId)
+  return PORTAL_INVITES
+}
+
+export function getPortalSharedItems(projectId?: string): PortalSharedItem[] {
+  if (projectId) return PORTAL_SHARED_ITEMS.filter(i => i.project_id === projectId)
+  return PORTAL_SHARED_ITEMS
+}
+
+export function getPortalItemsForInvite(inviteId: string): PortalSharedItem[] {
+  return PORTAL_SHARED_ITEMS.filter(i => i.visible_to_portal_invite_ids.includes(inviteId))
 }
