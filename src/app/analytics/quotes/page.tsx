@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { getFeeQuoteRecords, getFeeQuoteViews, getUser, PROJECTS } from '@/lib/mock-data'
-import { formatCurrency, formatDate, timeAgo, feeQuoteStatusColor, feeQuoteStatusLabel, cn } from '@/lib/utils'
+import { getFeeQuoteRecords, getFeeQuoteViews, getUser, PROJECTS, getQuoteConversionMetrics, getQuoteProjectLinks } from '@/lib/mock-data'
+import { formatCurrency, formatDate, timeAgo, feeQuoteStatusColor, feeQuoteStatusLabel, cn, formatPercent } from '@/lib/utils'
 import { Breadcrumb } from '@/components/Breadcrumb'
 import { FeeQuoteRecord, FeeQuoteView } from '@/lib/types'
 
@@ -11,7 +11,6 @@ export default function QuotePerformanceAnalytics() {
   const [period, setPeriod] = useState<'all' | '3mo' | '6mo' | '1yr'>('all')
 
   const quotes = getFeeQuoteRecords()
-  const allViews = getFeeQuoteViews('') // We'll filter manually
 
   // ━━━ KPI CALCULATIONS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const statusCounts = {
@@ -68,7 +67,7 @@ export default function QuotePerformanceAnalytics() {
   // ━━━ RECENT ACTIVITY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const allQuoteViews: Array<FeeQuoteView & { quoteName: string; quoteRef: string }> = []
   quotes.forEach(quote => {
-    const viewsForQuote = allViews.filter(v => v.fee_quote_id === quote.id)
+    const viewsForQuote = getFeeQuoteViews(quote.id)
     viewsForQuote.forEach(view => {
       allQuoteViews.push({
         ...view,
@@ -84,6 +83,32 @@ export default function QuotePerformanceAnalytics() {
 
   // ━━━ QUOTE VALUE CHART DATA (for rendering bars) ━━━━━━━━
   const maxFee = Math.max(...quotes.map(q => q.total_fee), 1)
+
+  // ━━━ CONVERSION METRICS & PIPELINE DATA ━━━━━━━━━━━━━━━━
+  const conversionMetrics = getQuoteConversionMetrics()
+  const quoteProjectLinks = getQuoteProjectLinks()
+
+  // Quote-to-project pipeline counts
+  const linkedToProjects = quoteProjectLinks.filter(link => link.project_creation_status === 'created').length
+  const awaitingLink = quoteProjectLinks.filter(link => link.project_creation_status === 'pending').length
+  const skipped = quoteProjectLinks.filter(link => link.project_creation_status === 'skipped').length
+
+  // Calculate overall average days to accept (weighted)
+  const totalAcceptedQuotes = conversionMetrics.reduce((sum, m) => sum + m.accepted_quotes, 0)
+  const overallAvgDaysToAccept = totalAcceptedQuotes > 0
+    ? conversionMetrics.reduce((sum, m) => sum + (m.avg_days_to_accept * m.accepted_quotes), 0) / totalAcceptedQuotes
+    : 0
+
+  // Calculate weighted average win rate
+  const totalQuotesInMetrics = conversionMetrics.reduce((sum, m) => sum + m.total_quotes, 0)
+  const weightedAvgWinRate = totalQuotesInMetrics > 0
+    ? conversionMetrics.reduce((sum, m) => sum + (m.win_rate * m.total_quotes), 0) / totalQuotesInMetrics
+    : 0
+
+  // Pipeline value calculations
+  const sentAndViewedQuotes = quotes.filter(q => q.status === 'sent' || q.status === 'viewed')
+  const totalPipelineValue = sentAndViewedQuotes.reduce((sum, q) => sum + q.total_fee, 0)
+  const expectedValue = totalPipelineValue * (weightedAvgWinRate / 100)
 
   // ━━━ STATUS COLOR MAP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const statusBgColors: Record<string, string> = {
@@ -386,6 +411,263 @@ export default function QuotePerformanceAnalytics() {
               <p className="text-[14px] text-ink-400">No quotes currently need follow-up action</p>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ━━━ WIN RATE BY SECTOR ━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="pb-16">
+        <div className="border-t border-surface-200/60 pt-10 mb-8">
+          <h2 className="font-display text-xl text-ink-900 mb-6">Win Rate by Sector</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {conversionMetrics.map((metric) => {
+              const barColor = metric.win_rate > 40
+                ? 'bg-emerald-500'
+                : metric.win_rate >= 20
+                ? 'bg-amber-500'
+                : 'bg-red-500'
+
+              return (
+                <div key={metric.sector} className="bg-white rounded-2xl border border-surface-200 p-6 shadow-sm">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <p className="text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold mb-1">Sector</p>
+                      <p className="text-lg font-medium text-ink-900">{metric.sector}</p>
+                    </div>
+                    <p className="text-[13px] font-semibold text-ink-900">{formatPercent(metric.win_rate)}</p>
+                  </div>
+
+                  {/* Win rate bar */}
+                  <div className="mb-5">
+                    <div className="relative h-2 bg-surface-100 rounded-full overflow-hidden">
+                      <div
+                        className={cn(barColor, 'h-full rounded-full transition-all duration-300')}
+                        style={{ width: `${Math.max(metric.win_rate, 2)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  {/* Metrics grid */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <p className="text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold">Quotes</p>
+                      <p className="text-lg font-medium text-ink-900">{metric.total_quotes}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold">Won Value</p>
+                      <p className="text-sm font-medium text-ink-900">{formatCurrency(metric.won_value)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold">Avg Days</p>
+                      <p className="text-lg font-medium text-ink-900">{Math.round(metric.avg_days_to_accept)}</p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ━━━ QUOTE-TO-PROJECT PIPELINE ━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="pb-16">
+        <div className="border-t border-surface-200/60 pt-10 mb-8">
+          <h2 className="font-display text-xl text-ink-900 mb-6">Quote-to-Project Pipeline</h2>
+
+          {/* KPI Cards */}
+          <div className="grid grid-cols-3 gap-4 mb-8">
+            <div className="bg-white rounded-2xl border border-surface-200 p-6 shadow-sm">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="w-1 h-8 bg-emerald-500 rounded-r-sm"></div>
+                <div className="flex-1">
+                  <p className="text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold">Linked to Projects</p>
+                </div>
+              </div>
+              <p className="text-3xl font-light text-ink-900">{linkedToProjects}</p>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-surface-200 p-6 shadow-sm">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="w-1 h-8 bg-amber-500 rounded-r-sm"></div>
+                <div className="flex-1">
+                  <p className="text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold">Awaiting Link</p>
+                </div>
+              </div>
+              <p className="text-3xl font-light text-ink-900">{awaitingLink}</p>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-surface-200 p-6 shadow-sm">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="w-1 h-8 bg-slate-300 rounded-r-sm"></div>
+                <div className="flex-1">
+                  <p className="text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold">Skipped</p>
+                </div>
+              </div>
+              <p className="text-3xl font-light text-ink-900">{skipped}</p>
+            </div>
+          </div>
+
+          {/* Pipeline table */}
+          {quoteProjectLinks.length > 0 ? (
+            <div className="bg-white rounded-2xl border border-surface-200 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-surface-200 bg-surface-50/50">
+                      <th className="text-left px-6 py-4 text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold">Quote Ref</th>
+                      <th className="text-left px-6 py-4 text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold">Status</th>
+                      <th className="text-left px-6 py-4 text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold">Linked Project</th>
+                      <th className="text-left px-6 py-4 text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {quoteProjectLinks.slice(0, 8).map((link, idx) => {
+                      const quote = quotes.find(q => q.id === link.fee_quote_id)
+                      const project = PROJECTS.find(p => p.id === link.project_id)
+                      const statusColors = {
+                        'created': 'bg-emerald-100 text-emerald-700',
+                        'pending': 'bg-amber-100 text-amber-700',
+                        'skipped': 'bg-slate-100 text-slate-700',
+                      }
+                      const statusLabel = {
+                        'created': 'Linked',
+                        'pending': 'Pending',
+                        'skipped': 'Skipped',
+                      }
+
+                      return (
+                        <tr key={idx} className="border-b border-surface-100 hover:bg-surface-50/50 transition-colors">
+                          <td className="px-6 py-4">
+                            <p className="text-[13px] font-medium text-ink-900">{quote ? quote.quote_reference : 'Quote not found'}</p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={cn('inline-block px-3 py-1 rounded-full text-[11px] font-medium', statusColors[link.project_creation_status])}>
+                              {statusLabel[link.project_creation_status]}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-[13px] text-ink-600">
+                              {project ? project.name : link.project_id ? 'Project not found' : '—'}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-[13px] text-ink-400">{link.linked_at ? formatDate(link.linked_at) : '—'}</p>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border border-surface-200 p-8 text-center">
+              <p className="text-[14px] text-ink-400">No quote-to-project links</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ━━━ AVERAGE TIME TO ACCEPT ━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="pb-16">
+        <div className="border-t border-surface-200/60 pt-10 mb-8">
+          <h2 className="font-display text-xl text-ink-900 mb-6">Average Time to Accept</h2>
+          <div className="bg-white rounded-2xl border border-surface-200 p-8 shadow-sm">
+            {/* Overall metric */}
+            <div className="mb-10 pb-10 border-b border-surface-200/60">
+              <div className="flex items-baseline justify-between mb-4">
+                <p className="text-[14px] font-medium text-ink-900">Overall Average</p>
+                <p className="text-3xl font-light text-ink-900">{Math.round(overallAvgDaysToAccept)}</p>
+              </div>
+              <p className="text-[13px] text-ink-400">days across all sectors</p>
+            </div>
+
+            {/* Per-sector breakdown */}
+            <div className="space-y-4">
+              {conversionMetrics
+                .sort((a, b) => a.avg_days_to_accept - b.avg_days_to_accept)
+                .map((metric) => {
+                  const maxDays = Math.max(...conversionMetrics.map(m => m.avg_days_to_accept), 30)
+                  const barWidth = (metric.avg_days_to_accept / maxDays) * 100
+
+                  return (
+                    <div key={metric.sector}>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-[13px] font-medium text-ink-900">{metric.sector}</p>
+                        <p className="text-[13px] text-ink-600">{Math.round(metric.avg_days_to_accept)} days</p>
+                      </div>
+                      <div className="relative h-2 bg-surface-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-indigo-500 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.max(barWidth, 2)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )
+                })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ━━━ PIPELINE VALUE FORECAST ━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="pb-16">
+        <div className="border-t border-surface-200/60 pt-10 mb-8">
+          <h2 className="font-display text-xl text-ink-900 mb-6">Pipeline Value Forecast</h2>
+          <div className="grid grid-cols-2 gap-6 mb-8">
+            <div className="bg-white rounded-2xl border border-surface-200 p-8 shadow-sm">
+              <p className="text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold mb-3">Total Pipeline Value</p>
+              <p className="text-4xl font-light text-ink-900 mb-2">{formatCurrency(totalPipelineValue)}</p>
+              <p className="text-[13px] text-ink-400">Sent & viewed quotes</p>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-surface-200 p-8 shadow-sm">
+              <p className="text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold mb-3">Expected Value</p>
+              <p className="text-4xl font-light text-emerald-600 mb-2">{formatCurrency(expectedValue)}</p>
+              <p className="text-[13px] text-ink-400">Based on {formatPercent(weightedAvgWinRate)} win rate</p>
+            </div>
+          </div>
+
+          {/* Breakdown */}
+          <div className="bg-white rounded-2xl border border-surface-200 p-6 shadow-sm">
+            <p className="text-[11px] text-ink-300 uppercase tracking-[0.08em] font-semibold mb-6">Breakdown by Status</p>
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[13px] font-medium text-ink-900">Sent</p>
+                  <div className="text-right">
+                    <p className="text-[13px] font-medium text-ink-900">{quotes.filter(q => q.status === 'sent').length} quotes</p>
+                    <p className="text-[12px] text-ink-400">{formatCurrency(quotes.filter(q => q.status === 'sent').reduce((sum, q) => sum + q.total_fee, 0))}</p>
+                  </div>
+                </div>
+                <div className="relative h-2 bg-surface-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-500 rounded-full"
+                    style={{
+                      width: `${totalPipelineValue > 0 ? ((quotes.filter(q => q.status === 'sent').reduce((sum, q) => sum + q.total_fee, 0) / totalPipelineValue) * 100) : 0}%`
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[13px] font-medium text-ink-900">Viewed</p>
+                  <div className="text-right">
+                    <p className="text-[13px] font-medium text-ink-900">{quotes.filter(q => q.status === 'viewed').length} quotes</p>
+                    <p className="text-[12px] text-ink-400">{formatCurrency(quotes.filter(q => q.status === 'viewed').reduce((sum, q) => sum + q.total_fee, 0))}</p>
+                  </div>
+                </div>
+                <div className="relative h-2 bg-surface-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-indigo-500 rounded-full"
+                    style={{
+                      width: `${totalPipelineValue > 0 ? ((quotes.filter(q => q.status === 'viewed').reduce((sum, q) => sum + q.total_fee, 0) / totalPipelineValue) * 100) : 0}%`
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

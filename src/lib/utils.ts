@@ -1,4 +1,4 @@
-import { HealthStatus, TaskStatus, RiskSeverity, ApprovalStatus, IssueStatus, ChangeStatus, RiskRegisterStatus, ActionStatus, RiskProbability, RiskImpact, MeetingType, DesignRiskReviewStatus, ContractEventStatus, TenderStatus, SiteQueryStatus, BuildingRegStatus, InspectionStatus, ComplianceStatus, DocumentStatus, KnowledgeCategory, DutyholderRole, DrawingIssueType, CommercialHealthFlag, UtilisationStatus, FeeQuoteStatus, OpportunityStatus, IntegrationStatus, QuoteSectionType, FeeQuoteRecord } from './types'
+import { HealthStatus, TaskStatus, RiskSeverity, ApprovalStatus, IssueStatus, ChangeStatus, RiskRegisterStatus, ActionStatus, RiskProbability, RiskImpact, MeetingType, DesignRiskReviewStatus, ContractEventStatus, TenderStatus, SiteQueryStatus, BuildingRegStatus, InspectionStatus, ComplianceStatus, DocumentStatus, KnowledgeCategory, DutyholderRole, DrawingIssueType, CommercialHealthFlag, UtilisationStatus, FeeQuoteStatus, OpportunityStatus, IntegrationStatus, QuoteSectionType, FeeQuoteRecord, HealthAlertSeverity, HealthAlertCategory } from './types'
 
 export function cn(...classes: (string | undefined | false | null)[]): string {
   return classes.filter(Boolean).join(' ')
@@ -562,5 +562,71 @@ export function portalItemTypeIcon(type: 'document' | 'approval' | 'drawing' | '
     case 'report': return '📊'
     case 'meeting_minutes': return '📝'
   }
+}
+
+// ── Phase 4 Wave 2 Utilities ───────────────────────────────────
+
+export function healthAlertSeverityColor(s: HealthAlertSeverity): string {
+  switch (s) {
+    case 'info': return 'bg-blue-100 text-blue-700'
+    case 'warning': return 'bg-amber-100 text-amber-700'
+    case 'critical': return 'bg-red-100 text-red-700'
+  }
+}
+
+export function healthAlertSeverityDot(s: HealthAlertSeverity): string {
+  switch (s) {
+    case 'info': return 'bg-blue-500'
+    case 'warning': return 'bg-amber-500'
+    case 'critical': return 'bg-red-500'
+  }
+}
+
+export function healthAlertCategoryLabel(c: HealthAlertCategory): string {
+  const labels: Record<HealthAlertCategory, string> = {
+    burn_rate: 'Burn Rate',
+    margin_erosion: 'Margin Erosion',
+    billing_gap: 'Billing Gap',
+    scope_creep: 'Scope Creep',
+    programme_delay: 'Programme Delay',
+    near_loss: 'Near Loss',
+    fee_overrun: 'Fee Overrun',
+  }
+  return labels[c]
+}
+
+export function healthAlertCategoryIcon(c: HealthAlertCategory): string {
+  const icons: Record<HealthAlertCategory, string> = {
+    burn_rate: '🔥',
+    margin_erosion: '📉',
+    billing_gap: '💰',
+    scope_creep: '📐',
+    programme_delay: '⏱',
+    near_loss: '⚠',
+    fee_overrun: '🚨',
+  }
+  return icons[c]
+}
+
+export function burnRatioColor(ratio: number): string {
+  if (ratio <= 1.0) return 'text-emerald-600'
+  if (ratio <= 1.1) return 'text-amber-600'
+  return 'text-red-600'
+}
+
+export function burnRatioBg(ratio: number): string {
+  if (ratio <= 1.0) return 'bg-emerald-100'
+  if (ratio <= 1.1) return 'bg-amber-100'
+  return 'bg-red-100'
+}
+
+export function varianceColor(variance: number): string {
+  if (variance <= 0) return 'text-emerald-600'
+  if (variance <= 10) return 'text-amber-600'
+  return 'text-red-600'
+}
+
+export function formatBurnRatio(ratio: number): string {
+  return ratio.toFixed(2) + 'x'
 }
 

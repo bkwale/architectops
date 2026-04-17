@@ -761,6 +761,60 @@ export interface DrawingIssueTemplate {
   created_at: string
 }
 
+// ── Phase 4 Wave 2: Health Engine Types ─────────────────────
+
+export type HealthAlertSeverity = 'info' | 'warning' | 'critical'
+export type HealthAlertCategory = 'burn_rate' | 'margin_erosion' | 'billing_gap' | 'scope_creep' | 'programme_delay' | 'near_loss' | 'fee_overrun'
+
+export interface ProjectHealthAlert {
+  id: string
+  project_id: string
+  category: HealthAlertCategory
+  severity: HealthAlertSeverity
+  title: string
+  description: string
+  metric_value: number
+  threshold_value: number
+  suggested_action: string
+  acknowledged_flag: boolean
+  acknowledged_by_user_id?: string
+  acknowledged_at?: string
+  created_at: string
+}
+
+export interface BurnBudgetMetric {
+  project_id: string
+  stage: RIBAStage
+  stage_label: string
+  budgeted_hours: number
+  actual_hours: number
+  budgeted_fee: number
+  actual_fee_earned: number
+  burn_ratio: number // actual / budgeted (>1 = overspend)
+  variance_percent: number
+}
+
+export interface QuoteProjectLink {
+  id: string
+  fee_quote_id: string
+  project_id?: string // null = not yet linked
+  linked_at?: string
+  linked_by_user_id?: string
+  auto_created_flag: boolean
+  project_creation_status: 'pending' | 'created' | 'skipped'
+}
+
+export interface QuoteConversionMetric {
+  sector: string
+  total_quotes: number
+  accepted_quotes: number
+  win_rate: number
+  total_value: number
+  won_value: number
+  avg_days_to_accept: number
+  avg_quote_value: number
+}
+
 // ── Phase 3 Wave 3: Opportunities / Proposals Types ─────────
 export type OpportunityStatus = 'lead' | 'qualifying' | 'proposal_sent' | 'negotiation' | 'won' | 'lost' | 'dormant'
 

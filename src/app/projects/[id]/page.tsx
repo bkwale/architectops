@@ -202,6 +202,7 @@ export default function ProjectDashboard({ params }: { params: { id: string } })
         <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Workspaces</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
+            { href: `/projects/${project.id}/health`, label: 'Health', sub: 'Scorecards & Alerts' },
             { href: `/projects/${project.id}/registers`, label: 'Registers', sub: 'Issues, Changes & Risks' },
             { href: `/projects/${project.id}/meetings`, label: 'Meetings', sub: 'Meetings & Actions' },
             { href: `/projects/${project.id}/design-risks`, label: 'Design Risk', sub: 'Risk Workspace' },

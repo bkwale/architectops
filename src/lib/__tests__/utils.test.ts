@@ -15,6 +15,9 @@ import {
   formatCurrency, formatPercent,
   opportunityStatusColor, opportunityStatusLabel,
   confidenceBadgeColor,
+  healthAlertSeverityColor, healthAlertSeverityDot,
+  healthAlertCategoryLabel, healthAlertCategoryIcon,
+  burnRatioColor, burnRatioBg, varianceColor, formatBurnRatio,
 } from '../utils'
 
 describe('cn (class name helper)', () => {
@@ -346,5 +349,87 @@ describe('severityDot', () => {
     expect(severityDot('low')).toContain('bg-')
     expect(severityDot('medium')).toContain('bg-')
     expect(severityDot('high')).toContain('bg-')
+  })
+})
+
+// ── Phase 4 Wave 2 Tests ──────────────────────────────────
+
+describe('healthAlertSeverityColor', () => {
+  it('returns correct color for all severities', () => {
+    expect(healthAlertSeverityColor('info')).toContain('blue')
+    expect(healthAlertSeverityColor('warning')).toContain('amber')
+    expect(healthAlertSeverityColor('critical')).toContain('red')
+  })
+})
+
+describe('healthAlertSeverityDot', () => {
+  it('returns dot classes for all severities', () => {
+    expect(healthAlertSeverityDot('info')).toContain('bg-blue')
+    expect(healthAlertSeverityDot('warning')).toContain('bg-amber')
+    expect(healthAlertSeverityDot('critical')).toContain('bg-red')
+  })
+})
+
+describe('healthAlertCategoryLabel', () => {
+  it('returns labels for all categories', () => {
+    const categories = ['burn_rate', 'margin_erosion', 'billing_gap', 'scope_creep', 'programme_delay', 'near_loss', 'fee_overrun'] as const
+    categories.forEach(c => {
+      const result = healthAlertCategoryLabel(c)
+      expect(result).toBeTruthy()
+      expect(typeof result).toBe('string')
+    })
+  })
+})
+
+describe('healthAlertCategoryIcon', () => {
+  it('returns icons for all categories', () => {
+    const categories = ['burn_rate', 'margin_erosion', 'billing_gap', 'scope_creep', 'programme_delay', 'near_loss', 'fee_overrun'] as const
+    categories.forEach(c => {
+      expect(healthAlertCategoryIcon(c)).toBeTruthy()
+    })
+  })
+})
+
+describe('burnRatioColor', () => {
+  it('returns emerald for ratio <= 1.0', () => {
+    expect(burnRatioColor(0.9)).toContain('emerald')
+    expect(burnRatioColor(1.0)).toContain('emerald')
+  })
+  it('returns amber for ratio 1.01-1.1', () => {
+    expect(burnRatioColor(1.05)).toContain('amber')
+    expect(burnRatioColor(1.1)).toContain('amber')
+  })
+  it('returns red for ratio > 1.1', () => {
+    expect(burnRatioColor(1.15)).toContain('red')
+    expect(burnRatioColor(1.5)).toContain('red')
+  })
+})
+
+describe('burnRatioBg', () => {
+  it('returns background classes', () => {
+    expect(burnRatioBg(0.9)).toContain('bg-emerald')
+    expect(burnRatioBg(1.05)).toContain('bg-amber')
+    expect(burnRatioBg(1.2)).toContain('bg-red')
+  })
+})
+
+describe('varianceColor', () => {
+  it('returns emerald for variance <= 0', () => {
+    expect(varianceColor(-5)).toContain('emerald')
+    expect(varianceColor(0)).toContain('emerald')
+  })
+  it('returns amber for variance 1-10', () => {
+    expect(varianceColor(5)).toContain('amber')
+  })
+  it('returns red for variance > 10', () => {
+    expect(varianceColor(15)).toContain('red')
+  })
+})
+
+describe('formatBurnRatio', () => {
+  it('formats burn ratio with x suffix', () => {
+    expect(formatBurnRatio(1.12)).toBe('1.12x')
+    expect(formatBurnRatio(0.95)).toBe('0.95x')
+    expect(formatBurnRatio(1.0)).toBe('1.00x')
   })
 })

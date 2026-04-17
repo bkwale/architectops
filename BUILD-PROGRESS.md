@@ -98,13 +98,19 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 **Utils:** Updated feeQuoteStatusColor/Label (8 statuses), added quoteSectionTypeLabel, numberingPreview, quoteNeedsFollowUp, healthScoreColor/Bg
 **Sidebar:** Added Quote Performance (Analytics), Numbering (Settings)
 
-### Wave 2 — Health Engine (NOT STARTED)
+### Wave 2 — Health Engine (COMPLETE)
 | Feature | Route | Status |
 |---------|-------|--------|
-| Project Health 2.0 (scorecards, alerts, burn vs budget) | `/projects/[id]/health` | Pending |
-| Portfolio Health & Commercial Analytics 2.0 | `/analytics/portfolio` (upgrade) | Pending |
-| Quote-to-Project Linking (acceptance → project creation) | `/fee-quotes/[id]` (upgrade) | Pending |
-| Quote Analytics Dashboard | `/analytics/quotes` (upgrade) | Pending |
+| Project Health 2.0 (scorecards, alerts, burn vs budget) | `/projects/[id]/health` | Done |
+| Portfolio Health & Commercial Analytics 2.0 | `/analytics/portfolio` (upgrade) | Done |
+| Quote-to-Project Linking (acceptance → project creation) | `/fee-quotes/[id]` (upgrade) | Done |
+| Quote Analytics Dashboard | `/analytics/quotes` (upgrade) | Done |
+
+**Types added:** ProjectHealthAlert, BurnBudgetMetric, QuoteProjectLink, QuoteConversionMetric, HealthAlertSeverity, HealthAlertCategory
+**Mock data:** 9 health alerts, 9 burn-budget metrics, 5 quote-project links, 5 conversion metrics, 7 new helper functions
+**Utils:** healthAlertSeverityColor/Dot, healthAlertCategoryLabel/Icon, burnRatioColor/Bg, varianceColor, formatBurnRatio
+**Project workspace:** Added Health link to project dashboard
+**Upgrades:** Portfolio (health trends, alert summary, at-risk deep dive), Quote detail (project linking workflow), Quote analytics (win rate by sector, pipeline forecast, time-to-accept)
 
 ### Wave 3 — Compliance (NOT STARTED)
 | Feature | Route | Status |
@@ -164,6 +170,7 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 - `/building-regs` — Building Regulations
 - `/brpd` — BRPD & Dutyholder Coordination
 - `/documents` — Documents & Transmittals
+- `/health` — Project Health Scorecard (Phase 4)
 
 ## Data Model Summary
 - **6 projects**, **5 users**, **107 tasks**
@@ -174,3 +181,4 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 - **Phase 3 Wave 3:** 3 fee recommendations, 4 fee quotes, 16 line items, 6 opportunities
 - **Phase 3 Wave 4:** 3 AI conversations (8 messages), 10 suggested prompts, 6 integrations, 5 portal invites, 6 shared items
 - **Phase 4 Wave 1:** 6 fee quotes (all statuses), 19 line items, 11 quote sections, 10 view tracking entries, 3 quote templates, 4 terms library items, 5 exclusions library items, 17 health snapshots, 3 project number templates, 1 quote number template, 3 drawing issue templates
+- **Phase 4 Wave 2:** 9 health alerts, 9 burn-budget metrics, 5 quote-project links, 5 conversion metrics

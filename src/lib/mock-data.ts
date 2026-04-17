@@ -1,4 +1,4 @@
-import { User, Project, Task, RIBAStage, ApprovalRequest, Issue, Change, RiskRegisterItem, Meeting, MeetingAction, DesignRisk, ContractAdminRecord, ContractEvent, PlanningRecord, SiteConstraint, TenderRecord, TenderReturn, TenderEvaluation, SiteQuery, BuildingRegRecord, BuildingInspection, DutyholderRecord, BRPDGateway, DocumentRecord, DocumentTransmittal, KnowledgeArticle, CPDRecord, Competency, UserCompetency, TrainingPlan, JurisdictionPack, OrganisationSettings, AISourcePermission, AILog, DrawingIssueRecord, ProjectCommercial, CashflowForecast, StaffAllocation, StaffCapacity, FeeRecommendation, FeeQuoteRecord, FeeQuoteLineItem, Opportunity, AISuggestedPrompt, AIConversation, AIMessage, AISource, Integration, PortalInvite, PortalSharedItem, FeeQuoteSection, FeeQuoteView, FeeQuoteTemplate, TermsLibraryItem, ExclusionsLibraryItem, ProjectHealthSnapshot, TaskScheduleMetric, ProjectNumberTemplate, QuoteNumberTemplate, DrawingIssueTemplate } from './types'
+import { User, Project, Task, RIBAStage, ApprovalRequest, Issue, Change, RiskRegisterItem, Meeting, MeetingAction, DesignRisk, ContractAdminRecord, ContractEvent, PlanningRecord, SiteConstraint, TenderRecord, TenderReturn, TenderEvaluation, SiteQuery, BuildingRegRecord, BuildingInspection, DutyholderRecord, BRPDGateway, DocumentRecord, DocumentTransmittal, KnowledgeArticle, CPDRecord, Competency, UserCompetency, TrainingPlan, JurisdictionPack, OrganisationSettings, AISourcePermission, AILog, DrawingIssueRecord, ProjectCommercial, CashflowForecast, StaffAllocation, StaffCapacity, FeeRecommendation, FeeQuoteRecord, FeeQuoteLineItem, Opportunity, AISuggestedPrompt, AIConversation, AIMessage, AISource, Integration, PortalInvite, PortalSharedItem, FeeQuoteSection, FeeQuoteView, FeeQuoteTemplate, TermsLibraryItem, ExclusionsLibraryItem, ProjectHealthSnapshot, TaskScheduleMetric, ProjectNumberTemplate, QuoteNumberTemplate, DrawingIssueTemplate, ProjectHealthAlert, BurnBudgetMetric, QuoteProjectLink, QuoteConversionMetric } from './types'
 import { STAGE_TEMPLATES } from './stage-templates'
 
 // ── Demo Users ──────────────────────────────────────────────
@@ -2482,4 +2482,92 @@ export function getPortalSharedItems(projectId?: string): PortalSharedItem[] {
 
 export function getPortalItemsForInvite(inviteId: string): PortalSharedItem[] {
   return PORTAL_SHARED_ITEMS.filter(i => i.visible_to_portal_invite_ids.includes(inviteId))
+}
+
+// ── Phase 4 Wave 2: Health Engine Data ──────────────────────
+
+const PROJECT_HEALTH_ALERTS: ProjectHealthAlert[] = [
+  // p1 — Riverside House Extension
+  { id: 'pha-1', project_id: 'p1', category: 'burn_rate', severity: 'warning', title: 'Stage 3 burn rate above budget', description: 'Detailed design hours are 12% over budgeted allocation. Current burn ratio 1.12 against stage budget.', metric_value: 1.12, threshold_value: 1.0, suggested_action: 'Review remaining scope items with project lead. Consider submitting a variation for additional design coordination.', acknowledged_flag: false, created_at: '2026-03-15T10:00:00Z' },
+  { id: 'pha-2', project_id: 'p1', category: 'scope_creep', severity: 'info', title: 'Additional planning revision requested', description: 'Client requested minor amendments to planning drawings post-submission. 8 hours additional work estimated.', metric_value: 8, threshold_value: 0, suggested_action: 'Log as variation and confirm fee impact with client before proceeding.', acknowledged_flag: true, acknowledged_by_user_id: 'u2', acknowledged_at: '2026-03-16T09:00:00Z', created_at: '2026-03-14T14:00:00Z' },
+
+  // p2 — Clapham Mixed-Use
+  { id: 'pha-3', project_id: 'p2', category: 'billing_gap', severity: 'warning', title: 'Invoice gap: 6 weeks since last bill', description: 'Last invoice was raised on 2 Feb. Current WIP of £14,000 is unbilled. Practice cashflow may be impacted.', metric_value: 42, threshold_value: 30, suggested_action: 'Raise Stage 2 interim invoice this week. WIP should be billed monthly per agreement.', acknowledged_flag: false, created_at: '2026-03-10T11:00:00Z' },
+  { id: 'pha-4', project_id: 'p2', category: 'programme_delay', severity: 'info', title: 'Pre-app meeting delayed by 2 weeks', description: 'LPA pushed pre-application meeting from 10 Mar to 24 Mar. No fee impact but programme is now 2 weeks behind.', metric_value: 14, threshold_value: 7, suggested_action: 'Update programme and notify client. Consider whether this affects Stage 2 completion date.', acknowledged_flag: true, acknowledged_by_user_id: 'u3', acknowledged_at: '2026-03-12T08:00:00Z', created_at: '2026-03-08T16:00:00Z' },
+
+  // p3 — Weybridge School Refurb
+  { id: 'pha-5', project_id: 'p3', category: 'margin_erosion', severity: 'critical', title: 'Forecast margin below 5%', description: 'Current forecast margin is 8% but trending down. Technical coordination overruns have consumed contingency. Risk of fee loss if trend continues.', metric_value: 8, threshold_value: 10, suggested_action: 'Urgent: review remaining scope and submit variation order for additional coordination works.', acknowledged_flag: false, created_at: '2026-03-05T09:00:00Z' },
+  { id: 'pha-6', project_id: 'p3', category: 'fee_overrun', severity: 'critical', title: 'Stage 4 technical design 22% over budget', description: 'Stage 4 hours have exceeded budget by 22%. Multiple coordination issues with structural engineer and M&E consultant.', metric_value: 1.22, threshold_value: 1.0, suggested_action: 'Freeze non-essential design work. Raise formal variation for consultant coordination. Escalate to practice principal.', acknowledged_flag: false, created_at: '2026-03-01T11:00:00Z' },
+  { id: 'pha-7', project_id: 'p3', category: 'near_loss', severity: 'critical', title: 'Project approaching loss-making territory', description: 'If current burn rate continues, project will become loss-making within 4 weeks. Immediate intervention required.', metric_value: 2, threshold_value: 5, suggested_action: 'Arrange fee review meeting with practice principal. Prepare fee impact assessment and variation request.', acknowledged_flag: false, created_at: '2026-02-28T14:00:00Z' },
+
+  // p5 — Dulwich Home Studio
+  { id: 'pha-8', project_id: 'p5', category: 'burn_rate', severity: 'warning', title: 'Small project approaching fee cap', description: 'Only £2,000 of agreed fee remaining with 25 hours of estimated work. Current hourly rate has dropped to £72/hr vs target £95/hr.', metric_value: 72, threshold_value: 95, suggested_action: 'Review remaining deliverables and prioritise. Consider whether Stage 6 site visits can be reduced.', acknowledged_flag: false, created_at: '2026-03-18T10:00:00Z' },
+
+  // p6 — Southwark Workspace Conversion (on hold)
+  { id: 'pha-9', project_id: 'p6', category: 'billing_gap', severity: 'warning', title: 'Unbilled WIP on paused project', description: 'Project is effectively paused but £5,000 of WIP remains unbilled from pre-pause work. Risk of write-off if not invoiced soon.', metric_value: 90, threshold_value: 60, suggested_action: 'Raise final pre-pause invoice immediately. Confirm with client whether project will resume.', acknowledged_flag: false, created_at: '2026-01-15T09:00:00Z' },
+]
+
+const BURN_BUDGET_METRICS: BurnBudgetMetric[] = [
+  // p1 — Riverside House (Stage 0-3)
+  { project_id: 'p1', stage: 0, stage_label: 'Strategic Definition', budgeted_hours: 20, actual_hours: 18, budgeted_fee: 2400, actual_fee_earned: 2400, burn_ratio: 0.90, variance_percent: -10 },
+  { project_id: 'p1', stage: 1, stage_label: 'Preparation & Briefing', budgeted_hours: 40, actual_hours: 38, budgeted_fee: 4800, actual_fee_earned: 4800, burn_ratio: 0.95, variance_percent: -5 },
+  { project_id: 'p1', stage: 2, stage_label: 'Concept Design', budgeted_hours: 80, actual_hours: 85, budgeted_fee: 9600, actual_fee_earned: 9600, burn_ratio: 1.06, variance_percent: 6 },
+  { project_id: 'p1', stage: 3, stage_label: 'Spatial Coordination', budgeted_hours: 120, actual_hours: 134, budgeted_fee: 14400, actual_fee_earned: 14400, burn_ratio: 1.12, variance_percent: 12 },
+
+  // p3 — Weybridge School (Stage 0-4)
+  { project_id: 'p3', stage: 0, stage_label: 'Strategic Definition', budgeted_hours: 15, actual_hours: 14, budgeted_fee: 1800, actual_fee_earned: 1800, burn_ratio: 0.93, variance_percent: -7 },
+  { project_id: 'p3', stage: 1, stage_label: 'Preparation & Briefing', budgeted_hours: 30, actual_hours: 28, budgeted_fee: 3600, actual_fee_earned: 3600, burn_ratio: 0.93, variance_percent: -7 },
+  { project_id: 'p3', stage: 2, stage_label: 'Concept Design', budgeted_hours: 60, actual_hours: 62, budgeted_fee: 7200, actual_fee_earned: 7200, burn_ratio: 1.03, variance_percent: 3 },
+  { project_id: 'p3', stage: 3, stage_label: 'Spatial Coordination', budgeted_hours: 100, actual_hours: 115, budgeted_fee: 12000, actual_fee_earned: 12000, burn_ratio: 1.15, variance_percent: 15 },
+  { project_id: 'p3', stage: 4, stage_label: 'Technical Design', budgeted_hours: 200, actual_hours: 244, budgeted_fee: 24000, actual_fee_earned: 24000, burn_ratio: 1.22, variance_percent: 22 },
+]
+
+const QUOTE_PROJECT_LINKS: QuoteProjectLink[] = [
+  { id: 'qpl-1', fee_quote_id: 'fq-1', project_id: 'p1', linked_at: '2025-09-01T10:00:00Z', linked_by_user_id: 'u1', auto_created_flag: true, project_creation_status: 'created' },
+  { id: 'qpl-2', fee_quote_id: 'fq-2', project_id: 'p2', linked_at: '2025-11-15T14:00:00Z', linked_by_user_id: 'u1', auto_created_flag: false, project_creation_status: 'created' },
+  { id: 'qpl-3', fee_quote_id: 'fq-3', project_id: undefined, linked_at: undefined, linked_by_user_id: undefined, auto_created_flag: false, project_creation_status: 'pending' },
+  { id: 'qpl-4', fee_quote_id: 'fq-4', project_id: undefined, linked_at: undefined, linked_by_user_id: undefined, auto_created_flag: false, project_creation_status: 'pending' },
+  { id: 'qpl-5', fee_quote_id: 'fq-5', project_id: undefined, linked_at: undefined, linked_by_user_id: undefined, auto_created_flag: false, project_creation_status: 'skipped' },
+]
+
+const QUOTE_CONVERSION_METRICS: QuoteConversionMetric[] = [
+  { sector: 'Residential', total_quotes: 12, accepted_quotes: 5, win_rate: 41.7, total_value: 285000, won_value: 118000, avg_days_to_accept: 18, avg_quote_value: 23750 },
+  { sector: 'Commercial', total_quotes: 6, accepted_quotes: 1, win_rate: 16.7, total_value: 420000, won_value: 85000, avg_days_to_accept: 32, avg_quote_value: 70000 },
+  { sector: 'Education', total_quotes: 4, accepted_quotes: 2, win_rate: 50.0, total_value: 310000, won_value: 167000, avg_days_to_accept: 45, avg_quote_value: 77500 },
+  { sector: 'Public', total_quotes: 3, accepted_quotes: 0, win_rate: 0.0, total_value: 390000, won_value: 0, avg_days_to_accept: 0, avg_quote_value: 130000 },
+  { sector: 'Community', total_quotes: 2, accepted_quotes: 1, win_rate: 50.0, total_value: 65000, won_value: 35000, avg_days_to_accept: 22, avg_quote_value: 32500 },
+]
+
+// ── Phase 4 Wave 2: Helper Functions ────────────────────────
+
+export function getProjectHealthAlerts(projectId: string): ProjectHealthAlert[] {
+  return PROJECT_HEALTH_ALERTS.filter(a => a.project_id === projectId).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+}
+
+export function getAllHealthAlerts(): ProjectHealthAlert[] {
+  return PROJECT_HEALTH_ALERTS.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+}
+
+export function getUnacknowledgedAlerts(projectId?: string): ProjectHealthAlert[] {
+  const alerts = projectId ? PROJECT_HEALTH_ALERTS.filter(a => a.project_id === projectId) : PROJECT_HEALTH_ALERTS
+  return alerts.filter(a => !a.acknowledged_flag).sort((a, b) => {
+    const sevOrder = { critical: 0, warning: 1, info: 2 }
+    return sevOrder[a.severity] - sevOrder[b.severity]
+  })
+}
+
+export function getBurnBudgetMetrics(projectId: string): BurnBudgetMetric[] {
+  return BURN_BUDGET_METRICS.filter(m => m.project_id === projectId).sort((a, b) => a.stage - b.stage)
+}
+
+export function getQuoteProjectLink(quoteId: string): QuoteProjectLink | undefined {
+  return QUOTE_PROJECT_LINKS.find(l => l.fee_quote_id === quoteId)
+}
+
+export function getQuoteProjectLinks(): QuoteProjectLink[] {
+  return QUOTE_PROJECT_LINKS
+}
+
+export function getQuoteConversionMetrics(): QuoteConversionMetric[] {
+  return QUOTE_CONVERSION_METRICS
 }

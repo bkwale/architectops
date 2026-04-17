@@ -1,7 +1,8 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { getFeeQuoteRecord, getFeeQuoteLineItems, getProject, getOpportunity } from '@/lib/mock-data'
+import Link from 'next/link'
+import { getFeeQuoteRecord, getFeeQuoteLineItems, getProject, getOpportunity, getQuoteProjectLink, PROJECTS } from '@/lib/mock-data'
 import { RIBA_STAGES } from '@/lib/types'
 import { cn, formatDate, formatCurrency, feeQuoteStatusColor, feeQuoteStatusLabel } from '@/lib/utils'
 import { Breadcrumb } from '@/components/Breadcrumb'
@@ -15,6 +16,8 @@ export default function FeeQuoteDetailPage() {
   const lineItems = getFeeQuoteLineItems(quoteId)
   const relatedProject = quote?.related_project_id ? getProject(quote.related_project_id) : null
   const relatedOpportunity = quote?.related_opportunity_id ? getOpportunity(quote.related_opportunity_id) : null
+  const quoteLink = getQuoteProjectLink(quoteId)
+  const linkedProject = quoteLink?.project_id ? PROJECTS.find(p => p.id === quoteLink.project_id) : null
 
   if (!quote) {
     return (
@@ -45,6 +48,20 @@ export default function FeeQuoteDetailPage() {
           { label: quote.quote_reference },
         ]} />
       </section>
+
+      {/* ━━━ ACCEPTANCE WORKFLOW BANNER ━━━━━━━━━━━━━━━━━━━ */}
+      {quote.status === 'accepted' && quoteLink?.project_creation_status === 'pending' && (
+        <section className="mb-16">
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-2xl flex items-center justify-between">
+            <p className="text-[12px] text-blue-800">
+              This quote has been accepted. Create a project to begin work.
+            </p>
+            <button className="bg-accent-600 text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-accent-700 transition-colors">
+              Create Project
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* ━━━ QUOTE HEADER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section className="pb-16">
@@ -221,6 +238,60 @@ export default function FeeQuoteDetailPage() {
               </div>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* ━━━ QUOTE-TO-PROJECT LINK ━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="pb-20">
+        <div className="border-t border-surface-200/60 pt-10 mt-10">
+          <h3 className="text-[11px] text-ink-400 uppercase tracking-[0.08em] font-semibold mb-4">Project Link</h3>
+
+          {quoteLink?.project_creation_status === 'created' && linkedProject ? (
+            <div className="bg-emerald-50 rounded-2xl border border-emerald-200 shadow-card p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-[11px] text-emerald-700 uppercase tracking-[0.08em] font-semibold mb-2">Linked to Project</p>
+                  <Link href={`/projects/${linkedProject.id}`} className="text-[13px] font-medium text-emerald-900 hover:underline">
+                    {linkedProject.name}
+                  </Link>
+                  {quoteLink.linked_at && (
+                    <p className="text-[11px] text-emerald-700 mt-2">
+                      Linked on {formatDate(quoteLink.linked_at)}
+                    </p>
+                  )}
+                </div>
+                {quoteLink.auto_created_flag && (
+                  <span className="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-md font-semibold whitespace-nowrap ml-4">
+                    AUTO-CREATED
+                  </span>
+                )}
+              </div>
+            </div>
+          ) : quoteLink?.project_creation_status === 'pending' && quote.status === 'accepted' ? (
+            <div className="bg-amber-50 rounded-2xl border border-amber-200 shadow-card p-6">
+              <p className="text-[11px] text-amber-700 uppercase tracking-[0.08em] font-semibold mb-4">Quote Accepted — Ready to Create Project</p>
+              <p className="text-[12px] text-amber-800 mb-4">This will create a new project pre-populated with the quote details.</p>
+              <div className="flex gap-3">
+                <button className="bg-accent-600 text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-accent-700 transition-colors">
+                  Create Project from Quote
+                </button>
+                <button className="bg-white text-accent-600 border border-accent-300 px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-accent-50 transition-colors">
+                  Link to Existing Project
+                </button>
+              </div>
+            </div>
+          ) : quoteLink?.project_creation_status === 'skipped' || quote.status === 'declined' || quote.status === 'expired' ? (
+            <div className="bg-white rounded-2xl border border-surface-200 shadow-card p-6">
+              <p className="text-[11px] text-ink-400 uppercase tracking-[0.08em] font-semibold mb-2">No project linked</p>
+              <p className="text-[12px] text-ink-600">
+                {quote.status === 'declined'
+                  ? 'This quote was declined by the client.'
+                  : quote.status === 'expired'
+                  ? 'This quote expired.'
+                  : '—'}
+              </p>
+            </div>
+          ) : null}
         </div>
       </section>
     </div>
