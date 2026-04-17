@@ -95,10 +95,52 @@ const config: Config = {
         'card-hover': '0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
         'elevated': '0 8px 24px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04)',
         'inner-glow': 'inset 0 1px 0 rgba(255,255,255,0.5)',
+        'premium': '0 0 0 1px rgba(0,0,0,0.03), 0 1px 2px rgba(0,0,0,0.04), 0 4px 8px rgba(0,0,0,0.04)',
+        'premium-hover': '0 0 0 1px rgba(0,0,0,0.03), 0 2px 4px rgba(0,0,0,0.04), 0 8px 16px rgba(0,0,0,0.06)',
+        'glow-indigo': '0 0 20px rgba(99, 102, 241, 0.15)',
+        'sidebar': '4px 0 24px rgba(0,0,0,0.12)',
+      },
+      backgroundImage: {
+        'gradient-hero': 'linear-gradient(135deg, #312e81 0%, #4338ca 40%, #6366f1 100%)',
+        'gradient-hero-soft': 'linear-gradient(135deg, rgba(49,46,129,0.04) 0%, rgba(99,102,241,0.06) 100%)',
+        'gradient-card': 'linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%)',
+        'gradient-sidebar': 'linear-gradient(180deg, #1a1a2e 0%, #16162a 50%, #0f0f1e 100%)',
+        'gradient-accent': 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+        'gradient-success': 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+        'gradient-warning': 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
+        'gradient-danger': 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
       },
       spacing: {
         '18': '4.5rem',
         '88': '22rem',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-out',
+        'slide-up': 'slideUp 0.4s ease-out',
+        'slide-in-left': 'slideInLeft 0.3s ease-out',
+        'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
+        'counter': 'counter 0.6s ease-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideInLeft: {
+          '0%': { opacity: '0', transform: 'translateX(-8px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        pulseSoft: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.6' },
+        },
+      },
+      backdropBlur: {
+        xs: '2px',
       },
     },
   },

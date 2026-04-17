@@ -1,8 +1,8 @@
 'use client'
 
-import { getAISourcePermissions, getAILogs, USERS, getUser } from '@/lib/mock-data'
+import { getAISourcePermissions, getAILogs, USERS, getUser, getAllVisibilityRules } from '@/lib/mock-data'
 import { AISourcePermission, AISourceCategory, AILog } from '@/lib/types'
-import { cn, formatDate } from '@/lib/utils'
+import { cn, formatDate, featureAreaLabel, roleLabel } from '@/lib/utils'
 import { Breadcrumb } from '@/components/Breadcrumb'
 
 // ── Helper: Human-readable category labels ──────────────────
@@ -57,6 +57,7 @@ function getConfidenceBadgeClass(level: 'high' | 'medium' | 'low'): string {
 export default function AdminControlsPage() {
   const permissions = getAISourcePermissions()
   const logs = getAILogs()
+  const visibilityRules = getAllVisibilityRules()
 
   return (
     <div className="max-w-6xl">
@@ -224,6 +225,115 @@ export default function AdminControlsPage() {
               </table>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ━━━ ROLE-BASED VISIBILITY SECTION ━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="pb-16">
+        <div className="border-t border-surface-200/60 pt-10">
+          <div className="mb-6">
+            <h2 className="font-display text-[1.5rem] text-ink-900 mb-2">Role-Based Visibility</h2>
+            <p className="text-[12px] text-ink-300">
+              Control which features each role can access
+            </p>
+          </div>
+
+          {/* Group rules by role */}
+          {['practice_owner', 'project_lead', 'team_member'].map(role => {
+            const rulesForRole = visibilityRules.filter(r => r.role === role)
+
+            return (
+              <div key={role} className="mb-8">
+                {/* Role Subheading */}
+                <h3 className="text-[13px] font-semibold text-ink-900 mb-4 uppercase tracking-[0.08em]">
+                  {roleLabel(role)}
+                </h3>
+
+                {/* Role Visibility Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-[12px]">
+                    <thead>
+                      <tr className="bg-surface-50 border-b border-surface-200/60">
+                        <th className="text-left py-3 px-4 text-[10px] font-semibold text-ink-400 uppercase tracking-[0.1em]">
+                          Feature Area
+                        </th>
+                        <th className="text-center py-3 px-4 text-[10px] font-semibold text-ink-400 uppercase tracking-[0.1em]">
+                          View
+                        </th>
+                        <th className="text-center py-3 px-4 text-[10px] font-semibold text-ink-400 uppercase tracking-[0.1em]">
+                          Edit
+                        </th>
+                        <th className="text-center py-3 px-4 text-[10px] font-semibold text-ink-400 uppercase tracking-[0.1em]">
+                          Delete
+                        </th>
+                        <th className="text-center py-3 px-4 text-[10px] font-semibold text-ink-400 uppercase tracking-[0.1em]">
+                          Export
+                        </th>
+                        <th className="text-left py-3 px-4 text-[10px] font-semibold text-ink-400 uppercase tracking-[0.1em]">
+                          Notes
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rulesForRole.map(rule => (
+                        <tr key={rule.id} className="border-b border-surface-200/40 hover:bg-surface-50 transition-colors">
+                          {/* Feature Area */}
+                          <td className="py-3 px-4 text-ink-700 font-medium">
+                            {featureAreaLabel(rule.feature_area)}
+                          </td>
+
+                          {/* View */}
+                          <td className="py-3 px-4 text-center">
+                            <span className={cn(
+                              'inline-block text-lg font-semibold',
+                              rule.can_view ? 'text-emerald-600' : 'text-red-400'
+                            )}>
+                              {rule.can_view ? '✓' : '✗'}
+                            </span>
+                          </td>
+
+                          {/* Edit */}
+                          <td className="py-3 px-4 text-center">
+                            <span className={cn(
+                              'inline-block text-lg font-semibold',
+                              rule.can_edit ? 'text-emerald-600' : 'text-red-400'
+                            )}>
+                              {rule.can_edit ? '✓' : '✗'}
+                            </span>
+                          </td>
+
+                          {/* Delete */}
+                          <td className="py-3 px-4 text-center">
+                            <span className={cn(
+                              'inline-block text-lg font-semibold',
+                              rule.can_delete ? 'text-emerald-600' : 'text-red-400'
+                            )}>
+                              {rule.can_delete ? '✓' : '✗'}
+                            </span>
+                          </td>
+
+                          {/* Export */}
+                          <td className="py-3 px-4 text-center">
+                            <span className={cn(
+                              'inline-block text-lg font-semibold',
+                              rule.can_export ? 'text-emerald-600' : 'text-red-400'
+                            )}>
+                              {rule.can_export ? '✓' : '✗'}
+                            </span>
+                          </td>
+
+                          {/* Notes */}
+                          <td className="py-3 px-4 text-ink-400 text-[11px] italic">
+                            {rule.restriction_notes ? rule.restriction_notes : '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </section>
     </div>

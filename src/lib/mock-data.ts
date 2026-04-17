@@ -1,4 +1,4 @@
-import { User, Project, Task, RIBAStage, ApprovalRequest, Issue, Change, RiskRegisterItem, Meeting, MeetingAction, DesignRisk, ContractAdminRecord, ContractEvent, PlanningRecord, SiteConstraint, TenderRecord, TenderReturn, TenderEvaluation, SiteQuery, BuildingRegRecord, BuildingInspection, DutyholderRecord, BRPDGateway, DocumentRecord, DocumentTransmittal, KnowledgeArticle, CPDRecord, Competency, UserCompetency, TrainingPlan, JurisdictionPack, OrganisationSettings, AISourcePermission, AILog, DrawingIssueRecord, ProjectCommercial, CashflowForecast, StaffAllocation, StaffCapacity, FeeRecommendation, FeeQuoteRecord, FeeQuoteLineItem, Opportunity, AISuggestedPrompt, AIConversation, AIMessage, AISource, Integration, PortalInvite, PortalSharedItem, FeeQuoteSection, FeeQuoteView, FeeQuoteTemplate, TermsLibraryItem, ExclusionsLibraryItem, ProjectHealthSnapshot, TaskScheduleMetric, ProjectNumberTemplate, QuoteNumberTemplate, DrawingIssueTemplate, ProjectHealthAlert, BurnBudgetMetric, QuoteProjectLink, QuoteConversionMetric, ComplianceStatement, BRPDRequirement, BRPDChangelogEntry, DrawingIssueWorkflow, DrawingEmail } from './types'
+import { User, Project, Task, RIBAStage, ApprovalRequest, Issue, Change, RiskRegisterItem, Meeting, MeetingAction, DesignRisk, ContractAdminRecord, ContractEvent, PlanningRecord, SiteConstraint, TenderRecord, TenderReturn, TenderEvaluation, SiteQuery, BuildingRegRecord, BuildingInspection, DutyholderRecord, BRPDGateway, DocumentRecord, DocumentTransmittal, KnowledgeArticle, CPDRecord, Competency, UserCompetency, TrainingPlan, JurisdictionPack, OrganisationSettings, AISourcePermission, AILog, DrawingIssueRecord, ProjectCommercial, CashflowForecast, StaffAllocation, StaffCapacity, FeeRecommendation, FeeQuoteRecord, FeeQuoteLineItem, Opportunity, AISuggestedPrompt, AIConversation, AIMessage, AISource, Integration, PortalInvite, PortalSharedItem, FeeQuoteSection, FeeQuoteView, FeeQuoteTemplate, TermsLibraryItem, ExclusionsLibraryItem, ProjectHealthSnapshot, TaskScheduleMetric, ProjectNumberTemplate, QuoteNumberTemplate, DrawingIssueTemplate, ProjectHealthAlert, BurnBudgetMetric, QuoteProjectLink, QuoteConversionMetric, ComplianceStatement, BRPDRequirement, BRPDChangelogEntry, DrawingIssueWorkflow, DrawingEmail, WizardStep, BriefSection, ProjectBrief, QuoteAccountingLink, RoleVisibilityRule, LeaveRecord, BankHoliday, LeaveEntitlement } from './types'
 import { STAGE_TEMPLATES } from './stage-templates'
 
 // ── Demo Users ──────────────────────────────────────────────
@@ -2679,4 +2679,229 @@ export function getActiveDrawingWorkflows(projectId: string): DrawingIssueWorkfl
 
 export function getEscalatedWorkflows(projectId: string): DrawingIssueWorkflow[] {
   return DRAWING_ISSUE_WORKFLOWS.filter(w => w.project_id === projectId && w.escalated_flag)
+}
+
+// ── Phase 4 Wave 4: Project Creation & Access Control Data ──
+
+export const PROJECT_WIZARD_STEPS: WizardStep[] = [
+  { number: 1, title: 'Project Identity', description: 'Name, reference, and client details', required: true, fields: ['name', 'client', 'project_ref'] },
+  { number: 2, title: 'Project Type & Sector', description: 'Building type, sector classification, and scale', required: true, fields: ['sector', 'building_type', 'gross_internal_area'], help_text: 'Sector determines fee benchmarks and compliance templates.' },
+  { number: 3, title: 'Site & Location', description: 'Address, local authority, and site constraints', required: true, fields: ['address', 'local_authority', 'conservation_area'] },
+  { number: 4, title: 'RIBA Stage', description: 'Current stage and anticipated programme', required: true, fields: ['current_stage', 'target_completion_date'] },
+  { number: 5, title: 'Project Team', description: 'Lead, team members, and resource allocation', required: true, fields: ['project_lead', 'team_members'] },
+  { number: 6, title: 'Client Brief', description: 'Key requirements, aspirations, and constraints', required: false, fields: ['brief_summary', 'key_requirements', 'budget_range'] },
+  { number: 7, title: 'Fee & Commercial', description: 'Fee basis, agreed fee, and payment terms', required: false, fields: ['fee_basis', 'agreed_fee', 'payment_schedule'], help_text: 'Link to an accepted fee quote if available.' },
+  { number: 8, title: 'Compliance Setup', description: 'Building Safety Act, CDM, and regulatory requirements', required: false, fields: ['bsa_applicable', 'cdm_role', 'building_regs_route'] },
+  { number: 9, title: 'Dutyholder Appointments', description: 'Principal Designer, Principal Contractor, and client duties', required: false, fields: ['dutyholders'], help_text: 'Required for higher-risk buildings under BSA 2022.' },
+  { number: 10, title: 'Document Templates', description: 'Select numbering conventions and document templates', required: false, fields: ['numbering_template', 'drawing_issue_template'] },
+  { number: 11, title: 'Integrations', description: 'Link accounting, calendar, and storage systems', required: false, fields: ['xero_link', 'calendar_link', 'storage_link'] },
+  { number: 12, title: 'Review & Create', description: 'Review all details and create the project', required: true, fields: [] },
+]
+
+export const PROJECT_BRIEFS: ProjectBrief[] = [
+  {
+    id: 'pb1', project_id: 'p1', version: 1, status: 'issued',
+    sections: [
+      { id: 'pbs1', project_id: 'p1', section_number: 1, title: 'Project Overview', description: 'High-level summary of the project scope and objectives', content: 'Rear and side extension to a Victorian semi-detached house in Richmond. The project aims to create an open-plan kitchen/dining space with a new first-floor bedroom above. The design must be sympathetic to the conservation area setting.', status: 'approved', required: true, last_edited_by_user_id: 'u2', last_edited_at: '2025-10-01', approved_by_user_id: 'u1', approved_at: '2025-10-05' },
+      { id: 'pbs2', project_id: 'p1', section_number: 2, title: 'Client Requirements', description: 'Detailed client needs and aspirations', content: 'Open-plan kitchen/dining/living at ground floor. Master bedroom with ensuite at first floor. Maximise natural light. Maintain existing garden access. Budget: £180,000–£220,000 construction cost.', status: 'approved', required: true, last_edited_by_user_id: 'u2', last_edited_at: '2025-10-01', approved_by_user_id: 'u1', approved_at: '2025-10-05' },
+      { id: 'pbs3', project_id: 'p1', section_number: 3, title: 'Site Constraints', description: 'Physical, planning, and legal constraints', content: 'Conservation area — Article 4 direction applies. Party wall to eastern neighbour. Mature oak tree (TPO) in rear garden — root protection zone affects foundation design. Thames Water easement runs along western boundary.', status: 'approved', required: true, last_edited_by_user_id: 'u2', last_edited_at: '2025-10-02', approved_by_user_id: 'u1', approved_at: '2025-10-05' },
+      { id: 'pbs4', project_id: 'p1', section_number: 4, title: 'Design Aspirations', description: 'Design quality, materials, and aesthetic goals', content: 'Contemporary extension with zinc standing-seam cladding. Large format glazing to garden elevation. Internal palette: exposed brickwork, engineered oak flooring, polished concrete worktops.', status: 'complete', required: false, last_edited_by_user_id: 'u2', last_edited_at: '2025-10-03' },
+      { id: 'pbs5', project_id: 'p1', section_number: 5, title: 'Sustainability', description: 'Environmental targets and energy strategy', content: 'Target EPC A. Air source heat pump. Triple-glazed windows. Green roof to single-storey section. PV panels on south-facing roof slope.', status: 'draft', required: false, last_edited_by_user_id: 'u4', last_edited_at: '2025-11-15' },
+      { id: 'pbs6', project_id: 'p1', section_number: 6, title: 'Programme & Budget', description: 'Key milestones, budget, and delivery targets', content: 'Planning submission: Dec 2025. Start on site: May 2026. Completion: Nov 2026. Construction budget: £200,000. Professional fees: £48,000 (inc. structural, M&E).', status: 'approved', required: true, last_edited_by_user_id: 'u2', last_edited_at: '2025-10-04', approved_by_user_id: 'u1', approved_at: '2025-10-05' },
+    ],
+    created_by_user_id: 'u2', created_at: '2025-10-01', updated_at: '2025-11-15', issued_date: '2025-10-06', issued_to: 'Harris Family Trust'
+  },
+  {
+    id: 'pb2', project_id: 'p2', version: 1, status: 'draft',
+    sections: [
+      { id: 'pbs7', project_id: 'p2', section_number: 1, title: 'Project Overview', description: 'High-level summary of the project scope and objectives', content: '12-storey residential tower with ground-floor commercial. 85 apartments (mix of 1, 2, and 3-bed). Higher-risk building under Building Safety Act 2022.', status: 'complete', required: true, last_edited_by_user_id: 'u3', last_edited_at: '2026-01-15' },
+      { id: 'pbs8', project_id: 'p2', section_number: 2, title: 'Client Requirements', description: 'Detailed client needs and aspirations', content: 'Maximise unit count within planning envelope. 20% affordable housing. Communal roof terrace. Underground parking for 40 vehicles. BREEAM Very Good minimum.', status: 'complete', required: true, last_edited_by_user_id: 'u3', last_edited_at: '2026-01-20' },
+      { id: 'pbs9', project_id: 'p2', section_number: 3, title: 'Site Constraints', description: 'Physical, planning, and legal constraints', content: 'Brownfield site, former industrial use. Contamination investigation required. Adjacent to railway line — noise and vibration assessment needed. Flood Zone 2.', status: 'draft', required: true, last_edited_by_user_id: 'u3', last_edited_at: '2026-02-01' },
+      { id: 'pbs10', project_id: 'p2', section_number: 4, title: 'Design Aspirations', description: 'Design quality, materials, and aesthetic goals', content: '', status: 'empty', required: false },
+      { id: 'pbs11', project_id: 'p2', section_number: 5, title: 'Sustainability', description: 'Environmental targets and energy strategy', content: '', status: 'empty', required: false },
+      { id: 'pbs12', project_id: 'p2', section_number: 6, title: 'Programme & Budget', description: 'Key milestones, budget, and delivery targets', content: 'Estimated construction cost: £18M. Professional fees: £165,000. Programme: 36 months overall.', status: 'draft', required: true, last_edited_by_user_id: 'u3', last_edited_at: '2026-02-10' },
+    ],
+    created_by_user_id: 'u3', created_at: '2026-01-10', updated_at: '2026-02-10'
+  },
+]
+
+export const QUOTE_ACCOUNTING_LINKS: QuoteAccountingLink[] = [
+  { id: 'qal1', fee_quote_id: 'fq1', provider: 'xero', external_ref: 'INV-2025-0142', external_invoice_id: 'xero_inv_8821', sync_status: 'synced', last_synced_at: '2026-03-18T10:30:00Z', auto_sync_enabled: true, mapped_fields: ['client_name', 'agreed_fee', 'payment_schedule', 'line_items'] },
+  { id: 'qal2', fee_quote_id: 'fq2', provider: 'xero', external_ref: 'INV-2025-0198', sync_status: 'pending', auto_sync_enabled: true, mapped_fields: ['client_name', 'agreed_fee'] },
+  { id: 'qal3', fee_quote_id: 'fq3', provider: 'quickbooks', external_ref: 'EST-3421', external_invoice_id: 'qb_est_3421', sync_status: 'synced', last_synced_at: '2026-03-10T14:00:00Z', auto_sync_enabled: false, mapped_fields: ['client_name', 'agreed_fee', 'line_items'] },
+  { id: 'qal4', fee_quote_id: 'fq4', provider: 'xero', external_ref: 'INV-2026-0012', sync_status: 'failed', error_message: 'Xero contact not found. Please map the client manually.', auto_sync_enabled: true, mapped_fields: ['client_name', 'agreed_fee'] },
+  { id: 'qal5', fee_quote_id: 'fq5', provider: 'xero', external_ref: 'INV-2026-0045', sync_status: 'not_linked', auto_sync_enabled: false, mapped_fields: [] },
+]
+
+export const ROLE_VISIBILITY_RULES: RoleVisibilityRule[] = [
+  // Practice Owner — full access to everything
+  { id: 'rv1', organisation_id: 'org1', role: 'practice_owner', feature_area: 'projects', can_view: true, can_edit: true, can_delete: true, can_export: true },
+  { id: 'rv2', organisation_id: 'org1', role: 'practice_owner', feature_area: 'fee_quotes', can_view: true, can_edit: true, can_delete: true, can_export: true },
+  { id: 'rv3', organisation_id: 'org1', role: 'practice_owner', feature_area: 'analytics', can_view: true, can_edit: true, can_delete: false, can_export: true },
+  { id: 'rv4', organisation_id: 'org1', role: 'practice_owner', feature_area: 'ai_teammate', can_view: true, can_edit: true, can_delete: false, can_export: true },
+  { id: 'rv5', organisation_id: 'org1', role: 'practice_owner', feature_area: 'admin', can_view: true, can_edit: true, can_delete: true, can_export: true },
+  { id: 'rv6', organisation_id: 'org1', role: 'practice_owner', feature_area: 'integrations', can_view: true, can_edit: true, can_delete: true, can_export: false },
+  // Project Lead — most access, no admin delete
+  { id: 'rv7', organisation_id: 'org1', role: 'project_lead', feature_area: 'projects', can_view: true, can_edit: true, can_delete: false, can_export: true },
+  { id: 'rv8', organisation_id: 'org1', role: 'project_lead', feature_area: 'fee_quotes', can_view: true, can_edit: true, can_delete: false, can_export: true },
+  { id: 'rv9', organisation_id: 'org1', role: 'project_lead', feature_area: 'analytics', can_view: true, can_edit: false, can_delete: false, can_export: true },
+  { id: 'rv10', organisation_id: 'org1', role: 'project_lead', feature_area: 'ai_teammate', can_view: true, can_edit: true, can_delete: false, can_export: false },
+  { id: 'rv11', organisation_id: 'org1', role: 'project_lead', feature_area: 'admin', can_view: false, can_edit: false, can_delete: false, can_export: false, restriction_notes: 'Admin controls restricted to Practice Owners only.' },
+  { id: 'rv12', organisation_id: 'org1', role: 'project_lead', feature_area: 'integrations', can_view: true, can_edit: false, can_delete: false, can_export: false, restriction_notes: 'Can view connected integrations but cannot modify.' },
+  // Team Member — view-heavy, limited edit
+  { id: 'rv13', organisation_id: 'org1', role: 'team_member', feature_area: 'projects', can_view: true, can_edit: true, can_delete: false, can_export: false, restriction_notes: 'Can edit tasks assigned to them only.' },
+  { id: 'rv14', organisation_id: 'org1', role: 'team_member', feature_area: 'fee_quotes', can_view: false, can_edit: false, can_delete: false, can_export: false, restriction_notes: 'Fee data restricted to Project Leads and above.' },
+  { id: 'rv15', organisation_id: 'org1', role: 'team_member', feature_area: 'analytics', can_view: true, can_edit: false, can_delete: false, can_export: false, restriction_notes: 'View-only access to project analytics.' },
+  { id: 'rv16', organisation_id: 'org1', role: 'team_member', feature_area: 'ai_teammate', can_view: true, can_edit: true, can_delete: false, can_export: false },
+  { id: 'rv17', organisation_id: 'org1', role: 'team_member', feature_area: 'admin', can_view: false, can_edit: false, can_delete: false, can_export: false },
+  { id: 'rv18', organisation_id: 'org1', role: 'team_member', feature_area: 'integrations', can_view: false, can_edit: false, can_delete: false, can_export: false },
+]
+
+// ── Phase 4 Wave 4: Helper Functions ─────────────────────────
+
+export function getProjectWizardSteps(): WizardStep[] {
+  return PROJECT_WIZARD_STEPS
+}
+
+export function getProjectBrief(projectId: string): ProjectBrief | undefined {
+  return PROJECT_BRIEFS.find(b => b.project_id === projectId)
+}
+
+export function getProjectBriefs(): ProjectBrief[] {
+  return PROJECT_BRIEFS
+}
+
+export function getBriefSections(projectId: string): BriefSection[] {
+  const brief = PROJECT_BRIEFS.find(b => b.project_id === projectId)
+  return brief ? brief.sections.sort((a, b) => a.section_number - b.section_number) : []
+}
+
+export function getQuoteAccountingLinks(): QuoteAccountingLink[] {
+  return QUOTE_ACCOUNTING_LINKS
+}
+
+export function getQuoteAccountingLink(feeQuoteId: string): QuoteAccountingLink | undefined {
+  return QUOTE_ACCOUNTING_LINKS.find(l => l.fee_quote_id === feeQuoteId)
+}
+
+export function getAccountingLinksByProvider(provider: 'xero' | 'quickbooks'): QuoteAccountingLink[] {
+  return QUOTE_ACCOUNTING_LINKS.filter(l => l.provider === provider)
+}
+
+export function getRoleVisibilityRules(role: string): RoleVisibilityRule[] {
+  return ROLE_VISIBILITY_RULES.filter(r => r.role === role)
+}
+
+export function getAllVisibilityRules(): RoleVisibilityRule[] {
+  return ROLE_VISIBILITY_RULES
+}
+
+export function getFeatureAccess(role: string, featureArea: string): RoleVisibilityRule | undefined {
+  return ROLE_VISIBILITY_RULES.find(r => r.role === role && r.feature_area === featureArea)
+}
+
+// ── Leave & Holidays Data ──────────────────────────────────
+
+export const LEAVE_RECORDS: LeaveRecord[] = [
+  // Sarah Mitchell — on holiday soon
+  { id: 'lv1', user_id: 'u1', leave_type: 'holiday', status: 'approved', start_date: '2026-04-27', end_date: '2026-05-01', days: 5, notes: 'Bank holiday week — family trip to Cornwall', approved_by_user_id: 'u1', approved_at: '2026-03-15', created_at: '2026-03-10' },
+  { id: 'lv2', user_id: 'u1', leave_type: 'holiday', status: 'approved', start_date: '2026-08-10', end_date: '2026-08-21', days: 10, notes: 'Summer holiday', approved_by_user_id: 'u1', approved_at: '2026-02-20', created_at: '2026-02-18' },
+  // James Cooper
+  { id: 'lv3', user_id: 'u2', leave_type: 'holiday', status: 'approved', start_date: '2026-05-25', end_date: '2026-05-29', days: 5, notes: 'Half-term break', approved_by_user_id: 'u1', approved_at: '2026-04-01', created_at: '2026-03-28' },
+  { id: 'lv4', user_id: 'u2', leave_type: 'sick', status: 'approved', start_date: '2026-04-07', end_date: '2026-04-08', days: 2, notes: 'Flu', approved_by_user_id: 'u1', approved_at: '2026-04-07', created_at: '2026-04-07' },
+  { id: 'lv5', user_id: 'u2', leave_type: 'cpd', status: 'approved', start_date: '2026-06-12', end_date: '2026-06-12', days: 1, notes: 'RIBA CPD seminar — fire safety', approved_by_user_id: 'u1', approved_at: '2026-05-01', created_at: '2026-04-28' },
+  // Priya Sharma
+  { id: 'lv6', user_id: 'u3', leave_type: 'holiday', status: 'approved', start_date: '2026-04-20', end_date: '2026-04-24', days: 5, approved_by_user_id: 'u1', approved_at: '2026-03-10', created_at: '2026-03-08' },
+  { id: 'lv7', user_id: 'u3', leave_type: 'holiday', status: 'pending', start_date: '2026-07-13', end_date: '2026-07-24', days: 10, notes: 'India trip', created_at: '2026-04-12' },
+  // Tom Bradley
+  { id: 'lv8', user_id: 'u4', leave_type: 'parental', status: 'approved', start_date: '2026-09-01', end_date: '2026-09-26', days: 20, notes: 'Paternity leave', approved_by_user_id: 'u1', approved_at: '2026-03-20', created_at: '2026-03-15' },
+  { id: 'lv9', user_id: 'u4', leave_type: 'holiday', status: 'approved', start_date: '2026-05-05', end_date: '2026-05-09', days: 5, approved_by_user_id: 'u1', approved_at: '2026-04-10', created_at: '2026-04-08' },
+  // Ella Chen
+  { id: 'lv10', user_id: 'u5', leave_type: 'holiday', status: 'approved', start_date: '2026-06-02', end_date: '2026-06-06', days: 5, notes: 'Long weekend trip', approved_by_user_id: 'u1', approved_at: '2026-04-15', created_at: '2026-04-12' },
+  { id: 'lv11', user_id: 'u5', leave_type: 'cpd', status: 'pending', start_date: '2026-05-15', end_date: '2026-05-16', days: 2, notes: 'Passivhaus training course', created_at: '2026-04-14' },
+  { id: 'lv12', user_id: 'u5', leave_type: 'sick', status: 'approved', start_date: '2026-03-24', end_date: '2026-03-24', days: 1, approved_by_user_id: 'u1', approved_at: '2026-03-24', created_at: '2026-03-24' },
+]
+
+export const BANK_HOLIDAYS: BankHoliday[] = [
+  { date: '2026-01-01', name: 'New Year\'s Day', region: 'all' },
+  { date: '2026-04-03', name: 'Good Friday', region: 'all' },
+  { date: '2026-04-06', name: 'Easter Monday', region: 'england-wales' },
+  { date: '2026-05-04', name: 'Early May Bank Holiday', region: 'england-wales' },
+  { date: '2026-05-25', name: 'Spring Bank Holiday', region: 'england-wales' },
+  { date: '2026-08-31', name: 'Summer Bank Holiday', region: 'england-wales' },
+  { date: '2026-12-25', name: 'Christmas Day', region: 'all' },
+  { date: '2026-12-28', name: 'Boxing Day (substitute)', region: 'all' },
+]
+
+export const LEAVE_ENTITLEMENTS: LeaveEntitlement[] = [
+  { user_id: 'u1', year: 2026, total_days: 28, used_days: 5, pending_days: 10, carried_over: 3 },
+  { user_id: 'u2', year: 2026, total_days: 25, used_days: 2, pending_days: 6, carried_over: 0 },
+  { user_id: 'u3', year: 2026, total_days: 25, used_days: 5, pending_days: 10, carried_over: 2 },
+  { user_id: 'u4', year: 2026, total_days: 25, used_days: 0, pending_days: 25, carried_over: 0 },
+  { user_id: 'u5', year: 2026, total_days: 25, used_days: 1, pending_days: 7, carried_over: 0 },
+]
+
+// ── Leave Helper Functions ──────────────────────────────────
+
+export function getLeaveRecords(): LeaveRecord[] {
+  return LEAVE_RECORDS.sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
+}
+
+export function getUserLeaveRecords(userId: string): LeaveRecord[] {
+  return LEAVE_RECORDS.filter(l => l.user_id === userId)
+    .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
+}
+
+export function getPendingLeaveRequests(): LeaveRecord[] {
+  return LEAVE_RECORDS.filter(l => l.status === 'pending')
+    .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
+}
+
+export function getUpcomingLeave(daysAhead: number = 30): LeaveRecord[] {
+  const now = new Date()
+  const cutoff = new Date(now.getTime() + daysAhead * 86400000)
+  return LEAVE_RECORDS.filter(l =>
+    l.status === 'approved' &&
+    new Date(l.start_date) >= now &&
+    new Date(l.start_date) <= cutoff
+  ).sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
+}
+
+export function getBankHolidays(region: string = 'england-wales'): BankHoliday[] {
+  return BANK_HOLIDAYS.filter(h => h.region === region || h.region === 'all')
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+}
+
+export function getUpcomingBankHolidays(daysAhead: number = 90): BankHoliday[] {
+  const now = new Date()
+  const cutoff = new Date(now.getTime() + daysAhead * 86400000)
+  return getBankHolidays().filter(h =>
+    new Date(h.date) >= now && new Date(h.date) <= cutoff
+  )
+}
+
+export function getLeaveEntitlement(userId: string, year: number = 2026): LeaveEntitlement | undefined {
+  return LEAVE_ENTITLEMENTS.find(e => e.user_id === userId && e.year === year)
+}
+
+export function getLeaveEntitlements(): LeaveEntitlement[] {
+  return LEAVE_ENTITLEMENTS
+}
+
+export function getTeamAvailability(date: string): { userId: string; available: boolean; reason?: string }[] {
+  const d = new Date(date)
+  return LEAVE_ENTITLEMENTS.map(e => {
+    const userLeave = LEAVE_RECORDS.find(l =>
+      l.user_id === e.user_id &&
+      l.status === 'approved' &&
+      new Date(l.start_date) <= d &&
+      new Date(l.end_date) >= d
+    )
+    const bankHol = BANK_HOLIDAYS.find(h =>
+      h.date === date && (h.region === 'england-wales' || h.region === 'all')
+    )
+    if (bankHol) return { userId: e.user_id, available: false, reason: bankHol.name }
+    if (userLeave) return { userId: e.user_id, available: false, reason: userLeave.leave_type }
+    return { userId: e.user_id, available: true }
+  })
 }

@@ -42,6 +42,31 @@ import {
   getWorkflowEmails,
   getActiveDrawingWorkflows,
   getEscalatedWorkflows,
+  PROJECT_WIZARD_STEPS,
+  PROJECT_BRIEFS,
+  QUOTE_ACCOUNTING_LINKS,
+  ROLE_VISIBILITY_RULES,
+  getProjectWizardSteps,
+  getProjectBrief,
+  getProjectBriefs,
+  getBriefSections,
+  getQuoteAccountingLinks,
+  getQuoteAccountingLink,
+  getAccountingLinksByProvider,
+  getRoleVisibilityRules,
+  getAllVisibilityRules,
+  getFeatureAccess,
+  LEAVE_RECORDS,
+  BANK_HOLIDAYS,
+  LEAVE_ENTITLEMENTS,
+  getLeaveRecords,
+  getUserLeaveRecords,
+  getPendingLeaveRequests,
+  getUpcomingLeave,
+  getBankHolidays,
+  getLeaveEntitlement,
+  getLeaveEntitlements,
+  getTeamAvailability,
   COMPLIANCE_STATEMENTS,
   BRPD_REQUIREMENTS,
   BRPD_CHANGELOG,
@@ -683,6 +708,326 @@ describe('Drawing Emails', () => {
     DRAWING_EMAILS.filter(e => e.has_attachment).forEach(e => {
       expect(e.attachment_names).toBeDefined()
       expect(e.attachment_names!.length).toBeGreaterThan(0)
+    })
+  })
+})
+
+// ── Phase 4 Wave 4: Project Creation & Access Control ───────
+
+describe('Project Wizard Steps', () => {
+  it('has 12 steps', () => {
+    expect(PROJECT_WIZARD_STEPS).toHaveLength(12)
+  })
+  it('every step has required fields', () => {
+    PROJECT_WIZARD_STEPS.forEach(s => {
+      expect(s.number).toBeGreaterThan(0)
+      expect(s.title).toBeTruthy()
+      expect(s.description).toBeTruthy()
+      expect(typeof s.required).toBe('boolean')
+      expect(Array.isArray(s.fields)).toBe(true)
+    })
+  })
+  it('steps are numbered 1-12 sequentially', () => {
+    PROJECT_WIZARD_STEPS.forEach((s, i) => {
+      expect(s.number).toBe(i + 1)
+    })
+  })
+  it('first 5 steps are required', () => {
+    PROJECT_WIZARD_STEPS.slice(0, 5).forEach(s => {
+      expect(s.required).toBe(true)
+    })
+  })
+  it('last step (Review) is required and has no fields', () => {
+    const last = PROJECT_WIZARD_STEPS[11]
+    expect(last.title).toBe('Review & Create')
+    expect(last.required).toBe(true)
+    expect(last.fields).toHaveLength(0)
+  })
+  it('getProjectWizardSteps returns all steps', () => {
+    expect(getProjectWizardSteps()).toHaveLength(12)
+  })
+})
+
+describe('Project Briefs', () => {
+  it('has 2 briefs', () => {
+    expect(PROJECT_BRIEFS).toHaveLength(2)
+  })
+  it('every brief has required fields', () => {
+    PROJECT_BRIEFS.forEach(b => {
+      expect(b.id).toBeTruthy()
+      expect(b.project_id).toBeTruthy()
+      expect(typeof b.version).toBe('number')
+      expect(['draft', 'issued']).toContain(b.status)
+      expect(b.sections.length).toBeGreaterThan(0)
+      expect(b.created_by_user_id).toBeTruthy()
+      expect(b.created_at).toBeTruthy()
+    })
+  })
+  it('every section has required fields', () => {
+    PROJECT_BRIEFS.forEach(b => {
+      b.sections.forEach(s => {
+        expect(s.id).toBeTruthy()
+        expect(s.project_id).toBe(b.project_id)
+        expect(s.section_number).toBeGreaterThan(0)
+        expect(s.title).toBeTruthy()
+        expect(s.description).toBeTruthy()
+        expect(['empty', 'draft', 'complete', 'approved']).toContain(s.status)
+        expect(typeof s.required).toBe('boolean')
+      })
+    })
+  })
+  it('approved sections have approved_by_user_id', () => {
+    PROJECT_BRIEFS.forEach(b => {
+      b.sections.filter(s => s.status === 'approved').forEach(s => {
+        expect(s.approved_by_user_id).toBeTruthy()
+        expect(s.approved_at).toBeTruthy()
+      })
+    })
+  })
+  it('getProjectBrief finds by project id', () => {
+    const brief = getProjectBrief('p1')
+    expect(brief).toBeDefined()
+    expect(brief?.project_id).toBe('p1')
+  })
+  it('getProjectBrief returns undefined for unknown project', () => {
+    expect(getProjectBrief('nonexistent')).toBeUndefined()
+  })
+  it('getProjectBriefs returns all briefs', () => {
+    expect(getProjectBriefs()).toHaveLength(2)
+  })
+  it('getBriefSections returns sorted sections', () => {
+    const sections = getBriefSections('p1')
+    expect(sections.length).toBeGreaterThan(0)
+    for (let i = 1; i < sections.length; i++) {
+      expect(sections[i].section_number).toBeGreaterThanOrEqual(sections[i - 1].section_number)
+    }
+  })
+  it('getBriefSections returns empty for unknown project', () => {
+    expect(getBriefSections('nonexistent')).toHaveLength(0)
+  })
+})
+
+describe('Quote Accounting Links', () => {
+  it('has 5 links', () => {
+    expect(QUOTE_ACCOUNTING_LINKS).toHaveLength(5)
+  })
+  it('every link has required fields', () => {
+    QUOTE_ACCOUNTING_LINKS.forEach(l => {
+      expect(l.id).toBeTruthy()
+      expect(l.fee_quote_id).toBeTruthy()
+      expect(['xero', 'quickbooks']).toContain(l.provider)
+      expect(['synced', 'pending', 'failed', 'not_linked']).toContain(l.sync_status)
+      expect(typeof l.auto_sync_enabled).toBe('boolean')
+      expect(Array.isArray(l.mapped_fields)).toBe(true)
+    })
+  })
+  it('synced links have last_synced_at', () => {
+    QUOTE_ACCOUNTING_LINKS.filter(l => l.sync_status === 'synced').forEach(l => {
+      expect(l.last_synced_at).toBeTruthy()
+      expect(l.external_invoice_id).toBeTruthy()
+    })
+  })
+  it('failed links have error_message', () => {
+    QUOTE_ACCOUNTING_LINKS.filter(l => l.sync_status === 'failed').forEach(l => {
+      expect(l.error_message).toBeTruthy()
+    })
+  })
+  it('getQuoteAccountingLinks returns all', () => {
+    expect(getQuoteAccountingLinks()).toHaveLength(5)
+  })
+  it('getQuoteAccountingLink finds by fee_quote_id', () => {
+    const link = getQuoteAccountingLink('fq1')
+    expect(link).toBeDefined()
+    expect(link?.provider).toBe('xero')
+    expect(link?.sync_status).toBe('synced')
+  })
+  it('getQuoteAccountingLink returns undefined for unknown', () => {
+    expect(getQuoteAccountingLink('nonexistent')).toBeUndefined()
+  })
+  it('getAccountingLinksByProvider filters correctly', () => {
+    const xeroLinks = getAccountingLinksByProvider('xero')
+    expect(xeroLinks.length).toBeGreaterThan(0)
+    xeroLinks.forEach(l => expect(l.provider).toBe('xero'))
+
+    const qbLinks = getAccountingLinksByProvider('quickbooks')
+    expect(qbLinks.length).toBeGreaterThan(0)
+    qbLinks.forEach(l => expect(l.provider).toBe('quickbooks'))
+  })
+})
+
+describe('Role Visibility Rules', () => {
+  it('has 18 rules', () => {
+    expect(ROLE_VISIBILITY_RULES).toHaveLength(18)
+  })
+  it('every rule has required fields', () => {
+    ROLE_VISIBILITY_RULES.forEach(r => {
+      expect(r.id).toBeTruthy()
+      expect(r.organisation_id).toBeTruthy()
+      expect(r.role).toBeTruthy()
+      expect(r.feature_area).toBeTruthy()
+      expect(typeof r.can_view).toBe('boolean')
+      expect(typeof r.can_edit).toBe('boolean')
+      expect(typeof r.can_delete).toBe('boolean')
+      expect(typeof r.can_export).toBe('boolean')
+    })
+  })
+  it('practice_owner has full view access to all features', () => {
+    const ownerRules = getRoleVisibilityRules('practice_owner')
+    ownerRules.forEach(r => {
+      expect(r.can_view).toBe(true)
+    })
+  })
+  it('team_member cannot view fee_quotes or admin', () => {
+    const feeAccess = getFeatureAccess('team_member', 'fee_quotes')
+    expect(feeAccess?.can_view).toBe(false)
+    const adminAccess = getFeatureAccess('team_member', 'admin')
+    expect(adminAccess?.can_view).toBe(false)
+  })
+  it('project_lead cannot access admin', () => {
+    const adminAccess = getFeatureAccess('project_lead', 'admin')
+    expect(adminAccess?.can_view).toBe(false)
+  })
+  it('getRoleVisibilityRules filters by role', () => {
+    const ownerRules = getRoleVisibilityRules('practice_owner')
+    expect(ownerRules.length).toBe(6)
+    ownerRules.forEach(r => expect(r.role).toBe('practice_owner'))
+  })
+  it('getAllVisibilityRules returns all rules', () => {
+    expect(getAllVisibilityRules()).toHaveLength(18)
+  })
+  it('getFeatureAccess finds specific role/feature combo', () => {
+    const access = getFeatureAccess('project_lead', 'projects')
+    expect(access).toBeDefined()
+    expect(access?.can_view).toBe(true)
+    expect(access?.can_edit).toBe(true)
+    expect(access?.can_delete).toBe(false)
+  })
+  it('getFeatureAccess returns undefined for unknown combo', () => {
+    expect(getFeatureAccess('intern', 'projects')).toBeUndefined()
+  })
+  it('restricted rules have restriction_notes', () => {
+    const restricted = ROLE_VISIBILITY_RULES.filter(r => !r.can_view && r.restriction_notes)
+    expect(restricted.length).toBeGreaterThan(0)
+    restricted.forEach(r => expect(r.restriction_notes).toBeTruthy())
+  })
+})
+
+// ── Leave & Holidays ────────────────────────────────────────
+
+describe('Leave Records', () => {
+  it('has 12 leave records', () => {
+    expect(LEAVE_RECORDS).toHaveLength(12)
+  })
+  it('every record has required fields', () => {
+    LEAVE_RECORDS.forEach(l => {
+      expect(l.id).toBeTruthy()
+      expect(l.user_id).toBeTruthy()
+      expect(['holiday', 'sick', 'cpd', 'parental', 'compassionate', 'unpaid']).toContain(l.leave_type)
+      expect(['pending', 'approved', 'declined', 'cancelled']).toContain(l.status)
+      expect(l.start_date).toBeTruthy()
+      expect(l.end_date).toBeTruthy()
+      expect(typeof l.days).toBe('number')
+      expect(l.days).toBeGreaterThan(0)
+      expect(l.created_at).toBeTruthy()
+    })
+  })
+  it('approved records have approved_by_user_id', () => {
+    LEAVE_RECORDS.filter(l => l.status === 'approved').forEach(l => {
+      expect(l.approved_by_user_id).toBeTruthy()
+    })
+  })
+  it('getLeaveRecords returns sorted by start_date', () => {
+    const records = getLeaveRecords()
+    for (let i = 1; i < records.length; i++) {
+      expect(new Date(records[i].start_date).getTime()).toBeGreaterThanOrEqual(
+        new Date(records[i - 1].start_date).getTime()
+      )
+    }
+  })
+  it('getUserLeaveRecords filters by user', () => {
+    const u1Leave = getUserLeaveRecords('u1')
+    expect(u1Leave.length).toBeGreaterThan(0)
+    u1Leave.forEach(l => expect(l.user_id).toBe('u1'))
+  })
+  it('getPendingLeaveRequests returns only pending', () => {
+    const pending = getPendingLeaveRequests()
+    pending.forEach(l => expect(l.status).toBe('pending'))
+  })
+})
+
+describe('Bank Holidays', () => {
+  it('has 8 bank holidays', () => {
+    expect(BANK_HOLIDAYS).toHaveLength(8)
+  })
+  it('every holiday has required fields', () => {
+    BANK_HOLIDAYS.forEach(h => {
+      expect(h.date).toBeTruthy()
+      expect(h.name).toBeTruthy()
+      expect(['england-wales', 'scotland', 'northern-ireland', 'all']).toContain(h.region)
+    })
+  })
+  it('getBankHolidays filters by region', () => {
+    const engWales = getBankHolidays('england-wales')
+    engWales.forEach(h => {
+      expect(h.region === 'england-wales' || h.region === 'all').toBe(true)
+    })
+  })
+})
+
+describe('Leave Entitlements', () => {
+  it('has 5 entitlements', () => {
+    expect(LEAVE_ENTITLEMENTS).toHaveLength(5)
+  })
+  it('every entitlement has required fields', () => {
+    LEAVE_ENTITLEMENTS.forEach(e => {
+      expect(e.user_id).toBeTruthy()
+      expect(typeof e.year).toBe('number')
+      expect(typeof e.total_days).toBe('number')
+      expect(typeof e.used_days).toBe('number')
+      expect(typeof e.pending_days).toBe('number')
+      expect(typeof e.carried_over).toBe('number')
+    })
+  })
+  it('used + pending does not exceed total + carried', () => {
+    LEAVE_ENTITLEMENTS.forEach(e => {
+      expect(e.used_days + e.pending_days).toBeLessThanOrEqual(e.total_days + e.carried_over)
+    })
+  })
+  it('getLeaveEntitlement finds by user and year', () => {
+    const ent = getLeaveEntitlement('u1', 2026)
+    expect(ent).toBeDefined()
+    expect(ent?.total_days).toBe(28)
+  })
+  it('getLeaveEntitlement returns undefined for unknown user', () => {
+    expect(getLeaveEntitlement('nonexistent')).toBeUndefined()
+  })
+  it('getLeaveEntitlements returns all', () => {
+    expect(getLeaveEntitlements()).toHaveLength(5)
+  })
+})
+
+describe('Team Availability', () => {
+  it('returns availability for all team members', () => {
+    const avail = getTeamAvailability('2026-04-20')
+    expect(avail).toHaveLength(5)
+    avail.forEach(a => {
+      expect(a.userId).toBeTruthy()
+      expect(typeof a.available).toBe('boolean')
+    })
+  })
+  it('marks users on leave as unavailable', () => {
+    // Priya (u3) is on holiday 2026-04-20 to 2026-04-24
+    const avail = getTeamAvailability('2026-04-22')
+    const priya = avail.find(a => a.userId === 'u3')
+    expect(priya?.available).toBe(false)
+    expect(priya?.reason).toBe('holiday')
+  })
+  it('marks bank holidays as unavailable', () => {
+    // Good Friday 2026-04-03
+    const avail = getTeamAvailability('2026-04-03')
+    avail.forEach(a => {
+      expect(a.available).toBe(false)
+      expect(a.reason).toBe('Good Friday')
     })
   })
 })

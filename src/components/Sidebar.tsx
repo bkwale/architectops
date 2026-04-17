@@ -41,16 +41,61 @@ const ACTION_ITEMS = [
   { href: '/projects/new', label: 'New Project', icon: PlusIcon },
 ]
 
+function NavItem({ href, label, icon: Icon, isActive, onClick }: {
+  href: string; label: string; icon: React.FC<{ className?: string }>; isActive: boolean; onClick?: () => void
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className={cn(
+        'flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 relative group',
+        isActive
+          ? 'bg-white/[0.08] text-white'
+          : 'text-white/40 hover:text-white/70 hover:bg-white/[0.04]'
+      )}
+    >
+      {/* Active indicator bar */}
+      {isActive && (
+        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-accent-400" />
+      )}
+      <Icon className={cn('w-[18px] h-[18px] shrink-0', isActive ? 'text-accent-400' : 'text-white/25 group-hover:text-white/40')} />
+      {label}
+    </Link>
+  )
+}
+
+function NavSection({ title, items, pathname, onClick }: {
+  title: string; items: typeof NAV_ITEMS; pathname: string; onClick?: () => void
+}) {
+  return (
+    <div className="mt-7">
+      <p className="text-[9px] font-semibold text-white/20 uppercase tracking-[0.18em] px-3 mb-2">{title}</p>
+      <div className="space-y-0.5">
+        {items.map(item => {
+          const isActive = item.href === '/'
+            ? pathname === '/'
+            : pathname.startsWith(item.href)
+          return (
+            <NavItem key={item.href} {...item} isActive={isActive} onClick={onClick} />
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 export function Sidebar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const close = () => setOpen(false)
 
   return (
     <>
       {/* Mobile hamburger */}
       <button
         onClick={() => setOpen(!open)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 rounded-lg bg-ink-900 shadow-elevated"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-ink-900 shadow-elevated"
         aria-label="Toggle menu"
       >
         <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,164 +109,91 @@ export function Sidebar() {
 
       {/* Overlay */}
       {open && (
-        <div className="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-30" onClick={() => setOpen(false)} />
+        <div className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-30" onClick={close} />
       )}
 
-      {/* Sidebar — dark, quiet, architectural */}
+      {/* Sidebar */}
       <aside className={cn(
-        'fixed top-0 left-0 h-full w-72 bg-ink-900 z-40 transition-transform duration-200 flex flex-col',
+        'fixed top-0 left-0 h-full w-72 sidebar-mesh z-40 transition-transform duration-200 flex flex-col shadow-sidebar',
         open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       )}>
         {/* Logo */}
-        <div className="px-7 pt-8 pb-7">
-          <Link href="/" className="flex items-center gap-3.5" onClick={() => setOpen(false)}>
-            <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
-              <span className="text-white font-bold text-[13px] tracking-tight font-display">A</span>
+        <div className="px-6 pt-7 pb-6">
+          <Link href="/" className="flex items-center gap-3" onClick={close}>
+            <div className="w-9 h-9 rounded-xl bg-gradient-accent flex items-center justify-center shadow-glow-indigo">
+              <span className="text-white font-bold text-[14px] tracking-tight">A</span>
             </div>
             <div>
-              <h1 className="font-display text-[17px] text-white leading-tight tracking-tight">ArchitectOps</h1>
-              <p className="text-[9px] text-white/30 font-medium tracking-[0.2em] uppercase mt-0.5">Project Control</p>
+              <h1 className="text-[16px] font-semibold text-white leading-tight tracking-tight">ArchitectOps</h1>
+              <p className="text-[9px] text-white/25 font-medium tracking-[0.2em] uppercase mt-0.5">Project Control</p>
             </div>
           </Link>
         </div>
 
-        {/* Primary Nav */}
-        <nav className="px-4 flex-1">
-          <p className="text-[9px] font-semibold text-white/20 uppercase tracking-[0.18em] px-3 mb-3">Navigate</p>
-          <div className="space-y-0.5">
-            {NAV_ITEMS.map(item => {
-              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150',
-                    isActive
-                      ? 'bg-white/10 text-white'
-                      : 'text-white/40 hover:text-white/70 hover:bg-white/5'
-                  )}
-                >
-                  <item.icon className={cn('w-[18px] h-[18px]', isActive ? 'text-white/80' : 'text-white/25')} />
-                  {item.label}
-                </Link>
-              )
-            })}
+        {/* Search */}
+        <div className="px-4 mb-4">
+          <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.06]">
+            <svg className="w-4 h-4 text-white/25 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            <span className="text-[12px] text-white/20">Search...</span>
+            <span className="ml-auto text-[10px] text-white/15 border border-white/10 rounded px-1.5 py-0.5 font-mono">/</span>
           </div>
+        </div>
 
-          <div className="mt-8">
-            <p className="text-[9px] font-semibold text-white/20 uppercase tracking-[0.18em] px-3 mb-3">Analytics</p>
+        {/* Navigation */}
+        <nav className="px-3 flex-1 overflow-y-auto">
+          {/* Primary */}
+          <div>
+            <p className="text-[9px] font-semibold text-white/20 uppercase tracking-[0.18em] px-3 mb-2">Navigate</p>
             <div className="space-y-0.5">
-              {ANALYTICS_ITEMS.map(item => {
-                const isActive = pathname.startsWith(item.href)
+              {NAV_ITEMS.map(item => {
+                const isActive = item.href === '/'
+                  ? pathname === '/'
+                  : pathname.startsWith(item.href)
                 return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150',
-                      isActive
-                        ? 'bg-white/10 text-white'
-                        : 'text-white/40 hover:text-white/70 hover:bg-white/5'
-                    )}
-                  >
-                    <item.icon className={cn('w-[18px] h-[18px]', isActive ? 'text-white/80' : 'text-white/25')} />
-                    {item.label}
-                  </Link>
+                  <NavItem key={item.href} {...item} isActive={isActive} onClick={close} />
                 )
               })}
             </div>
           </div>
 
-          <div className="mt-8">
-            <p className="text-[9px] font-semibold text-white/20 uppercase tracking-[0.18em] px-3 mb-3">Commercial</p>
-            <div className="space-y-0.5">
-              {COMMERCIAL_ITEMS.map(item => {
-                const isActive = pathname.startsWith(item.href)
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150',
-                      isActive
-                        ? 'bg-white/10 text-white'
-                        : 'text-white/40 hover:text-white/70 hover:bg-white/5'
-                    )}
-                  >
-                    <item.icon className={cn('w-[18px] h-[18px]', isActive ? 'text-white/80' : 'text-white/25')} />
-                    {item.label}
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
+          <NavSection title="Analytics" items={ANALYTICS_ITEMS} pathname={pathname} onClick={close} />
+          <NavSection title="Commercial" items={COMMERCIAL_ITEMS} pathname={pathname} onClick={close} />
+          <NavSection title="Settings" items={SETTINGS_ITEMS} pathname={pathname} onClick={close} />
 
-          <div className="mt-8">
-            <p className="text-[9px] font-semibold text-white/20 uppercase tracking-[0.18em] px-3 mb-3">Settings</p>
-            <div className="space-y-0.5">
-              {SETTINGS_ITEMS.map(item => {
-                const isActive = pathname.startsWith(item.href)
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150',
-                      isActive
-                        ? 'bg-white/10 text-white'
-                        : 'text-white/40 hover:text-white/70 hover:bg-white/5'
-                    )}
-                  >
-                    <item.icon className={cn('w-[18px] h-[18px]', isActive ? 'text-white/80' : 'text-white/25')} />
-                    {item.label}
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <p className="text-[9px] font-semibold text-white/20 uppercase tracking-[0.18em] px-3 mb-3">Actions</p>
-            <div className="space-y-0.5">
-              {ACTION_ITEMS.map(item => {
-                const isActive = pathname === item.href
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150',
-                      isActive
-                        ? 'bg-white/10 text-white'
-                        : 'text-white/40 hover:text-white/70 hover:bg-white/5'
-                    )}
-                  >
-                    <item.icon className={cn('w-[18px] h-[18px]', isActive ? 'text-white/80' : 'text-white/25')} />
-                    {item.label}
-                  </Link>
-                )
-              })}
-            </div>
+          {/* New Project CTA */}
+          <div className="mt-7 px-1">
+            <Link
+              href="/projects/new"
+              onClick={close}
+              className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-gradient-accent text-white text-[12px] font-semibold tracking-wide hover:opacity-90 transition-opacity shadow-glow-indigo"
+            >
+              <PlusIcon className="w-4 h-4" />
+              New Project
+            </Link>
           </div>
         </nav>
 
-        {/* Thin divider */}
-        <div className="mx-7 border-t border-white/8" />
+        {/* Divider */}
+        <div className="mx-5 border-t border-white/[0.06]" />
 
-        {/* Footer */}
-        <div className="px-7 py-5">
+        {/* User */}
+        <div className="px-5 py-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[11px] font-semibold text-white/60">SM</div>
-            <div>
-              <p className="text-[12px] font-medium text-white/70">Sarah Mitchell</p>
-              <p className="text-[10px] text-white/25">Practice Owner</p>
+            <div className="relative">
+              <div className="w-9 h-9 rounded-full bg-gradient-accent flex items-center justify-center text-[12px] font-semibold text-white">SM</div>
+              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#16162a]" />
             </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-medium text-white/80 truncate">Sarah Mitchell</p>
+              <p className="text-[10px] text-white/30">Practice Owner</p>
+            </div>
+            <button className="text-white/20 hover:text-white/50 transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+            </button>
           </div>
         </div>
       </aside>

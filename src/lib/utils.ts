@@ -1,4 +1,4 @@
-import { HealthStatus, TaskStatus, RiskSeverity, ApprovalStatus, IssueStatus, ChangeStatus, RiskRegisterStatus, ActionStatus, RiskProbability, RiskImpact, MeetingType, DesignRiskReviewStatus, ContractEventStatus, TenderStatus, SiteQueryStatus, BuildingRegStatus, InspectionStatus, ComplianceStatus, DocumentStatus, KnowledgeCategory, DutyholderRole, DrawingIssueType, CommercialHealthFlag, UtilisationStatus, FeeQuoteStatus, OpportunityStatus, IntegrationStatus, QuoteSectionType, FeeQuoteRecord, HealthAlertSeverity, HealthAlertCategory, ComplianceStatementStatus, BRPDRequirementStatus, BRPDChangeType, DrawingWorkflowStatus, DrawingEmailDirection } from './types'
+import { HealthStatus, TaskStatus, RiskSeverity, ApprovalStatus, IssueStatus, ChangeStatus, RiskRegisterStatus, ActionStatus, RiskProbability, RiskImpact, MeetingType, DesignRiskReviewStatus, ContractEventStatus, TenderStatus, SiteQueryStatus, BuildingRegStatus, InspectionStatus, ComplianceStatus, DocumentStatus, KnowledgeCategory, DutyholderRole, DrawingIssueType, CommercialHealthFlag, UtilisationStatus, FeeQuoteStatus, OpportunityStatus, IntegrationStatus, QuoteSectionType, FeeQuoteRecord, HealthAlertSeverity, HealthAlertCategory, ComplianceStatementStatus, BRPDRequirementStatus, BRPDChangeType, DrawingWorkflowStatus, DrawingEmailDirection, WizardStepStatus, BriefSectionStatus, AccountingSyncStatus, FeatureArea, LeaveType, LeaveStatus } from './types'
 
 export function cn(...classes: (string | undefined | false | null)[]): string {
   return classes.filter(Boolean).join(' ')
@@ -745,6 +745,129 @@ export function requirementCategoryColor(category: string): string {
     case 'accessibility': return 'bg-purple-100 text-purple-700'
     case 'environmental': return 'bg-green-100 text-green-700'
     default: return 'bg-slate-100 text-slate-700'
+  }
+}
+
+// ── Phase 4 Wave 4: Project Creation & Access Control Utils ─
+
+export function wizardStepStatusColor(status: WizardStepStatus): string {
+  switch (status) {
+    case 'not_started': return 'bg-slate-100 text-slate-600'
+    case 'in_progress': return 'bg-blue-100 text-blue-700'
+    case 'complete': return 'bg-emerald-100 text-emerald-700'
+    case 'skipped': return 'bg-amber-100 text-amber-600'
+  }
+}
+
+export function wizardStepStatusLabel(status: WizardStepStatus): string {
+  switch (status) {
+    case 'not_started': return 'Not Started'
+    case 'in_progress': return 'In Progress'
+    case 'complete': return 'Complete'
+    case 'skipped': return 'Skipped'
+  }
+}
+
+export function briefSectionStatusColor(status: BriefSectionStatus): string {
+  switch (status) {
+    case 'empty': return 'bg-slate-100 text-slate-500'
+    case 'draft': return 'bg-amber-100 text-amber-700'
+    case 'complete': return 'bg-blue-100 text-blue-700'
+    case 'approved': return 'bg-emerald-100 text-emerald-700'
+  }
+}
+
+export function briefSectionStatusLabel(status: BriefSectionStatus): string {
+  switch (status) {
+    case 'empty': return 'Empty'
+    case 'draft': return 'Draft'
+    case 'complete': return 'Complete'
+    case 'approved': return 'Approved'
+  }
+}
+
+export function accountingSyncStatusColor(status: AccountingSyncStatus): string {
+  switch (status) {
+    case 'synced': return 'bg-emerald-100 text-emerald-700'
+    case 'pending': return 'bg-blue-100 text-blue-700'
+    case 'failed': return 'bg-red-100 text-red-700'
+    case 'not_linked': return 'bg-slate-100 text-slate-500'
+  }
+}
+
+export function accountingSyncStatusLabel(status: AccountingSyncStatus): string {
+  switch (status) {
+    case 'synced': return 'Synced'
+    case 'pending': return 'Pending'
+    case 'failed': return 'Failed'
+    case 'not_linked': return 'Not Linked'
+  }
+}
+
+export function featureAreaLabel(area: FeatureArea): string {
+  switch (area) {
+    case 'projects': return 'Projects'
+    case 'fee_quotes': return 'Fee Quotes'
+    case 'analytics': return 'Analytics'
+    case 'ai_teammate': return 'AI Teammate'
+    case 'integrations': return 'Integrations'
+    case 'portal': return 'Portal'
+    case 'admin': return 'Admin'
+    case 'knowledge': return 'Knowledge Base'
+    case 'cpd': return 'CPD & Training'
+    case 'staffing': return 'Staffing'
+  }
+}
+
+export function roleLabel(role: string): string {
+  switch (role) {
+    case 'practice_owner': return 'Practice Owner'
+    case 'project_lead': return 'Project Lead'
+    case 'team_member': return 'Team Member'
+    case 'admin': return 'Admin'
+    default: return role
+  }
+}
+
+// ── Leave & Holidays Utils ──────────────────────────────────
+
+export function leaveTypeColor(type: LeaveType): string {
+  switch (type) {
+    case 'holiday': return 'bg-blue-100 text-blue-700'
+    case 'sick': return 'bg-red-100 text-red-700'
+    case 'cpd': return 'bg-purple-100 text-purple-700'
+    case 'parental': return 'bg-pink-100 text-pink-700'
+    case 'compassionate': return 'bg-amber-100 text-amber-700'
+    case 'unpaid': return 'bg-slate-100 text-slate-600'
+  }
+}
+
+export function leaveTypeLabel(type: LeaveType): string {
+  switch (type) {
+    case 'holiday': return 'Holiday'
+    case 'sick': return 'Sick'
+    case 'cpd': return 'CPD'
+    case 'parental': return 'Parental'
+    case 'compassionate': return 'Compassionate'
+    case 'unpaid': return 'Unpaid'
+  }
+}
+
+export function leaveStatusColor(status: LeaveStatus): string {
+  switch (status) {
+    case 'pending': return 'bg-amber-100 text-amber-700'
+    case 'approved': return 'bg-emerald-100 text-emerald-700'
+    case 'declined': return 'bg-red-100 text-red-700'
+    case 'cancelled': return 'bg-slate-100 text-slate-500'
+  }
+}
+
+export function leaveStatusLabel(status: LeaveStatus): string {
+  switch (status) {
+    case 'pending': return 'Pending'
+    case 'approved': return 'Approved'
+    case 'declined': return 'Declined'
+    case 'cancelled': return 'Cancelled'
   }
 }
 

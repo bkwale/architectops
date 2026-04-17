@@ -1,8 +1,9 @@
 'use client'
 
-import { getIntegrations, getIntegrationsByCategory, getUser } from '@/lib/mock-data'
+import React from 'react'
+import { getIntegrations, getIntegrationsByCategory, getUser, getQuoteAccountingLinks } from '@/lib/mock-data'
 import { Integration, IntegrationStatus } from '@/lib/types'
-import { cn, formatDate, integrationStatusColor, integrationStatusLabel, integrationStatusDot } from '@/lib/utils'
+import { cn, formatDate, integrationStatusColor, integrationStatusLabel, integrationStatusDot, accountingSyncStatusColor, accountingSyncStatusLabel } from '@/lib/utils'
 import { Breadcrumb } from '@/components/Breadcrumb'
 
 // ── Helper: Get provider icon and color ──────────────────────
@@ -53,6 +54,16 @@ function getLastSyncDisplay(lastSyncAt?: string, syncFrequency?: number): string
   if (diffDays < 7) return `${diffDays}d ago`
 
   return formatDate(lastSyncAt)
+}
+
+// ── Component: Summary Card ────────────────────────────────
+function SummaryCard({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="bg-white rounded-2xl border border-surface-200 shadow-card p-4">
+      <p className="text-[11px] text-ink-400 uppercase tracking-[0.08em] font-semibold mb-3">{label}</p>
+      <p className="text-2xl font-semibold text-ink-900">{value}</p>
+    </div>
+  )
 }
 
 // ── Component: Integration Card ─────────────────────────────
@@ -185,7 +196,7 @@ export default function IntegrationsHubPage() {
       </section>
 
       {/* ━━━ DOCUMENT STORAGE INTEGRATIONS ━━━━━━━━━━━━━━━━━ */}
-      <section className="pb-16">
+      <section className="pb-12">
         <div className="border-t border-slate-200 pt-8">
           <h2 className="font-display text-xl text-ink-900 mb-4">Document Storage</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -195,6 +206,129 @@ export default function IntegrationsHubPage() {
           </div>
         </div>
       </section>
+
+      {/* ━━━ QUOTE ACCOUNTING LINKS ━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <QuoteAccountingLinksSection />
     </div>
   )
+}
+
+// ── Component: Quote Accounting Links Section ───────────────
+function QuoteAccountingLinksSection() {
+  const links = getQuoteAccountingLinks()
+
+  const stats = {
+    total: links.length,
+    synced: links.filter(l => l.sync_status === 'synced').length,
+    pending: links.filter(l => l.sync_status === 'pending').length,
+    failed: links.filter(l => l.sync_status === 'failed').length,
+  }
+
+  return (
+    <section className="pb-16">
+      <div className="border-t border-surface-200/60 pt-10">
+        <h2 className="font-display text-xl text-ink-900 mb-6">Quote → Invoice Sync</h2>
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <SummaryCard label="Total Links" value={stats.total} />
+          <SummaryCard label="Synced" value={stats.synced} />
+          <SummaryCard label="Pending" value={stats.pending} />
+          <SummaryCard label="Failed" value={stats.failed} />
+        </div>
+
+        {/* Links Table */}
+        <div className="bg-white rounded-2xl border border-surface-200 shadow-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-surface-200 bg-surface-50">
+                  <th className="px-6 py-3 text-left text-[11px] text-ink-400 uppercase tracking-[0.08em] font-semibold">Fee Quote ID</th>
+                  <th className="px-6 py-3 text-left text-[11px] text-ink-400 uppercase tracking-[0.08em] font-semibold">Provider</th>
+                  <th className="px-6 py-3 text-left text-[11px] text-ink-400 uppercase tracking-[0.08em] font-semibold">External Ref</th>
+                  <th className="px-6 py-3 text-left text-[11px] text-ink-400 uppercase tracking-[0.08em] font-semibold">Sync Status</th>
+                  <th className="px-6 py-3 text-left text-[11px] text-ink-400 uppercase tracking-[0.08em] font-semibold">Last Synced</th>
+                  <th className="px-6 py-3 text-center text-[11px] text-ink-400 uppercase tracking-[0.08em] font-semibold">Auto-Sync</th>
+                  <th className="px-6 py-3 text-right text-[11px] text-ink-400 uppercase tracking-[0.08em] font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-surface-200">
+                {links.map(link => (
+                  <React.Fragment key={link.id}>
+                    <tr className="hover:bg-surface-50 transition-colors">
+                      <td className="px-6 py-4 text-sm font-medium text-ink-900">{link.fee_quote_id}</td>
+                      <td className="px-6 py-4">
+                        <span className={cn('inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold', getProviderBadgeClass(link.provider))}>
+                          {link.provider === 'xero' ? 'Xero' : link.provider === 'quickbooks' ? 'QuickBooks' : link.provider}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-ink-700 font-mono">{link.external_ref}</td>
+                      <td className="px-6 py-4">
+                        <span className={cn('inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold', accountingSyncStatusColor(link.sync_status))}>
+                          {accountingSyncStatusLabel(link.sync_status)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-ink-700">{link.last_synced_at ? formatDate(link.last_synced_at) : 'Never'}</td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={cn('w-2 h-2 rounded-full inline-block', link.auto_sync_enabled ? 'bg-emerald-500' : 'bg-slate-300')} />
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button className="text-xs font-medium text-accent-600 hover:text-accent-700 transition-colors">
+                          View
+                        </button>
+                      </td>
+                    </tr>
+
+                    {/* Error Row */}
+                    {link.sync_status === 'failed' && link.error_message && (
+                      <tr className="bg-red-50">
+                        <td colSpan={7} className="px-6 py-3">
+                          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                            <p className="text-xs text-red-700"><strong>Error:</strong> {link.error_message}</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+
+                    {/* Mapped Fields Row */}
+                    {link.mapped_fields && link.mapped_fields.length > 0 && (
+                      <tr className="bg-slate-50">
+                        <td colSpan={7} className="px-6 py-3">
+                          <div className="flex flex-wrap gap-2">
+                            {link.mapped_fields.map((field, idx) => (
+                              <span key={idx} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-ink-100 text-ink-700 font-medium">
+                                {field}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {links.length === 0 && (
+            <div className="px-6 py-12 text-center">
+              <p className="text-sm text-ink-400">No quote accounting links yet</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── Helper: Get provider badge class ────────────────────────
+function getProviderBadgeClass(provider: string): string {
+  switch (provider) {
+    case 'xero':
+      return 'bg-emerald-100 text-emerald-700'
+    case 'quickbooks':
+      return 'bg-blue-100 text-blue-700'
+    default:
+      return 'bg-slate-100 text-slate-700'
+  }
 }

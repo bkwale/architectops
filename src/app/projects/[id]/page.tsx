@@ -214,6 +214,7 @@ export default function ProjectDashboard({ params }: { params: { id: string } })
             { href: `/projects/${project.id}/brpd`, label: 'BRPD', sub: 'Compliance & Dutyholders' },
             { href: `/projects/${project.id}/brpd/changelog`, label: 'BRPD Changelog', sub: 'Document Control' },
             { href: `/projects/${project.id}/drawing-issues`, label: 'Drawing Issues', sub: 'Email Workflow' },
+            { href: `/projects/${project.id}/brief`, label: 'Brief', sub: 'Project Brief Builder' },
             { href: `/projects/${project.id}/documents`, label: 'Documents', sub: 'Register & Transmittals' },
             { href: `/projects/${project.id}/ai`, label: 'AI Teammate', sub: 'Ask About This Project' },
             { href: '/approvals', label: 'Approvals', sub: 'Review Queue' },

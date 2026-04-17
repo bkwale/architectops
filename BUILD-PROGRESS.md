@@ -82,7 +82,7 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 **Utils:** integrationStatusColor/Label/Dot, portalAccessLabel/Color, portalItemTypeIcon, timeAgo
 **Sidebar:** Added AI Teammate, Portal (Navigate); Integrations (Settings)
 
-## Phase 4 — IN PROGRESS
+## Phase 4 — COMPLETE
 
 ### Wave 1 — Commercial Foundation (COMPLETE)
 | Feature | Route | Status |
@@ -124,13 +124,18 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 **Utils:** complianceStatementStatusColor/Label, brpdRequirementStatusColor/Label, brpdChangeTypeLabel/Color, drawingWorkflowStatusColor/Label, drawingEmailDirectionLabel/Color, requirementCategoryLabel/Color
 **Project workspaces:** Added BRPD Changelog, Drawing Issues links
 
-### Wave 4 — Project Creation (NOT STARTED)
+### Wave 4 — Project Creation (COMPLETE)
 | Feature | Route | Status |
 |---------|-------|--------|
-| New Project / Brief Creation 2.0 (12-step wizard) | `/projects/new` (upgrade) | Pending |
-| Project Brief Document Builder | `/projects/[id]/brief` | Pending |
-| Xero / QuickBooks Quote Linkage | `/settings/integrations` (upgrade) | Pending |
-| Role-Based Visibility Controls | `/settings/admin` (upgrade) | Pending |
+| New Project / Brief Creation 2.0 (12-step wizard) | `/projects/new` (upgrade) | Done |
+| Project Brief Document Builder | `/projects/[id]/brief` | Done |
+| Xero / QuickBooks Quote Linkage | `/settings/integrations` (upgrade) | Done |
+| Role-Based Visibility Controls | `/settings/admin` (upgrade) | Done |
+
+**Types added:** WizardStepStatus, WizardStep, BriefSectionStatus, BriefSection, ProjectBrief, AccountingSyncStatus, QuoteAccountingLink, FeatureArea, RoleVisibilityRule
+**Mock data:** 12 wizard steps, 2 project briefs (12 brief sections), 5 quote accounting links, 18 role visibility rules, 10 helper functions
+**Utils:** wizardStepStatusColor/Label, briefSectionStatusColor/Label, accountingSyncStatusColor/Label, featureAreaLabel, roleLabel
+**Project workspaces:** Added Brief link to project dashboard
 
 ## Current Route Map
 
@@ -159,9 +164,9 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 - `/ai` — AI Teammate (global portfolio chat)
 - `/projects/[id]/ai` — AI Teammate (project-scoped chat)
 - `/portal` — External Collaboration Portal
-- `/settings/admin` — Admin Controls (AI governance)
+- `/settings/admin` — Admin Controls (AI governance + Role-Based Visibility) (Phase 4 upgrade)
 - `/settings/international` — International & Jurisdiction settings
-- `/settings/integrations` — Integrations Hub (Xero, Outlook, SharePoint, etc)
+- `/settings/integrations` — Integrations Hub (Xero, Outlook, SharePoint, Quote Sync) (Phase 4 upgrade)
 - `/settings/numbering` — Numbering & Templates Admin (Phase 4)
 
 ### Project sub-routes (`/projects/[id]/...`)
@@ -176,6 +181,7 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 - `/brpd` — BRPD & Dutyholder Coordination (Phase 4 upgrade)
 - `/brpd/changelog` — BRPD Changelog & Document Control (Phase 4)
 - `/drawing-issues` — Drawing Issue & Email Workflow (Phase 4)
+- `/brief` — Project Brief Document Builder (Phase 4)
 - `/documents` — Documents & Transmittals
 - `/health` — Project Health Scorecard (Phase 4)
 
@@ -190,3 +196,4 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 - **Phase 4 Wave 1:** 6 fee quotes (all statuses), 19 line items, 11 quote sections, 10 view tracking entries, 3 quote templates, 4 terms library items, 5 exclusions library items, 17 health snapshots, 3 project number templates, 1 quote number template, 3 drawing issue templates
 - **Phase 4 Wave 2:** 9 health alerts, 9 burn-budget metrics, 5 quote-project links, 5 conversion metrics
 - **Phase 4 Wave 3:** 7 compliance statements, 8 BRPD requirements, 10 changelog entries, 6 drawing workflows, 11 drawing emails
+- **Phase 4 Wave 4:** 12 wizard steps, 2 project briefs (12 brief sections), 5 quote accounting links, 18 role visibility rules

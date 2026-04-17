@@ -24,6 +24,12 @@ import {
   drawingWorkflowStatusColor, drawingWorkflowStatusLabel,
   drawingEmailDirectionLabel, drawingEmailDirectionColor,
   requirementCategoryLabel, requirementCategoryColor,
+  wizardStepStatusColor, wizardStepStatusLabel,
+  briefSectionStatusColor, briefSectionStatusLabel,
+  accountingSyncStatusColor, accountingSyncStatusLabel,
+  featureAreaLabel, roleLabel,
+  leaveTypeColor, leaveTypeLabel,
+  leaveStatusColor, leaveStatusLabel,
 } from '../utils'
 
 describe('cn (class name helper)', () => {
@@ -563,5 +569,130 @@ describe('requirementCategoryColor', () => {
     expect(requirementCategoryColor('accessibility')).toContain('purple')
     expect(requirementCategoryColor('environmental')).toContain('green')
     expect(requirementCategoryColor('design')).toContain('indigo')
+  })
+})
+
+// ── Phase 4 Wave 4 ─────────────────────────────────────────
+
+describe('wizardStepStatusColor', () => {
+  it('returns correct colors for all statuses', () => {
+    expect(wizardStepStatusColor('not_started')).toContain('slate')
+    expect(wizardStepStatusColor('in_progress')).toContain('blue')
+    expect(wizardStepStatusColor('complete')).toContain('emerald')
+    expect(wizardStepStatusColor('skipped')).toContain('amber')
+  })
+})
+
+describe('wizardStepStatusLabel', () => {
+  it('returns correct labels', () => {
+    expect(wizardStepStatusLabel('not_started')).toBe('Not Started')
+    expect(wizardStepStatusLabel('in_progress')).toBe('In Progress')
+    expect(wizardStepStatusLabel('complete')).toBe('Complete')
+    expect(wizardStepStatusLabel('skipped')).toBe('Skipped')
+  })
+})
+
+describe('briefSectionStatusColor', () => {
+  it('returns correct colors for all statuses', () => {
+    expect(briefSectionStatusColor('empty')).toContain('slate')
+    expect(briefSectionStatusColor('draft')).toContain('amber')
+    expect(briefSectionStatusColor('complete')).toContain('blue')
+    expect(briefSectionStatusColor('approved')).toContain('emerald')
+  })
+})
+
+describe('briefSectionStatusLabel', () => {
+  it('returns correct labels', () => {
+    expect(briefSectionStatusLabel('empty')).toBe('Empty')
+    expect(briefSectionStatusLabel('draft')).toBe('Draft')
+    expect(briefSectionStatusLabel('complete')).toBe('Complete')
+    expect(briefSectionStatusLabel('approved')).toBe('Approved')
+  })
+})
+
+describe('accountingSyncStatusColor', () => {
+  it('returns correct colors for all statuses', () => {
+    expect(accountingSyncStatusColor('synced')).toContain('emerald')
+    expect(accountingSyncStatusColor('pending')).toContain('blue')
+    expect(accountingSyncStatusColor('failed')).toContain('red')
+    expect(accountingSyncStatusColor('not_linked')).toContain('slate')
+  })
+})
+
+describe('accountingSyncStatusLabel', () => {
+  it('returns correct labels', () => {
+    expect(accountingSyncStatusLabel('synced')).toBe('Synced')
+    expect(accountingSyncStatusLabel('pending')).toBe('Pending')
+    expect(accountingSyncStatusLabel('failed')).toBe('Failed')
+    expect(accountingSyncStatusLabel('not_linked')).toBe('Not Linked')
+  })
+})
+
+describe('featureAreaLabel', () => {
+  it('returns correct labels for all areas', () => {
+    expect(featureAreaLabel('projects')).toBe('Projects')
+    expect(featureAreaLabel('fee_quotes')).toBe('Fee Quotes')
+    expect(featureAreaLabel('analytics')).toBe('Analytics')
+    expect(featureAreaLabel('ai_teammate')).toBe('AI Teammate')
+    expect(featureAreaLabel('integrations')).toBe('Integrations')
+    expect(featureAreaLabel('portal')).toBe('Portal')
+    expect(featureAreaLabel('admin')).toBe('Admin')
+    expect(featureAreaLabel('knowledge')).toBe('Knowledge Base')
+    expect(featureAreaLabel('cpd')).toBe('CPD & Training')
+    expect(featureAreaLabel('staffing')).toBe('Staffing')
+  })
+})
+
+describe('roleLabel', () => {
+  it('returns correct labels for known roles', () => {
+    expect(roleLabel('practice_owner')).toBe('Practice Owner')
+    expect(roleLabel('project_lead')).toBe('Project Lead')
+    expect(roleLabel('team_member')).toBe('Team Member')
+    expect(roleLabel('admin')).toBe('Admin')
+  })
+  it('returns raw role for unknown roles', () => {
+    expect(roleLabel('intern')).toBe('intern')
+  })
+})
+
+// ── Leave & Holidays ────────────────────────────────────────
+
+describe('leaveTypeColor', () => {
+  it('returns correct colors for all types', () => {
+    expect(leaveTypeColor('holiday')).toContain('blue')
+    expect(leaveTypeColor('sick')).toContain('red')
+    expect(leaveTypeColor('cpd')).toContain('purple')
+    expect(leaveTypeColor('parental')).toContain('pink')
+    expect(leaveTypeColor('compassionate')).toContain('amber')
+    expect(leaveTypeColor('unpaid')).toContain('slate')
+  })
+})
+
+describe('leaveTypeLabel', () => {
+  it('returns correct labels', () => {
+    expect(leaveTypeLabel('holiday')).toBe('Holiday')
+    expect(leaveTypeLabel('sick')).toBe('Sick')
+    expect(leaveTypeLabel('cpd')).toBe('CPD')
+    expect(leaveTypeLabel('parental')).toBe('Parental')
+    expect(leaveTypeLabel('compassionate')).toBe('Compassionate')
+    expect(leaveTypeLabel('unpaid')).toBe('Unpaid')
+  })
+})
+
+describe('leaveStatusColor', () => {
+  it('returns correct colors for all statuses', () => {
+    expect(leaveStatusColor('pending')).toContain('amber')
+    expect(leaveStatusColor('approved')).toContain('emerald')
+    expect(leaveStatusColor('declined')).toContain('red')
+    expect(leaveStatusColor('cancelled')).toContain('slate')
+  })
+})
+
+describe('leaveStatusLabel', () => {
+  it('returns correct labels', () => {
+    expect(leaveStatusLabel('pending')).toBe('Pending')
+    expect(leaveStatusLabel('approved')).toBe('Approved')
+    expect(leaveStatusLabel('declined')).toBe('Declined')
+    expect(leaveStatusLabel('cancelled')).toBe('Cancelled')
   })
 })

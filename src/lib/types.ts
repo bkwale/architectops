@@ -1048,6 +1048,114 @@ export interface DrawingEmail {
   attachment_names?: string[]
 }
 
+// ── Phase 4 Wave 4: Project Creation & Access Control Types ─
+
+export type WizardStepStatus = 'not_started' | 'in_progress' | 'complete' | 'skipped'
+
+export interface WizardStep {
+  number: number
+  title: string
+  description: string
+  required: boolean
+  fields: string[]
+  help_text?: string
+}
+
+export type BriefSectionStatus = 'empty' | 'draft' | 'complete' | 'approved'
+
+export interface BriefSection {
+  id: string
+  project_id: string
+  section_number: number
+  title: string
+  description: string
+  content: string
+  status: BriefSectionStatus
+  required: boolean
+  last_edited_by_user_id?: string
+  last_edited_at?: string
+  approved_by_user_id?: string
+  approved_at?: string
+}
+
+export interface ProjectBrief {
+  id: string
+  project_id: string
+  version: number
+  status: 'draft' | 'issued' | 'superseded'
+  sections: BriefSection[]
+  created_by_user_id: string
+  created_at: string
+  updated_at: string
+  issued_date?: string
+  issued_to?: string
+}
+
+export type AccountingSyncStatus = 'synced' | 'pending' | 'failed' | 'not_linked'
+
+export interface QuoteAccountingLink {
+  id: string
+  fee_quote_id: string
+  provider: 'xero' | 'quickbooks'
+  external_ref: string
+  external_invoice_id?: string
+  sync_status: AccountingSyncStatus
+  last_synced_at?: string
+  error_message?: string
+  auto_sync_enabled: boolean
+  mapped_fields: string[]
+}
+
+export type FeatureArea = 'projects' | 'fee_quotes' | 'analytics' | 'ai_teammate' | 'integrations' | 'portal' | 'admin' | 'knowledge' | 'cpd' | 'staffing'
+
+export interface RoleVisibilityRule {
+  id: string
+  organisation_id: string
+  role: 'practice_owner' | 'project_lead' | 'team_member'
+  feature_area: FeatureArea
+  can_view: boolean
+  can_edit: boolean
+  can_delete: boolean
+  can_export: boolean
+  restriction_notes?: string
+}
+
+// ── Leave & Holidays ────────────────────────────────────────
+
+export type LeaveType = 'holiday' | 'sick' | 'cpd' | 'parental' | 'compassionate' | 'unpaid'
+export type LeaveStatus = 'pending' | 'approved' | 'declined' | 'cancelled'
+
+export interface LeaveRecord {
+  id: string
+  user_id: string
+  leave_type: LeaveType
+  status: LeaveStatus
+  start_date: string
+  end_date: string
+  days: number
+  half_day_start?: boolean
+  half_day_end?: boolean
+  notes?: string
+  approved_by_user_id?: string
+  approved_at?: string
+  created_at: string
+}
+
+export interface LeaveEntitlement {
+  user_id: string
+  year: number
+  total_days: number
+  used_days: number
+  pending_days: number
+  carried_over: number
+}
+
+export interface BankHoliday {
+  date: string
+  name: string
+  region: 'england-wales' | 'scotland' | 'northern-ireland' | 'all'
+}
+
 // ── RIBA Stage Info ─────────────────────────────────────────
 
 export const RIBA_STAGES: Record<RIBAStage, string> = {
