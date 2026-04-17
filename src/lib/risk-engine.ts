@@ -135,24 +135,26 @@ export function calculateRisks(project: Project, tasks: Task[]): RiskAlert[] {
 }
 
 export function calculateHealth(risks: RiskAlert[], overdueTasks: Task[]): HealthStatus {
-  const hasHigh = risks.some(r => r.severity === 'high')
-  const hasMedium = risks.some(r => r.severity === 'medium')
-  const hasOverdueRequired = overdueTasks.some(t => t.required_flag)
+  const activeRisks = risks.filter(r => !r.resolved_flag)
+  const hasHigh = activeRisks.some(r => r.severity === 'high')
+  const hasMedium = activeRisks.some(r => r.severity === 'medium')
+  const overdueRequired = overdueTasks.filter(t => t.required_flag && t.due_date && new Date(t.due_date) < new Date())
 
-  if (hasHigh || hasOverdueRequired) return 'red'
-  if (hasMedium || overdueTasks.length > 0) return 'amber'
+  if (hasHigh) return 'red'
+  if (hasMedium || overdueRequired.length > 0) return 'amber'
+  if (overdueTasks.length > 0) return 'amber'
   return 'green'
 }
 
 export function calculateCompletion(tasks: Task[]): number {
   if (tasks.length === 0) return 0
   const done = tasks.filter(t => t.status === 'done').length
-  return Math.round((done / tasks.length) * 100)
+  return parseFloat(((done / tasks.length) * 100).toFixed(2))
 }
 
 export function calculateStageCompletion(tasks: Task[], stage: number): number {
   const stageTasks = tasks.filter(t => t.stage === stage)
   if (stageTasks.length === 0) return 0
   const done = stageTasks.filter(t => t.status === 'done').length
-  return Math.round((done / stageTasks.length) * 100)
+  return parseFloat(((done / stageTasks.length) * 100).toFixed(2))
 }

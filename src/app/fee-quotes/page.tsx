@@ -2,14 +2,19 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { getFeeQuoteRecords, getProject, getOpportunity, PROJECTS } from '@/lib/mock-data'
+import { getFeeQuoteRecords, getUser, PROJECTS, getOpportunity } from '@/lib/mock-data'
 import { FeeQuoteRecord, FeeQuoteStatus } from '@/lib/types'
-import { cn, formatDate, formatCurrency, feeQuoteStatusColor, feeQuoteStatusLabel } from '@/lib/utils'
+import { cn, formatDate, formatCurrency, feeQuoteStatusColor, feeQuoteStatusLabel, timeAgo, quoteNeedsFollowUp } from '@/lib/utils'
 import { Breadcrumb } from '@/components/Breadcrumb'
-import { SummaryCard } from '@/components/SummaryCard'
-import { StatusBadge } from '@/components/StatusBadge'
 import { TabBar } from '@/components/TabBar'
-import { EmptyState } from '@/components/EmptyState'
+
+// Eye icon SVG
+const EyeIcon = ({ className = 'w-3 h-3' }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+  </svg>
+)
 
 export default function FeeQuotesPage() {
   const quotes = getFeeQuoteRecords()
@@ -23,132 +28,203 @@ export default function FeeQuotesPage() {
 
   // Calculate summary metrics
   const totalQuotes = quotes.length
+  const sentViewedQuotes = quotes.filter(q => q.status === 'sent' || q.status === 'viewed')
+  const pipelineValue = sentViewedQuotes.reduce((sum, q) => sum + q.total_fee, 0)
   const acceptedQuotes = quotes.filter(q => q.status === 'accepted')
   const acceptedValue = acceptedQuotes.reduce((sum, q) => sum + q.total_fee, 0)
-  const draftPendingQuotes = quotes.filter(q => q.status === 'draft' || q.status === 'issued').length
-  const conversionRate = totalQuotes > 0 ? Math.round((acceptedQuotes.length / totalQuotes) * 100) : 0
+  const declinedExpiredQuotes = quotes.filter(q => q.status === 'declined' || q.status === 'expired')
+  const conversionRate = (acceptedQuotes.length + declinedExpiredQuotes.length) > 0
+    ? Math.round((acceptedQuotes.length / (acceptedQuotes.length + declinedExpiredQuotes.length)) * 100)
+    : 0
 
-  // Tab counts
+  // Tab counts including expired
   const tabCounts = {
     all: quotes.length,
     draft: quotes.filter(q => q.status === 'draft').length,
-    issued: quotes.filter(q => q.status === 'issued').length,
+    sent: quotes.filter(q => q.status === 'sent').length,
+    viewed: quotes.filter(q => q.status === 'viewed').length,
     accepted: quotes.filter(q => q.status === 'accepted').length,
-    superseded: quotes.filter(q => q.status === 'superseded').length,
+    declined: quotes.filter(q => q.status === 'declined').length,
+    expired: quotes.filter(q => q.status === 'expired').length,
   }
 
   const tabs = [
     { key: 'all', label: 'All', count: tabCounts.all },
     { key: 'draft', label: 'Draft', count: tabCounts.draft },
-    { key: 'issued', label: 'Issued', count: tabCounts.issued },
+    { key: 'sent', label: 'Sent', count: tabCounts.sent },
+    { key: 'viewed', label: 'Viewed', count: tabCounts.viewed },
     { key: 'accepted', label: 'Accepted', count: tabCounts.accepted },
-    { key: 'superseded', label: 'Superseded', count: tabCounts.superseded },
+    { key: 'declined', label: 'Declined', count: tabCounts.declined },
+    { key: 'expired', label: 'Expired', count: tabCounts.expired },
   ]
 
   return (
-    <div className="max-w-6xl">
-      {/* ━━━ BREADCRUMB ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="pb-10">
-        <Breadcrumb items={[
-          { label: 'Dashboard', href: '/' },
-          { label: 'Fee Quotes' },
-        ]} />
-      </section>
+    <div className="bg-surface-50 min-h-screen">
+      <div className="max-w-6xl mx-auto px-0 py-0">
+        {/* ━━━ BREADCRUMB ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+        <section className="pt-10 pb-6">
+          <Breadcrumb items={[{ label: 'Fee Quotes' }]} />
+        </section>
 
-      {/* ━━━ HERO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="pb-16">
-        <h1 className="font-display text-[2rem] text-ink-900">Fee Quotes</h1>
-      </section>
+        {/* ━━━ HEADER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+        <section className="px-10 pb-8 flex items-start justify-between">
+          <div>
+            <h1 className="font-display text-3xl font-semibold text-ink-900 mb-2">Fee Quotes</h1>
+            <p className="text-[14px] text-ink-500">Manage proposals and track client responses</p>
+          </div>
+          <Link
+            href="/fee-quotes/new"
+            className="bg-ink-900 text-white px-5 py-2.5 rounded-lg font-medium text-[14px] hover:bg-ink-800 transition-colors"
+          >
+            New Quote
+          </Link>
+        </section>
 
-      {/* ━━━ SUMMARY CARDS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="pb-16">
-        <div className="border-t border-surface-300 pt-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-            <div className="bg-white border border-surface-200 rounded-2xl p-4 text-center shadow-card">
-              <p className="text-2xl font-light tracking-tight text-ink-900">{totalQuotes}</p>
-              <p className="text-[11px] text-ink-400 font-medium mt-1.5 tracking-wide">Total Quotes</p>
+        {/* ━━━ SUMMARY BAR ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+        <section className="border-t border-slate-300 px-10 py-8">
+          <div className="flex items-center justify-start gap-12">
+            <div className="flex flex-col">
+              <p className="text-[12px] text-ink-400 font-medium uppercase tracking-wide mb-1">Total Quotes</p>
+              <p className="text-2xl font-light text-ink-900">{totalQuotes}</p>
             </div>
-            <div className="bg-white border border-surface-200 rounded-2xl p-4 text-center shadow-card">
-              <p className="text-2xl font-light tracking-tight text-ink-900">{formatCurrency(acceptedValue)}</p>
-              <p className="text-[11px] text-ink-400 font-medium mt-1.5 tracking-wide">Accepted Value</p>
+            <div className="border-r border-slate-300 h-10"></div>
+            <div className="flex flex-col">
+              <p className="text-[12px] text-ink-400 font-medium uppercase tracking-wide mb-1">Pipeline Value</p>
+              <p className="text-2xl font-light text-ink-900">{formatCurrency(pipelineValue)}</p>
             </div>
-            <div className="bg-white border border-surface-200 rounded-2xl p-4 text-center shadow-card">
-              <p className="text-2xl font-light tracking-tight text-ink-900">{draftPendingQuotes}</p>
-              <p className="text-[11px] text-ink-400 font-medium mt-1.5 tracking-wide">Draft / Pending</p>
+            <div className="border-r border-slate-300 h-10"></div>
+            <div className="flex flex-col">
+              <p className="text-[12px] text-ink-400 font-medium uppercase tracking-wide mb-1">Won Value</p>
+              <p className="text-2xl font-light text-ink-900">{formatCurrency(acceptedValue)}</p>
             </div>
-            <div className="bg-white border border-surface-200 rounded-2xl p-4 text-center shadow-card">
-              <p className="text-2xl font-light tracking-tight text-ink-900">{conversionRate}%</p>
-              <p className="text-[11px] text-ink-400 font-medium mt-1.5 tracking-wide">Conversion Rate</p>
+            <div className="border-r border-slate-300 h-10"></div>
+            <div className="flex flex-col">
+              <p className="text-[12px] text-ink-400 font-medium uppercase tracking-wide mb-1">Conversion Rate</p>
+              <p className="text-2xl font-light text-ink-900">{conversionRate}%</p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ━━━ TAB BAR ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="pb-10">
-        <div className="border-t border-surface-300 pt-10">
+        {/* ━━━ TAB BAR ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+        <section className="border-t border-slate-300 px-10 py-6">
           <TabBar tabs={tabs} activeKey={activeTab} onSelect={setActiveTab} />
-        </div>
-      </section>
+        </section>
 
-      {/* ━━━ QUOTE LIST ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="pb-20">
-        {filteredQuotes.length === 0 ? (
-          <EmptyState text={`No ${activeTab !== 'all' ? activeTab : ''} fee quotes yet.`} />
-        ) : (
-          <div className="space-y-4">
-            {filteredQuotes.map((quote) => {
-              const relatedProject = quote.related_project_id ? getProject(quote.related_project_id) : null
-              const relatedOpportunity = quote.related_opportunity_id ? getOpportunity(quote.related_opportunity_id) : null
-              const relatedName = relatedProject?.name || relatedOpportunity?.title || '—'
+        {/* ━━━ QUOTE CARDS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+        <section className="px-10 pb-20">
+          {filteredQuotes.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-ink-400 text-[14px] mb-2">No quotes found</p>
+              <p className="text-ink-300 text-[13px]">
+                {activeTab !== 'all' ? `Try selecting a different status` : `Get started by creating a new quote`}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {filteredQuotes.map((quote) => {
+                const project = quote.related_project_id ? PROJECTS.find(p => p.id === quote.related_project_id) : null
+                const opportunity = quote.related_opportunity_id ? getOpportunity(quote.related_opportunity_id) : null
+                const preparedBy = getUser(quote.prepared_by_user_id)
+                const needsFollowUp = quoteNeedsFollowUp(quote)
 
-              return (
-                <Link
-                  key={quote.id}
-                  href={`/fee-quotes/${quote.id}`}
-                  className="block p-6 bg-white rounded-2xl border border-surface-200 shadow-card hover:border-accent-300 hover:shadow-lg transition-all"
-                >
-                  <div className="flex items-start justify-between gap-6 mb-4">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-[13px] font-semibold text-ink-900">{quote.quote_reference}</span>
-                        <StatusBadge
-                          label={feeQuoteStatusLabel(quote.status)}
-                          colorClass={feeQuoteStatusColor(quote.status)}
-                        />
+                return (
+                  <Link
+                    key={quote.id}
+                    href={`/fee-quotes/${quote.id}`}
+                    className="bg-white rounded-xl border border-slate-200 p-5 hover:border-accent-200 hover:shadow-sm transition-all"
+                  >
+                    {/* Status + Reference */}
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={cn(
+                            'inline-block px-2 py-1 rounded-full text-[11px] font-medium',
+                            feeQuoteStatusColor(quote.status)
+                          )}
+                        >
+                          {feeQuoteStatusLabel(quote.status)}
+                        </span>
                       </div>
-                      <p className="text-[12px] text-ink-400 mb-1">{relatedName}</p>
-                      <p className="text-[11px] text-ink-300">{quote.fee_basis}</p>
+                      <span className="font-mono text-[12px] text-ink-400">{quote.quote_reference}</span>
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-display text-[1.75rem] text-ink-900">
-                        {formatCurrency(quote.total_fee)}
+
+                    {/* Title + Client */}
+                    <div className="mb-4">
+                      <h3 className="text-[15px] font-semibold text-ink-900 mb-1">{quote.quote_title || 'Untitled Quote'}</h3>
+                      <p className="text-[13px] text-ink-500">{quote.client_name || '—'}</p>
+                    </div>
+
+                    {/* Fee Amount */}
+                    <div className="mb-4">
+                      <p className="font-display text-xl font-bold text-ink-900">{formatCurrency(quote.total_fee)}</p>
+                      <p className="text-[12px] text-ink-400 mt-0.5">
+                        {quote.fee_basis} · {quote.currency}
                       </p>
-                      <p className="text-[10px] text-ink-400 mt-1">Total Fee</p>
                     </div>
-                  </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-surface-100">
-                    <div className="flex items-center gap-8 text-[11px]">
-                      <div>
-                        <span className="text-ink-400">Issued</span>
-                        <p className="text-ink-600 font-mono">{quote.issued_date ? formatDate(quote.issued_date) : '—'}</p>
-                      </div>
-                      {quote.valid_until && (
-                        <div>
-                          <span className="text-ink-400">Valid Until</span>
-                          <p className="text-ink-600 font-mono">{formatDate(quote.valid_until)}</p>
-                        </div>
+                    {/* Dates + Prepared By */}
+                    <div className="text-[12px] text-ink-400 space-y-1 mb-4 pb-4 border-b border-slate-100">
+                      <p>Issued {quote.issue_date ? formatDate(quote.issue_date) : '—'}</p>
+                      {quote.valid_until && <p>Valid until {formatDate(quote.valid_until)}</p>}
+                      {preparedBy && <p>Prepared by {preparedBy.name}</p>}
+                    </div>
+
+                    {/* Bottom Row: Pills & Meta */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Project/Opportunity Pill */}
+                      {(project || opportunity) && (
+                        <span className="text-[11px] bg-slate-100 text-ink-600 px-2 py-1 rounded-full">
+                          Linked to {project?.name || opportunity?.title}
+                        </span>
+                      )}
+
+                      {/* View Count */}
+                      {quote.viewed_count && quote.viewed_count > 0 && (
+                        <span className="text-[11px] text-ink-400 flex items-center gap-1">
+                          <EyeIcon className="w-3 h-3" />
+                          Viewed {quote.viewed_count} {quote.viewed_count === 1 ? 'time' : 'times'}
+                        </span>
+                      )}
+
+                      {/* Follow-up Chip */}
+                      {needsFollowUp && (
+                        <span className="bg-amber-100 text-amber-700 text-[11px] px-2 py-0.5 rounded-full">
+                          Follow-up needed
+                        </span>
+                      )}
+
+                      {/* Accepted Badge */}
+                      {quote.accepted_at && (
+                        <span className="text-[11px] text-green-600">
+                          ✓ Accepted {timeAgo(quote.accepted_at)}
+                        </span>
+                      )}
+
+                      {/* Declined Badge */}
+                      {quote.declined_at && (
+                        <span className="text-[11px] text-red-600">
+                          ✕ Declined {timeAgo(quote.declined_at)}
+                        </span>
                       )}
                     </div>
-                    <span className="text-accent-600 text-[11px] font-medium">View →</span>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-        )}
-      </section>
+
+                    {/* Edit Button */}
+                    <div className="mt-4 pt-4 border-t border-slate-100 flex justify-end">
+                      <Link
+                        href={`/fee-quotes/${quote.id}/edit`}
+                        className="text-[12px] text-accent-600 font-medium hover:text-accent-700"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Edit →
+                      </Link>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   )
 }

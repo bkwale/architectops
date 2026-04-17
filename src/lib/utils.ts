@@ -1,4 +1,4 @@
-import { HealthStatus, TaskStatus, RiskSeverity, ApprovalStatus, IssueStatus, ChangeStatus, RiskRegisterStatus, ActionStatus, RiskProbability, RiskImpact, MeetingType, DesignRiskReviewStatus, ContractEventStatus, TenderStatus, SiteQueryStatus, BuildingRegStatus, InspectionStatus, ComplianceStatus, DocumentStatus, KnowledgeCategory, DutyholderRole, DrawingIssueType, CommercialHealthFlag, UtilisationStatus, FeeQuoteStatus, OpportunityStatus, IntegrationStatus } from './types'
+import { HealthStatus, TaskStatus, RiskSeverity, ApprovalStatus, IssueStatus, ChangeStatus, RiskRegisterStatus, ActionStatus, RiskProbability, RiskImpact, MeetingType, DesignRiskReviewStatus, ContractEventStatus, TenderStatus, SiteQueryStatus, BuildingRegStatus, InspectionStatus, ComplianceStatus, DocumentStatus, KnowledgeCategory, DutyholderRole, DrawingIssueType, CommercialHealthFlag, UtilisationStatus, FeeQuoteStatus, OpportunityStatus, IntegrationStatus, QuoteSectionType, FeeQuoteRecord } from './types'
 
 export function cn(...classes: (string | undefined | false | null)[]): string {
   return classes.filter(Boolean).join(' ')
@@ -62,7 +62,8 @@ export function formatDate(dateStr: string): string {
 export function daysUntil(dateStr: string): number {
   const now = new Date()
   const target = new Date(dateStr)
-  return Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  const diff = Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  return diff === 0 ? 0 : diff // avoid -0
 }
 
 export function isOverdue(dateStr?: string): boolean {
@@ -390,9 +391,12 @@ export function formatPercent(value: number): string {
 export function feeQuoteStatusColor(s: FeeQuoteStatus): string {
   switch (s) {
     case 'draft': return 'bg-slate-100 text-slate-600'
-    case 'issued': return 'bg-blue-100 text-blue-700'
+    case 'sent': return 'bg-blue-100 text-blue-700'
+    case 'viewed': return 'bg-indigo-100 text-indigo-700'
     case 'revised': return 'bg-amber-100 text-amber-700'
     case 'accepted': return 'bg-emerald-100 text-emerald-700'
+    case 'declined': return 'bg-red-100 text-red-700'
+    case 'expired': return 'bg-slate-100 text-slate-400'
     case 'superseded': return 'bg-violet-100 text-violet-700'
   }
 }
@@ -400,9 +404,12 @@ export function feeQuoteStatusColor(s: FeeQuoteStatus): string {
 export function feeQuoteStatusLabel(s: FeeQuoteStatus): string {
   switch (s) {
     case 'draft': return 'Draft'
-    case 'issued': return 'Issued'
+    case 'sent': return 'Sent'
+    case 'viewed': return 'Viewed'
     case 'revised': return 'Revised'
     case 'accepted': return 'Accepted'
+    case 'declined': return 'Declined'
+    case 'expired': return 'Expired'
     case 'superseded': return 'Superseded'
   }
 }
@@ -437,6 +444,69 @@ export function confidenceBadgeColor(c: 'high' | 'medium' | 'low'): string {
     case 'medium': return 'bg-amber-100 text-amber-700'
     case 'low': return 'bg-red-100 text-red-700'
   }
+}
+
+// ── Phase 4 Wave 1 Utilities ───────────────────────────────────
+
+export function quoteSectionTypeLabel(s: QuoteSectionType): string {
+  const labels: Record<QuoteSectionType, string> = {
+    cover: 'Cover / Introduction',
+    project_understanding: 'Project Understanding',
+    scope_of_service: 'Scope of Service',
+    stage_breakdown: 'Stage Breakdown',
+    optional_extras: 'Optional Extras',
+    consultant_coordination: 'Consultant Coordination',
+    programme_assumptions: 'Programme Assumptions',
+    design_freeze_note: 'Design Freeze Note',
+    meetings_and_communication: 'Meetings & Communication',
+    expenses_and_travel: 'Expenses & Travel',
+    exclusions: 'Exclusions',
+    terms_and_conditions: 'Terms & Conditions',
+    payment_terms: 'Payment Terms',
+    acceptance: 'Acceptance / Next Steps',
+  }
+  return labels[s]
+}
+
+export function numberingPreview(format: string, sampleSeq?: number): string {
+  const year = new Date().getFullYear().toString()
+  const shortYear = year.slice(-2)
+  let result = format
+    .replace('{YEAR}', year)
+    .replace('{YY}', shortYear)
+    .replace('{PROJECT}', 'MA-2025-001')
+
+  const seqMatch = result.match(/\{SEQ:(\d+)\}/)
+  if (seqMatch) {
+    const pad = parseInt(seqMatch[1])
+    const seq = (sampleSeq || 1).toString().padStart(pad, '0')
+    result = result.replace(seqMatch[0], seq)
+  }
+  return result
+}
+
+export function quoteNeedsFollowUp(quote: { status: FeeQuoteStatus; sent_at?: string; viewed_count: number; valid_until: string }): boolean {
+  if (quote.status === 'sent' && quote.viewed_count === 0) {
+    const daysSinceSent = quote.sent_at ? Math.floor((Date.now() - new Date(quote.sent_at).getTime()) / 86400000) : 0
+    return daysSinceSent > 3
+  }
+  if (quote.status === 'viewed') {
+    const daysUntilExpiry = Math.floor((new Date(quote.valid_until).getTime() - Date.now()) / 86400000)
+    return daysUntilExpiry < 7
+  }
+  return false
+}
+
+export function healthScoreColor(score: number): string {
+  if (score >= 75) return 'text-emerald-600'
+  if (score >= 50) return 'text-amber-600'
+  return 'text-red-600'
+}
+
+export function healthScoreBg(score: number): string {
+  if (score >= 75) return 'bg-emerald-100'
+  if (score >= 50) return 'bg-amber-100'
+  return 'bg-red-100'
 }
 
 // ── Phase 3 Wave 4 Utilities ───────────────────────────────

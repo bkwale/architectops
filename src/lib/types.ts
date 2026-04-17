@@ -52,6 +52,11 @@ export interface Task {
   required_flag: boolean
   created_at: string
   updated_at: string
+  expected_start_date?: string
+  expected_end_date?: string
+  category?: string
+  fee_impact_flag?: boolean
+  billing_milestone_flag?: boolean
 }
 
 export interface RiskAlert {
@@ -591,7 +596,7 @@ export interface FeeRecommendation {
 }
 
 // ── Phase 3 Wave 3: Fee Quote Types ─────────────────────────
-export type FeeQuoteStatus = 'draft' | 'issued' | 'revised' | 'accepted' | 'superseded'
+export type FeeQuoteStatus = 'draft' | 'sent' | 'viewed' | 'revised' | 'accepted' | 'declined' | 'expired' | 'superseded'
 
 export interface FeeQuoteRecord {
   id: string
@@ -599,29 +604,161 @@ export interface FeeQuoteRecord {
   related_project_id?: string
   related_opportunity_id?: string
   quote_reference: string
+  quote_title: string
   status: FeeQuoteStatus
+  client_name: string
+  client_contact_id?: string
+  issue_date: string
+  valid_until: string
   fee_basis: string
   total_fee: number
-  exclusions_text: string
+  currency: string
+  prepared_by_user_id: string
+  sent_at?: string
+  viewed_count: number
+  last_viewed_at?: string
+  accepted_at?: string
+  declined_at?: string
   terms_text: string
-  issued_date?: string
-  valid_until?: string
-  created_by_user_id: string
+  exclusions_text: string
+  assumptions_text: string
+  payment_schedule_text: string
+  meetings_included_count?: number
+  mileage_rate?: number
+  expense_allowance?: number
+  design_freeze_flag: boolean
+  deposit_required_flag: boolean
+  deposit_amount?: number
+  created_at: string
   updated_at: string
 }
 
 export interface FeeQuoteLineItem {
   id: string
-  fee_quote_record_id: string
+  fee_quote_id: string
   sort_order: number
-  line_type: 'stage' | 'service' | 'expense' | 'discount'
+  line_type: 'stage' | 'service' | 'expense' | 'discount' | 'optional' | 'consultant'
   title: string
   description: string
+  related_stage?: RIBAStage
   quantity?: number
   unit?: string
   rate?: number
   amount: number
-  related_stage?: RIBAStage
+  optional_flag: boolean
+  selected_by_default: boolean
+  image_url?: string
+  expense_flag: boolean
+  travel_flag: boolean
+  meeting_flag: boolean
+  design_freeze_dependency_flag: boolean
+}
+
+// ── Phase 4: Fee Quote Sections ──────────────────────────────
+export type QuoteSectionType = 'cover' | 'project_understanding' | 'scope_of_service' | 'stage_breakdown' | 'optional_extras' | 'consultant_coordination' | 'programme_assumptions' | 'design_freeze_note' | 'meetings_and_communication' | 'expenses_and_travel' | 'exclusions' | 'terms_and_conditions' | 'payment_terms' | 'acceptance'
+
+export interface FeeQuoteSection {
+  id: string
+  fee_quote_id: string
+  section_type: QuoteSectionType
+  title: string
+  body_text: string
+  sort_order: number
+  image_url?: string
+}
+
+export interface FeeQuoteView {
+  id: string
+  fee_quote_id: string
+  viewer_identifier: string
+  viewed_at: string
+  source: 'email' | 'portal' | 'direct_link'
+}
+
+export interface FeeQuoteTemplate {
+  id: string
+  organisation_id: string
+  name: string
+  template_type: 'full_quote' | 'section' | 'line_items'
+  body_json: string
+  active_flag: boolean
+  created_at: string
+}
+
+export interface TermsLibraryItem {
+  id: string
+  organisation_id: string
+  title: string
+  terms_text: string
+  category: string
+  active_flag: boolean
+  created_at: string
+}
+
+export interface ExclusionsLibraryItem {
+  id: string
+  organisation_id: string
+  title: string
+  exclusions_text: string
+  active_flag: boolean
+  created_at: string
+}
+
+// ── Phase 4: Project Health Snapshots ────────────────────────
+export interface ProjectHealthSnapshot {
+  id: string
+  project_id: string
+  snapshot_date: string
+  health_score: number
+  forecast_margin: number
+  burn_ratio: number
+  quote_review_flag: boolean
+  near_loss_flag: boolean
+  billing_risk_flag: boolean
+  reasons_json: string[]
+}
+
+// ── Phase 4: Task Schedule Metrics ──────────────────────────
+export interface TaskScheduleMetric {
+  id: string
+  project_id: string
+  task_id: string
+  stage_code: RIBAStage
+  category: string
+  expected_start_date?: string
+  expected_end_date?: string
+  actual_completion_date?: string
+  delay_days?: number
+}
+
+// ── Phase 4: Numbering Templates ────────────────────────────
+export interface ProjectNumberTemplate {
+  id: string
+  organisation_id: string
+  office_id?: string
+  project_type?: string
+  template_name: string
+  format_string: string
+  active_flag: boolean
+  created_at: string
+}
+
+export interface QuoteNumberTemplate {
+  id: string
+  organisation_id: string
+  template_name: string
+  format_string: string
+  active_flag: boolean
+  created_at: string
+}
+
+export interface DrawingIssueTemplate {
+  id: string
+  organisation_id: string
+  issue_type: string
+  format_string: string
+  active_flag: boolean
+  created_at: string
 }
 
 // ── Phase 3 Wave 3: Opportunities / Proposals Types ─────────

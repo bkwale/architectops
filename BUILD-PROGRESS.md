@@ -82,6 +82,45 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 **Utils:** integrationStatusColor/Label/Dot, portalAccessLabel/Color, portalItemTypeIcon, timeAgo
 **Sidebar:** Added AI Teammate, Portal (Navigate); Integrations (Settings)
 
+## Phase 4 — IN PROGRESS
+
+### Wave 1 — Commercial Foundation (COMPLETE)
+| Feature | Route | Status |
+|---------|-------|--------|
+| Enhanced Fee Quote Builder | `/fee-quotes/[id]/edit` | Done |
+| Fee Quote Analytics | `/analytics/quotes` | Done |
+| Numbering & Templates Admin | `/settings/numbering` | Done |
+| Fee Quotes List (rebuilt) | `/fee-quotes` | Done |
+
+**Types updated:** FeeQuoteRecord (22 new fields), FeeQuoteLineItem (10 new fields), FeeQuoteStatus (8 statuses), Task (5 new fields)
+**Types added:** FeeQuoteSection, FeeQuoteView, FeeQuoteTemplate, TermsLibraryItem, ExclusionsLibraryItem, ProjectHealthSnapshot, TaskScheduleMetric, ProjectNumberTemplate, QuoteNumberTemplate, DrawingIssueTemplate, QuoteSectionType
+**Mock data:** 6 fee quotes (all statuses), 19 line items, 11 quote sections, 10 view tracking entries, 3 templates, 4 terms library, 5 exclusions library, 17 health snapshots, 7 numbering templates, 10 new helper functions
+**Utils:** Updated feeQuoteStatusColor/Label (8 statuses), added quoteSectionTypeLabel, numberingPreview, quoteNeedsFollowUp, healthScoreColor/Bg
+**Sidebar:** Added Quote Performance (Analytics), Numbering (Settings)
+
+### Wave 2 — Health Engine (NOT STARTED)
+| Feature | Route | Status |
+|---------|-------|--------|
+| Project Health 2.0 (scorecards, alerts, burn vs budget) | `/projects/[id]/health` | Pending |
+| Portfolio Health & Commercial Analytics 2.0 | `/analytics/portfolio` (upgrade) | Pending |
+| Quote-to-Project Linking (acceptance → project creation) | `/fee-quotes/[id]` (upgrade) | Pending |
+| Quote Analytics Dashboard | `/analytics/quotes` (upgrade) | Pending |
+
+### Wave 3 — Compliance (NOT STARTED)
+| Feature | Route | Status |
+|---------|-------|--------|
+| BRPD Workspace 2.0 (compliance statements, requirements tracker) | `/projects/[id]/brpd` (upgrade) | Pending |
+| BRPD Changelog & Document Control | `/projects/[id]/brpd/changelog` | Pending |
+| Drawing Issue & Email Workflow | `/projects/[id]/drawing-issues` | Pending |
+
+### Wave 4 — Project Creation (NOT STARTED)
+| Feature | Route | Status |
+|---------|-------|--------|
+| New Project / Brief Creation 2.0 (12-step wizard) | `/projects/new` (upgrade) | Pending |
+| Project Brief Document Builder | `/projects/[id]/brief` | Pending |
+| Xero / QuickBooks Quote Linkage | `/settings/integrations` (upgrade) | Pending |
+| Role-Based Visibility Controls | `/settings/admin` (upgrade) | Pending |
+
 ## Current Route Map
 
 ### Top-level routes
@@ -101,8 +140,10 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 - `/analytics/cashflow` — Cashflow Forecast
 - `/analytics/drawing-issues` — Drawing Issue Intelligence
 - `/fee-recommendations` — Fee Benchmarks & Recommendations
-- `/fee-quotes` — Fee Quotes listing
+- `/fee-quotes` — Fee Quotes dashboard (rebuilt Phase 4)
 - `/fee-quotes/[id]` — Fee Quote detail (line items, terms)
+- `/fee-quotes/[id]/edit` — Fee Quote visual builder (Phase 4)
+- `/analytics/quotes` — Quote Performance analytics (Phase 4)
 - `/opportunities` — Opportunities & Pipeline
 - `/ai` — AI Teammate (global portfolio chat)
 - `/projects/[id]/ai` — AI Teammate (project-scoped chat)
@@ -110,6 +151,7 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 - `/settings/admin` — Admin Controls (AI governance)
 - `/settings/international` — International & Jurisdiction settings
 - `/settings/integrations` — Integrations Hub (Xero, Outlook, SharePoint, etc)
+- `/settings/numbering` — Numbering & Templates Admin (Phase 4)
 
 ### Project sub-routes (`/projects/[id]/...`)
 - `/registers` — Issues, Changes & Risk Register
@@ -131,3 +173,4 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 - **Phase 3 Wave 2:** 14 drawing issues, 6 project commercials, 9 cashflow months, 12 staff allocations, 5 staff capacities
 - **Phase 3 Wave 3:** 3 fee recommendations, 4 fee quotes, 16 line items, 6 opportunities
 - **Phase 3 Wave 4:** 3 AI conversations (8 messages), 10 suggested prompts, 6 integrations, 5 portal invites, 6 shared items
+- **Phase 4 Wave 1:** 6 fee quotes (all statuses), 19 line items, 11 quote sections, 10 view tracking entries, 3 quote templates, 4 terms library items, 5 exclusions library items, 17 health snapshots, 3 project number templates, 1 quote number template, 3 drawing issue templates

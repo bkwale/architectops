@@ -21,6 +21,7 @@ const ANALYTICS_ITEMS = [
   { href: '/analytics/commercial', label: 'Commercial', icon: CurrencyIcon },
   { href: '/analytics/cashflow', label: 'Cashflow', icon: TrendIcon },
   { href: '/analytics/drawing-issues', label: 'Drawing Issues', icon: LayersIcon },
+  { href: '/analytics/quotes', label: 'Quote Performance', icon: PieIcon },
 ]
 
 const COMMERCIAL_ITEMS = [
@@ -33,6 +34,7 @@ const SETTINGS_ITEMS = [
   { href: '/settings/admin', label: 'Admin Controls', icon: ShieldIcon },
   { href: '/settings/international', label: 'International', icon: GlobeIcon },
   { href: '/settings/integrations', label: 'Integrations', icon: LinkIcon },
+  { href: '/settings/numbering', label: 'Numbering', icon: HashIcon },
 ]
 
 const ACTION_ITEMS = [
@@ -381,6 +383,23 @@ function LinkIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+    </svg>
+  )
+}
+
+function PieIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
+    </svg>
+  )
+}
+
+function HashIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5" />
     </svg>
   )
 }

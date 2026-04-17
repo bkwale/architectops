@@ -202,10 +202,10 @@ export default function FeeQuoteDetailPage() {
         <div className="border-t border-surface-200/60 pt-10 mt-10">
           <h3 className="text-[13px] font-semibold text-ink-900 uppercase tracking-[0.1em] mb-4">Quote Details</h3>
           <div className="grid grid-cols-3 gap-8 text-[12px]">
-            {quote.issued_date && (
+            {quote.issue_date && (
               <div>
                 <p className="text-ink-400 mb-1">Issued Date</p>
-                <p className="text-ink-700 font-mono">{formatDate(quote.issued_date)}</p>
+                <p className="text-ink-700 font-mono">{formatDate(quote.issue_date)}</p>
               </div>
             )}
             {quote.valid_until && (
@@ -214,10 +214,10 @@ export default function FeeQuoteDetailPage() {
                 <p className="text-ink-700 font-mono">{formatDate(quote.valid_until)}</p>
               </div>
             )}
-            {quote.created_by_user_id && (
+            {quote.prepared_by_user_id && (
               <div>
                 <p className="text-ink-400 mb-1">Created By</p>
-                <p className="text-ink-700">{quote.created_by_user_id}</p>
+                <p className="text-ink-700">{quote.prepared_by_user_id}</p>
               </div>
             )}
           </div>
