@@ -18,6 +18,12 @@ import {
   healthAlertSeverityColor, healthAlertSeverityDot,
   healthAlertCategoryLabel, healthAlertCategoryIcon,
   burnRatioColor, burnRatioBg, varianceColor, formatBurnRatio,
+  complianceStatementStatusColor, complianceStatementStatusLabel,
+  brpdRequirementStatusColor, brpdRequirementStatusLabel,
+  brpdChangeTypeLabel, brpdChangeTypeColor,
+  drawingWorkflowStatusColor, drawingWorkflowStatusLabel,
+  drawingEmailDirectionLabel, drawingEmailDirectionColor,
+  requirementCategoryLabel, requirementCategoryColor,
 } from '../utils'
 
 describe('cn (class name helper)', () => {
@@ -431,5 +437,131 @@ describe('formatBurnRatio', () => {
     expect(formatBurnRatio(1.12)).toBe('1.12x')
     expect(formatBurnRatio(0.95)).toBe('0.95x')
     expect(formatBurnRatio(1.0)).toBe('1.00x')
+  })
+})
+
+// ── Phase 4 Wave 3: BRPD Compliance & Drawing Workflow Utils ──
+
+describe('complianceStatementStatusColor', () => {
+  it('returns correct colors for all statuses', () => {
+    expect(complianceStatementStatusColor('draft')).toContain('slate')
+    expect(complianceStatementStatusColor('under_review')).toContain('blue')
+    expect(complianceStatementStatusColor('approved')).toContain('emerald')
+    expect(complianceStatementStatusColor('expired')).toContain('amber')
+    expect(complianceStatementStatusColor('rejected')).toContain('red')
+  })
+})
+
+describe('complianceStatementStatusLabel', () => {
+  it('returns correct labels', () => {
+    expect(complianceStatementStatusLabel('draft')).toBe('Draft')
+    expect(complianceStatementStatusLabel('under_review')).toBe('Under Review')
+    expect(complianceStatementStatusLabel('approved')).toBe('Approved')
+    expect(complianceStatementStatusLabel('expired')).toBe('Expired')
+    expect(complianceStatementStatusLabel('rejected')).toBe('Rejected')
+  })
+})
+
+describe('brpdRequirementStatusColor', () => {
+  it('returns correct colors for all statuses', () => {
+    expect(brpdRequirementStatusColor('not_started')).toContain('slate')
+    expect(brpdRequirementStatusColor('in_progress')).toContain('blue')
+    expect(brpdRequirementStatusColor('evidenced')).toContain('cyan')
+    expect(brpdRequirementStatusColor('verified')).toContain('emerald')
+    expect(brpdRequirementStatusColor('non_compliant')).toContain('red')
+  })
+})
+
+describe('brpdRequirementStatusLabel', () => {
+  it('returns correct labels', () => {
+    expect(brpdRequirementStatusLabel('not_started')).toBe('Not Started')
+    expect(brpdRequirementStatusLabel('in_progress')).toBe('In Progress')
+    expect(brpdRequirementStatusLabel('evidenced')).toBe('Evidenced')
+    expect(brpdRequirementStatusLabel('verified')).toBe('Verified')
+    expect(brpdRequirementStatusLabel('non_compliant')).toBe('Non-Compliant')
+  })
+})
+
+describe('brpdChangeTypeLabel', () => {
+  it('returns correct labels for all change types', () => {
+    expect(brpdChangeTypeLabel('dutyholder_change')).toBe('Dutyholder')
+    expect(brpdChangeTypeLabel('gateway_update')).toBe('Gateway')
+    expect(brpdChangeTypeLabel('compliance_update')).toBe('Compliance')
+    expect(brpdChangeTypeLabel('document_revision')).toBe('Document')
+    expect(brpdChangeTypeLabel('requirement_update')).toBe('Requirement')
+    expect(brpdChangeTypeLabel('evidence_upload')).toBe('Evidence')
+  })
+})
+
+describe('brpdChangeTypeColor', () => {
+  it('returns distinct colors for each type', () => {
+    expect(brpdChangeTypeColor('dutyholder_change')).toContain('purple')
+    expect(brpdChangeTypeColor('gateway_update')).toContain('blue')
+    expect(brpdChangeTypeColor('compliance_update')).toContain('emerald')
+    expect(brpdChangeTypeColor('document_revision')).toContain('amber')
+    expect(brpdChangeTypeColor('requirement_update')).toContain('cyan')
+    expect(brpdChangeTypeColor('evidence_upload')).toContain('slate')
+  })
+})
+
+describe('drawingWorkflowStatusColor', () => {
+  it('returns correct colors for all statuses', () => {
+    expect(drawingWorkflowStatusColor('draft')).toContain('slate')
+    expect(drawingWorkflowStatusColor('issued')).toContain('blue')
+    expect(drawingWorkflowStatusColor('queried')).toContain('amber')
+    expect(drawingWorkflowStatusColor('responded')).toContain('cyan')
+    expect(drawingWorkflowStatusColor('closed')).toContain('emerald')
+    expect(drawingWorkflowStatusColor('escalated')).toContain('red')
+  })
+})
+
+describe('drawingWorkflowStatusLabel', () => {
+  it('returns correct labels', () => {
+    expect(drawingWorkflowStatusLabel('draft')).toBe('Draft')
+    expect(drawingWorkflowStatusLabel('issued')).toBe('Issued')
+    expect(drawingWorkflowStatusLabel('queried')).toBe('Queried')
+    expect(drawingWorkflowStatusLabel('responded')).toBe('Responded')
+    expect(drawingWorkflowStatusLabel('closed')).toBe('Closed')
+    expect(drawingWorkflowStatusLabel('escalated')).toBe('Escalated')
+  })
+})
+
+describe('drawingEmailDirectionLabel', () => {
+  it('returns Sent for outbound', () => {
+    expect(drawingEmailDirectionLabel('outbound')).toBe('Sent')
+  })
+  it('returns Received for inbound', () => {
+    expect(drawingEmailDirectionLabel('inbound')).toBe('Received')
+  })
+})
+
+describe('drawingEmailDirectionColor', () => {
+  it('returns blue for outbound', () => {
+    expect(drawingEmailDirectionColor('outbound')).toContain('blue')
+  })
+  it('returns emerald for inbound', () => {
+    expect(drawingEmailDirectionColor('inbound')).toContain('emerald')
+  })
+})
+
+describe('requirementCategoryLabel', () => {
+  it('returns correct labels', () => {
+    expect(requirementCategoryLabel('fire')).toBe('Fire')
+    expect(requirementCategoryLabel('structural')).toBe('Structural')
+    expect(requirementCategoryLabel('safety')).toBe('Safety')
+    expect(requirementCategoryLabel('accessibility')).toBe('Accessibility')
+    expect(requirementCategoryLabel('environmental')).toBe('Environmental')
+    expect(requirementCategoryLabel('design')).toBe('Design')
+  })
+})
+
+describe('requirementCategoryColor', () => {
+  it('returns distinct colors', () => {
+    expect(requirementCategoryColor('fire')).toContain('orange')
+    expect(requirementCategoryColor('safety')).toContain('red')
+    expect(requirementCategoryColor('structural')).toContain('slate')
+    expect(requirementCategoryColor('accessibility')).toContain('purple')
+    expect(requirementCategoryColor('environmental')).toContain('green')
+    expect(requirementCategoryColor('design')).toContain('indigo')
   })
 })

@@ -32,6 +32,21 @@ import {
   getQuoteProjectLink,
   getQuoteProjectLinks,
   getQuoteConversionMetrics,
+  getProjectComplianceStatements,
+  getComplianceStatement,
+  getProjectBRPDRequirements,
+  getGatewayRequirements,
+  getProjectChangelog,
+  getDrawingIssueWorkflows,
+  getDrawingIssueWorkflow,
+  getWorkflowEmails,
+  getActiveDrawingWorkflows,
+  getEscalatedWorkflows,
+  COMPLIANCE_STATEMENTS,
+  BRPD_REQUIREMENTS,
+  BRPD_CHANGELOG,
+  DRAWING_ISSUE_WORKFLOWS,
+  DRAWING_EMAILS,
 } from '../mock-data'
 
 describe('Core data integrity', () => {
@@ -489,5 +504,185 @@ describe('Quote Conversion Metrics (Phase 4 Wave 2)', () => {
   it('has at least one sector with wins', () => {
     const hasWins = getQuoteConversionMetrics().some(m => m.accepted_quotes > 0)
     expect(hasWins).toBe(true)
+  })
+})
+
+// ── Phase 4 Wave 3: Compliance & Drawing Workflow Tests ──────
+
+describe('Compliance Statements', () => {
+  it('has 7 compliance statements', () => {
+    expect(COMPLIANCE_STATEMENTS).toHaveLength(7)
+  })
+  it('every statement has required fields', () => {
+    COMPLIANCE_STATEMENTS.forEach(cs => {
+      expect(cs.id).toBeTruthy()
+      expect(cs.project_id).toBeTruthy()
+      expect(cs.title).toBeTruthy()
+      expect(cs.regulation_ref).toBeTruthy()
+      expect(cs.status).toBeTruthy()
+      expect(cs.due_date).toBeTruthy()
+      expect(Array.isArray(cs.evidence_document_ids)).toBe(true)
+    })
+  })
+  it('getProjectComplianceStatements filters by project', () => {
+    const p2Statements = getProjectComplianceStatements('p2')
+    expect(p2Statements.length).toBeGreaterThan(0)
+    p2Statements.forEach(cs => expect(cs.project_id).toBe('p2'))
+  })
+  it('getComplianceStatement finds by id', () => {
+    const cs = getComplianceStatement('cs1')
+    expect(cs).toBeDefined()
+    expect(cs?.title).toContain('Fire Safety')
+  })
+  it('approved statements have approved_date', () => {
+    COMPLIANCE_STATEMENTS.filter(cs => cs.status === 'approved').forEach(cs => {
+      expect(cs.approved_date).toBeTruthy()
+      expect(cs.approved_by_user_id).toBeTruthy()
+    })
+  })
+})
+
+describe('BRPD Requirements', () => {
+  it('has 8 requirements', () => {
+    expect(BRPD_REQUIREMENTS).toHaveLength(8)
+  })
+  it('every requirement has required fields', () => {
+    BRPD_REQUIREMENTS.forEach(r => {
+      expect(r.id).toBeTruthy()
+      expect(r.project_id).toBeTruthy()
+      expect([1, 2, 3]).toContain(r.gateway_number)
+      expect(r.requirement_ref).toBeTruthy()
+      expect(r.title).toBeTruthy()
+      expect(r.status).toBeTruthy()
+      expect(r.target_date).toBeTruthy()
+      expect(r.category).toBeTruthy()
+    })
+  })
+  it('getProjectBRPDRequirements filters by project', () => {
+    const p2Reqs = getProjectBRPDRequirements('p2')
+    expect(p2Reqs.length).toBe(8) // all are for p2
+    p2Reqs.forEach(r => expect(r.project_id).toBe('p2'))
+  })
+  it('getGatewayRequirements filters by gateway number', () => {
+    const gw1Reqs = getGatewayRequirements('p2', 1)
+    expect(gw1Reqs.length).toBeGreaterThan(0)
+    gw1Reqs.forEach(r => expect(r.gateway_number).toBe(1))
+  })
+  it('verified requirements have completed_date', () => {
+    BRPD_REQUIREMENTS.filter(r => r.status === 'verified').forEach(r => {
+      expect(r.completed_date).toBeTruthy()
+      expect(r.verified_by_user_id).toBeTruthy()
+    })
+  })
+})
+
+describe('BRPD Changelog', () => {
+  it('has 10 changelog entries', () => {
+    expect(BRPD_CHANGELOG).toHaveLength(10)
+  })
+  it('every entry has required fields', () => {
+    BRPD_CHANGELOG.forEach(entry => {
+      expect(entry.id).toBeTruthy()
+      expect(entry.project_id).toBeTruthy()
+      expect(entry.change_type).toBeTruthy()
+      expect(entry.title).toBeTruthy()
+      expect(entry.description).toBeTruthy()
+      expect(entry.changed_by_user_id).toBeTruthy()
+      expect(entry.changed_at).toBeTruthy()
+      expect(typeof entry.approved_flag).toBe('boolean')
+    })
+  })
+  it('getProjectChangelog returns sorted by date desc', () => {
+    const p2Log = getProjectChangelog('p2')
+    expect(p2Log.length).toBeGreaterThan(0)
+    for (let i = 1; i < p2Log.length; i++) {
+      expect(new Date(p2Log[i - 1].changed_at).getTime()).toBeGreaterThanOrEqual(
+        new Date(p2Log[i].changed_at).getTime()
+      )
+    }
+  })
+  it('approved entries have approved_by_user_id', () => {
+    BRPD_CHANGELOG.filter(e => e.approved_flag).forEach(e => {
+      expect(e.approved_by_user_id).toBeTruthy()
+    })
+  })
+})
+
+describe('Drawing Issue Workflows', () => {
+  it('has 6 workflows', () => {
+    expect(DRAWING_ISSUE_WORKFLOWS).toHaveLength(6)
+  })
+  it('every workflow has required fields', () => {
+    DRAWING_ISSUE_WORKFLOWS.forEach(w => {
+      expect(w.id).toBeTruthy()
+      expect(w.project_id).toBeTruthy()
+      expect(w.drawing_issue_id).toBeTruthy()
+      expect(w.drawing_ref).toBeTruthy()
+      expect(w.status).toBeTruthy()
+      expect(w.issued_to_name).toBeTruthy()
+      expect(w.issued_to_email).toBeTruthy()
+      expect(w.issued_date).toBeTruthy()
+      expect(w.response_due_date).toBeTruthy()
+      expect(typeof w.escalated_flag).toBe('boolean')
+      expect(typeof w.query_count).toBe('number')
+    })
+  })
+  it('getDrawingIssueWorkflows filters by project', () => {
+    const p1Workflows = getDrawingIssueWorkflows('p1')
+    expect(p1Workflows.length).toBeGreaterThan(0)
+    p1Workflows.forEach(w => expect(w.project_id).toBe('p1'))
+  })
+  it('getDrawingIssueWorkflow finds by id', () => {
+    const wf = getDrawingIssueWorkflow('diw1')
+    expect(wf).toBeDefined()
+    expect(wf?.status).toBe('queried')
+  })
+  it('getActiveDrawingWorkflows excludes draft and closed', () => {
+    const active = getActiveDrawingWorkflows('p1')
+    active.forEach(w => {
+      expect(w.status).not.toBe('draft')
+      expect(w.status).not.toBe('closed')
+    })
+  })
+  it('getEscalatedWorkflows returns only escalated', () => {
+    const escalated = getEscalatedWorkflows('p3')
+    expect(escalated.length).toBeGreaterThan(0)
+    escalated.forEach(w => expect(w.escalated_flag).toBe(true))
+  })
+})
+
+describe('Drawing Emails', () => {
+  it('has 11 emails', () => {
+    expect(DRAWING_EMAILS).toHaveLength(11)
+  })
+  it('every email has required fields', () => {
+    DRAWING_EMAILS.forEach(e => {
+      expect(e.id).toBeTruthy()
+      expect(e.workflow_id).toBeTruthy()
+      expect(['outbound', 'inbound']).toContain(e.direction)
+      expect(e.from_name).toBeTruthy()
+      expect(e.from_email).toBeTruthy()
+      expect(e.to_name).toBeTruthy()
+      expect(e.to_email).toBeTruthy()
+      expect(e.subject).toBeTruthy()
+      expect(e.body_preview).toBeTruthy()
+      expect(e.sent_at).toBeTruthy()
+      expect(typeof e.has_attachment).toBe('boolean')
+    })
+  })
+  it('getWorkflowEmails returns chronological order', () => {
+    const emails = getWorkflowEmails('diw1')
+    expect(emails.length).toBeGreaterThan(0)
+    for (let i = 1; i < emails.length; i++) {
+      expect(new Date(emails[i].sent_at).getTime()).toBeGreaterThanOrEqual(
+        new Date(emails[i - 1].sent_at).getTime()
+      )
+    }
+  })
+  it('emails with attachments have attachment_names', () => {
+    DRAWING_EMAILS.filter(e => e.has_attachment).forEach(e => {
+      expect(e.attachment_names).toBeDefined()
+      expect(e.attachment_names!.length).toBeGreaterThan(0)
+    })
   })
 })

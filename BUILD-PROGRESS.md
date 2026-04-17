@@ -112,12 +112,17 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 **Project workspace:** Added Health link to project dashboard
 **Upgrades:** Portfolio (health trends, alert summary, at-risk deep dive), Quote detail (project linking workflow), Quote analytics (win rate by sector, pipeline forecast, time-to-accept)
 
-### Wave 3 — Compliance (NOT STARTED)
+### Wave 3 — Compliance (COMPLETE)
 | Feature | Route | Status |
 |---------|-------|--------|
-| BRPD Workspace 2.0 (compliance statements, requirements tracker) | `/projects/[id]/brpd` (upgrade) | Pending |
-| BRPD Changelog & Document Control | `/projects/[id]/brpd/changelog` | Pending |
-| Drawing Issue & Email Workflow | `/projects/[id]/drawing-issues` | Pending |
+| BRPD Workspace 2.0 (compliance statements, requirements tracker) | `/projects/[id]/brpd` (upgrade) | Done |
+| BRPD Changelog & Document Control | `/projects/[id]/brpd/changelog` | Done |
+| Drawing Issue & Email Workflow | `/projects/[id]/drawing-issues` | Done |
+
+**Types added:** ComplianceStatement, ComplianceStatementStatus, BRPDRequirement, BRPDRequirementStatus, BRPDChangelogEntry, BRPDChangeType, DrawingIssueWorkflow, DrawingWorkflowStatus, DrawingEmail, DrawingEmailDirection
+**Mock data:** 7 compliance statements, 8 BRPD requirements, 10 changelog entries, 6 drawing workflows, 11 drawing emails, 10 helper functions
+**Utils:** complianceStatementStatusColor/Label, brpdRequirementStatusColor/Label, brpdChangeTypeLabel/Color, drawingWorkflowStatusColor/Label, drawingEmailDirectionLabel/Color, requirementCategoryLabel/Color
+**Project workspaces:** Added BRPD Changelog, Drawing Issues links
 
 ### Wave 4 — Project Creation (NOT STARTED)
 | Feature | Route | Status |
@@ -168,7 +173,9 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 - `/tender` — Tender / ITT / Evaluation
 - `/site-queries` — Site Queries
 - `/building-regs` — Building Regulations
-- `/brpd` — BRPD & Dutyholder Coordination
+- `/brpd` — BRPD & Dutyholder Coordination (Phase 4 upgrade)
+- `/brpd/changelog` — BRPD Changelog & Document Control (Phase 4)
+- `/drawing-issues` — Drawing Issue & Email Workflow (Phase 4)
 - `/documents` — Documents & Transmittals
 - `/health` — Project Health Scorecard (Phase 4)
 
@@ -182,3 +189,4 @@ Core RIBA stage tracking, project dashboards, task management, risk detection en
 - **Phase 3 Wave 4:** 3 AI conversations (8 messages), 10 suggested prompts, 6 integrations, 5 portal invites, 6 shared items
 - **Phase 4 Wave 1:** 6 fee quotes (all statuses), 19 line items, 11 quote sections, 10 view tracking entries, 3 quote templates, 4 terms library items, 5 exclusions library items, 17 health snapshots, 3 project number templates, 1 quote number template, 3 drawing issue templates
 - **Phase 4 Wave 2:** 9 health alerts, 9 burn-budget metrics, 5 quote-project links, 5 conversion metrics
+- **Phase 4 Wave 3:** 7 compliance statements, 8 BRPD requirements, 10 changelog entries, 6 drawing workflows, 11 drawing emails

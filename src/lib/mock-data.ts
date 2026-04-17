@@ -1,4 +1,4 @@
-import { User, Project, Task, RIBAStage, ApprovalRequest, Issue, Change, RiskRegisterItem, Meeting, MeetingAction, DesignRisk, ContractAdminRecord, ContractEvent, PlanningRecord, SiteConstraint, TenderRecord, TenderReturn, TenderEvaluation, SiteQuery, BuildingRegRecord, BuildingInspection, DutyholderRecord, BRPDGateway, DocumentRecord, DocumentTransmittal, KnowledgeArticle, CPDRecord, Competency, UserCompetency, TrainingPlan, JurisdictionPack, OrganisationSettings, AISourcePermission, AILog, DrawingIssueRecord, ProjectCommercial, CashflowForecast, StaffAllocation, StaffCapacity, FeeRecommendation, FeeQuoteRecord, FeeQuoteLineItem, Opportunity, AISuggestedPrompt, AIConversation, AIMessage, AISource, Integration, PortalInvite, PortalSharedItem, FeeQuoteSection, FeeQuoteView, FeeQuoteTemplate, TermsLibraryItem, ExclusionsLibraryItem, ProjectHealthSnapshot, TaskScheduleMetric, ProjectNumberTemplate, QuoteNumberTemplate, DrawingIssueTemplate, ProjectHealthAlert, BurnBudgetMetric, QuoteProjectLink, QuoteConversionMetric } from './types'
+import { User, Project, Task, RIBAStage, ApprovalRequest, Issue, Change, RiskRegisterItem, Meeting, MeetingAction, DesignRisk, ContractAdminRecord, ContractEvent, PlanningRecord, SiteConstraint, TenderRecord, TenderReturn, TenderEvaluation, SiteQuery, BuildingRegRecord, BuildingInspection, DutyholderRecord, BRPDGateway, DocumentRecord, DocumentTransmittal, KnowledgeArticle, CPDRecord, Competency, UserCompetency, TrainingPlan, JurisdictionPack, OrganisationSettings, AISourcePermission, AILog, DrawingIssueRecord, ProjectCommercial, CashflowForecast, StaffAllocation, StaffCapacity, FeeRecommendation, FeeQuoteRecord, FeeQuoteLineItem, Opportunity, AISuggestedPrompt, AIConversation, AIMessage, AISource, Integration, PortalInvite, PortalSharedItem, FeeQuoteSection, FeeQuoteView, FeeQuoteTemplate, TermsLibraryItem, ExclusionsLibraryItem, ProjectHealthSnapshot, TaskScheduleMetric, ProjectNumberTemplate, QuoteNumberTemplate, DrawingIssueTemplate, ProjectHealthAlert, BurnBudgetMetric, QuoteProjectLink, QuoteConversionMetric, ComplianceStatement, BRPDRequirement, BRPDChangelogEntry, DrawingIssueWorkflow, DrawingEmail } from './types'
 import { STAGE_TEMPLATES } from './stage-templates'
 
 // ── Demo Users ──────────────────────────────────────────────
@@ -2570,4 +2570,113 @@ export function getQuoteProjectLinks(): QuoteProjectLink[] {
 
 export function getQuoteConversionMetrics(): QuoteConversionMetric[] {
   return QUOTE_CONVERSION_METRICS
+}
+
+// ── Phase 4 Wave 3: BRPD Compliance & Drawing Workflow Data ─
+
+export const COMPLIANCE_STATEMENTS: ComplianceStatement[] = [
+  { id: 'cs1', project_id: 'p2', title: 'Fire Safety Strategy Compliance', description: 'Confirm fire safety strategy meets BS 9991 and Approved Document B requirements for higher-risk residential building.', regulation_ref: 'ADB Vol 2 / BS 9991:2015', responsible_dutyholder_id: 'dh7', status: 'approved', evidence_document_ids: ['doc8'], due_date: '2026-04-01', submitted_date: '2026-03-20', approved_date: '2026-03-28', approved_by_user_id: 'u1', created_at: '2026-02-01', updated_at: '2026-03-28' },
+  { id: 'cs2', project_id: 'p2', title: 'Structural Stability Statement', description: 'Confirm structural design meets Building Regulations Part A and relevant Eurocodes.', regulation_ref: 'Part A / EN 1990-1999', responsible_dutyholder_id: 'dh7', status: 'under_review', evidence_document_ids: [], due_date: '2026-05-15', submitted_date: '2026-04-10', created_at: '2026-02-15', updated_at: '2026-04-10' },
+  { id: 'cs3', project_id: 'p2', title: 'Accessibility Compliance', description: 'Demonstrate compliance with Part M including wheelchair-accessible units and common areas.', regulation_ref: 'Part M Vol 1 & 2', responsible_dutyholder_id: 'dh6', status: 'draft', evidence_document_ids: [], due_date: '2026-06-01', created_at: '2026-03-01', updated_at: '2026-03-01' },
+  { id: 'cs4', project_id: 'p1', title: 'Energy Performance Statement', description: 'Confirm compliance with Part L conservation of fuel and power for domestic extension.', regulation_ref: 'Part L1B 2021', responsible_dutyholder_id: 'dh2', status: 'approved', evidence_document_ids: ['doc1', 'doc2'], due_date: '2026-02-28', submitted_date: '2026-02-20', approved_date: '2026-02-25', approved_by_user_id: 'u1', created_at: '2025-12-01', updated_at: '2026-02-25' },
+  { id: 'cs5', project_id: 'p1', title: 'Party Wall Compliance', description: 'Confirm Party Wall Act obligations discharged. Awards in place for shared boundary works.', regulation_ref: 'Party Wall Act 1996', responsible_dutyholder_id: 'dh1', status: 'expired', evidence_document_ids: ['doc7'], due_date: '2026-01-15', submitted_date: '2026-01-10', approved_date: '2026-01-12', approved_by_user_id: 'u2', notes: 'Award expired — renewal required before Stage 5.', created_at: '2025-10-01', updated_at: '2026-03-15' },
+  { id: 'cs6', project_id: 'p3', title: 'CDM Compliance Statement', description: 'Principal Designer compliance with CDM 2015 Regulations for education project.', regulation_ref: 'CDM 2015 Reg 9-12', responsible_dutyholder_id: 'dh4', status: 'approved', evidence_document_ids: ['doc4', 'doc5'], due_date: '2025-12-01', submitted_date: '2025-11-25', approved_date: '2025-11-30', approved_by_user_id: 'u1', created_at: '2025-09-01', updated_at: '2025-11-30' },
+  { id: 'cs7', project_id: 'p3', title: 'Asbestos Management Compliance', description: 'Confirm asbestos survey completed and management plan in place per Control of Asbestos Regulations 2012.', regulation_ref: 'CAR 2012 / HSG 264', responsible_dutyholder_id: 'dh5', status: 'under_review', evidence_document_ids: ['doc5'], due_date: '2026-04-15', submitted_date: '2026-04-01', created_at: '2025-10-01', updated_at: '2026-04-01' },
+]
+
+export const BRPD_REQUIREMENTS: BRPDRequirement[] = [
+  { id: 'br1', project_id: 'p2', gateway_number: 1, requirement_ref: 'GW1-REQ-001', title: 'Fire & Emergency File', description: 'Submit fire strategy and emergency evacuation plan to BSR.', status: 'in_progress', assigned_dutyholder_id: 'dh7', target_date: '2026-05-15', category: 'fire' },
+  { id: 'br2', project_id: 'p2', gateway_number: 1, requirement_ref: 'GW1-REQ-002', title: 'Structural Design Information', description: 'Provide structural design basis and key design decisions.', status: 'not_started', assigned_dutyholder_id: 'dh7', target_date: '2026-05-15', category: 'structural' },
+  { id: 'br3', project_id: 'p2', gateway_number: 1, requirement_ref: 'GW1-REQ-003', title: 'Principal Designer Competence', description: 'Evidence of Principal Designer competence and organisational capability.', status: 'evidenced', assigned_dutyholder_id: 'dh7', evidence_notes: 'ARB registration + PD training certificates uploaded.', target_date: '2026-04-01', completed_date: '2026-03-25', category: 'safety' },
+  { id: 'br4', project_id: 'p2', gateway_number: 1, requirement_ref: 'GW1-REQ-004', title: 'Accessibility Strategy', description: 'Submit accessibility design strategy per Part M Volume 2.', status: 'not_started', assigned_dutyholder_id: 'dh6', target_date: '2026-05-30', category: 'accessibility' },
+  { id: 'br5', project_id: 'p2', gateway_number: 2, requirement_ref: 'GW2-REQ-001', title: 'Construction Control Plan', description: 'Submit construction phase plan and control measures.', status: 'not_started', target_date: '2026-12-01', category: 'safety' },
+  { id: 'br6', project_id: 'p2', gateway_number: 2, requirement_ref: 'GW2-REQ-002', title: 'Mandatory Occurrence Reporting', description: 'Establish mandatory occurrence reporting system for construction phase.', status: 'not_started', target_date: '2026-12-01', category: 'safety' },
+  { id: 'br7', project_id: 'p2', gateway_number: 3, requirement_ref: 'GW3-REQ-001', title: 'Golden Thread Information', description: 'Complete golden thread of building information for handover to accountable person.', status: 'not_started', target_date: '2027-08-01', category: 'safety' },
+  { id: 'br8', project_id: 'p2', gateway_number: 1, requirement_ref: 'GW1-REQ-005', title: 'Environmental Impact Assessment', description: 'Submit environmental impact assessment and sustainability statement.', status: 'verified', assigned_dutyholder_id: 'dh7', evidence_notes: 'BREEAM pre-assessment submitted. Rating: Very Good.', target_date: '2026-04-01', completed_date: '2026-03-20', verified_by_user_id: 'u1', category: 'environmental' },
+]
+
+export const BRPD_CHANGELOG: BRPDChangelogEntry[] = [
+  { id: 'cl1', project_id: 'p2', change_type: 'dutyholder_change', title: 'Principal Designer appointed', description: 'Priya Sharma (Studio Mitchell) appointed as Principal Designer for Meridian Tower.', reference_id: 'dh7', changed_by_user_id: 'u1', changed_at: '2025-12-01', approved_flag: true, approved_by_user_id: 'u1' },
+  { id: 'cl2', project_id: 'p2', change_type: 'gateway_update', title: 'Gateway 1 target date confirmed', description: 'BSR pre-application meeting held. Gateway 1 target date set to 01 Jun 2026.', reference_id: 'gw1', previous_value: 'TBC', new_value: '2026-06-01', changed_by_user_id: 'u3', changed_at: '2026-01-15', approved_flag: true, approved_by_user_id: 'u1' },
+  { id: 'cl3', project_id: 'p2', change_type: 'compliance_update', title: 'Fire Safety Strategy approved', description: 'Fire safety strategy compliance statement reviewed and approved by Practice Director.', reference_id: 'cs1', previous_value: 'under_review', new_value: 'approved', changed_by_user_id: 'u1', changed_at: '2026-03-28', approved_flag: true, approved_by_user_id: 'u1' },
+  { id: 'cl4', project_id: 'p2', change_type: 'evidence_upload', title: 'PD competence evidence uploaded', description: 'ARB registration certificate and Principal Designer training records uploaded.', reference_id: 'br3', changed_by_user_id: 'u3', changed_at: '2026-03-25', approved_flag: false },
+  { id: 'cl5', project_id: 'p2', change_type: 'requirement_update', title: 'Environmental assessment verified', description: 'BREEAM pre-assessment submitted and verified. Rating: Very Good.', reference_id: 'br8', previous_value: 'evidenced', new_value: 'verified', changed_by_user_id: 'u1', changed_at: '2026-03-22', approved_flag: true, approved_by_user_id: 'u1' },
+  { id: 'cl6', project_id: 'p2', change_type: 'document_revision', title: 'Concept Design Report drafted', description: 'Stage 2 concept design report uploaded as draft for internal review.', reference_id: 'doc8', changed_by_user_id: 'u3', changed_at: '2026-03-12', approved_flag: false },
+  { id: 'cl7', project_id: 'p1', change_type: 'compliance_update', title: 'Party Wall compliance expired', description: 'Party Wall Act award has expired. Renewal required before construction works commence.', reference_id: 'cs5', previous_value: 'approved', new_value: 'expired', changed_by_user_id: 'u2', changed_at: '2026-03-15', approved_flag: false },
+  { id: 'cl8', project_id: 'p1', change_type: 'dutyholder_change', title: 'Client duty briefing completed', description: 'William Harris completed client duty briefing under Building Safety Act.', reference_id: 'dh1', changed_by_user_id: 'u2', changed_at: '2025-09-01', approved_flag: true, approved_by_user_id: 'u2' },
+  { id: 'cl9', project_id: 'p3', change_type: 'compliance_update', title: 'CDM Compliance Statement approved', description: 'CDM 2015 compliance statement reviewed and approved for education project.', reference_id: 'cs6', previous_value: 'under_review', new_value: 'approved', changed_by_user_id: 'u1', changed_at: '2025-11-30', approved_flag: true, approved_by_user_id: 'u1' },
+  { id: 'cl10', project_id: 'p2', change_type: 'requirement_update', title: 'Structural design info requirement added', description: 'New requirement added for Gateway 1: structural design basis documentation.', reference_id: 'br2', changed_by_user_id: 'u3', changed_at: '2026-02-20', approved_flag: true, approved_by_user_id: 'u1' },
+]
+
+export const DRAWING_ISSUE_WORKFLOWS: DrawingIssueWorkflow[] = [
+  { id: 'diw1', project_id: 'p1', drawing_issue_id: 'di3', drawing_ref: 'P1-SM-XX-00-DR-A-0100', drawing_title: 'Ground Floor GA', status: 'queried', issued_to_name: 'Peter Keane', issued_to_email: 'peter@bwbconsulting.co.uk', issued_date: '2026-02-15', response_due_date: '2026-03-01', escalated_flag: false, query_count: 2, created_by_user_id: 'u2' },
+  { id: 'diw2', project_id: 'p1', drawing_issue_id: 'di1', drawing_ref: 'P1-SM-XX-00-DR-A-0100', drawing_title: 'Ground Floor GA', status: 'closed', issued_to_name: 'Planning Officer', issued_to_email: 'planning@richmond.gov.uk', issued_date: '2025-12-01', response_due_date: '2026-01-05', response_received_date: '2025-12-20', closed_date: '2026-01-10', escalated_flag: false, query_count: 1, created_by_user_id: 'u2' },
+  { id: 'diw3', project_id: 'p3', drawing_issue_id: 'di8', drawing_ref: 'P3-SM-XX-00-DR-A-0100', drawing_title: 'Ground Floor Demolition', status: 'responded', issued_to_name: 'Mark Thomas', issued_to_email: 'm.thomas@westfield.co.uk', issued_date: '2026-01-15', response_due_date: '2026-01-29', response_received_date: '2026-01-25', escalated_flag: false, query_count: 0, created_by_user_id: 'u2' },
+  { id: 'diw4', project_id: 'p3', drawing_issue_id: 'di10', drawing_ref: 'P3-SM-XX-00-DR-A-0101', drawing_title: 'Ground Floor Proposed', status: 'escalated', issued_to_name: 'Mark Thomas', issued_to_email: 'm.thomas@westfield.co.uk', issued_date: '2026-03-01', response_due_date: '2026-03-15', escalated_flag: true, escalated_to_user_id: 'u1', query_count: 3, created_by_user_id: 'u2' },
+  { id: 'diw5', project_id: 'p5', drawing_issue_id: 'di12', drawing_ref: 'P5-SM-XX-00-DR-A-0100', drawing_title: 'Floor Plan & Roof Plan', status: 'issued', issued_to_name: 'Site Manager', issued_to_email: 'site@tbcbuilders.co.uk', issued_date: '2026-02-01', response_due_date: '2026-02-15', escalated_flag: false, query_count: 0, created_by_user_id: 'u2' },
+  { id: 'diw6', project_id: 'p2', drawing_issue_id: 'di13', drawing_ref: 'P2-SM-XX-00-DR-A-0100', drawing_title: 'Typical Floor Plan', status: 'draft', issued_to_name: 'Paul Kensington', issued_to_email: 'pk@meridiandev.co.uk', issued_date: '2026-02-01', response_due_date: '2026-02-15', escalated_flag: false, query_count: 0, created_by_user_id: 'u3' },
+]
+
+export const DRAWING_EMAILS: DrawingEmail[] = [
+  { id: 'de1', workflow_id: 'diw1', direction: 'outbound', from_name: 'Sarah Mitchell', from_email: 'sarah@studiomitchell.co.uk', to_name: 'Peter Keane', to_email: 'peter@bwbconsulting.co.uk', subject: 'Drawing Issue: P1-SM-XX-00-DR-A-0100 Rev W01', body_preview: 'Please find attached the working drawing issue for Ground Floor GA at Stage 3. Could you review the structural implications of the revised beam layout and confirm adequacy.', sent_at: '2026-02-15T10:30:00Z', has_attachment: true, attachment_names: ['P1-SM-XX-00-DR-A-0100-W01.pdf'] },
+  { id: 'de2', workflow_id: 'diw1', direction: 'inbound', from_name: 'Peter Keane', from_email: 'peter@bwbconsulting.co.uk', to_name: 'Sarah Mitchell', to_email: 'sarah@studiomitchell.co.uk', subject: 'RE: Drawing Issue: P1-SM-XX-00-DR-A-0100 Rev W01', body_preview: 'Thank you for the issue. We have two queries: (1) the rear extension beam span appears to exceed our preliminary calcs — please confirm dimension, (2) the foundation detail at grid line C needs clarification.', sent_at: '2026-02-20T14:15:00Z', has_attachment: false },
+  { id: 'de3', workflow_id: 'diw1', direction: 'outbound', from_name: 'Sarah Mitchell', from_email: 'sarah@studiomitchell.co.uk', to_name: 'Peter Keane', to_email: 'peter@bwbconsulting.co.uk', subject: 'RE: RE: Drawing Issue: P1-SM-XX-00-DR-A-0100 Rev W01', body_preview: 'Thanks Peter. (1) Beam span confirmed at 4.2m — we have adjusted to 3.8m in updated GA. (2) Foundation detail at grid C updated — see attached markup.', sent_at: '2026-02-22T09:00:00Z', has_attachment: true, attachment_names: ['P1-GFC-markup.pdf'] },
+  { id: 'de4', workflow_id: 'diw2', direction: 'outbound', from_name: 'Sarah Mitchell', from_email: 'sarah@studiomitchell.co.uk', to_name: 'Planning Officer', to_email: 'planning@richmond.gov.uk', subject: 'Planning Submission: P1-SM-XX-00-DR-A-0100 Rev P01', body_preview: 'Please find attached the planning drawings for 14 Riverside Walk, Richmond. Application ref: 2025/3421/HOU.', sent_at: '2025-12-01T11:00:00Z', has_attachment: true, attachment_names: ['P1-SM-XX-00-DR-A-0100-P01.pdf', 'Design-Access-Statement.pdf'] },
+  { id: 'de5', workflow_id: 'diw2', direction: 'inbound', from_name: 'Planning Officer', from_email: 'planning@richmond.gov.uk', to_name: 'Sarah Mitchell', to_email: 'sarah@studiomitchell.co.uk', subject: 'RE: Planning Submission 2025/3421/HOU', body_preview: 'Thank you for your submission. We have reviewed the proposals and note the following: rear elevation setback should be increased by 300mm to align with SPD guidance. Please submit amended drawings.', sent_at: '2025-12-20T16:30:00Z', has_attachment: false },
+  { id: 'de6', workflow_id: 'diw4', direction: 'outbound', from_name: 'Sarah Mitchell', from_email: 'sarah@studiomitchell.co.uk', to_name: 'Mark Thomas', to_email: 'm.thomas@westfield.co.uk', subject: 'Drawing Issue: P3-SM-XX-00-DR-A-0101 Rev C02', body_preview: 'Please find the re-issued Ground Floor Proposed drawing. This supersedes C01 with updated classroom layout per the client change request approved 28 Feb.', sent_at: '2026-03-01T09:30:00Z', has_attachment: true, attachment_names: ['P3-SM-XX-00-DR-A-0101-C02.pdf'] },
+  { id: 'de7', workflow_id: 'diw4', direction: 'inbound', from_name: 'Mark Thomas', from_email: 'm.thomas@westfield.co.uk', to_name: 'Sarah Mitchell', to_email: 'sarah@studiomitchell.co.uk', subject: 'RE: Drawing Issue: P3-SM-XX-00-DR-A-0101 Rev C02', body_preview: 'We have concerns about the revised layout. The relocated partition wall now clashes with the existing drainage run. This will require a site investigation.', sent_at: '2026-03-05T11:45:00Z', has_attachment: false },
+  { id: 'de8', workflow_id: 'diw4', direction: 'outbound', from_name: 'Sarah Mitchell', from_email: 'sarah@studiomitchell.co.uk', to_name: 'Mark Thomas', to_email: 'm.thomas@westfield.co.uk', subject: 'RE: RE: Drawing Issue: P3-SM-XX-00-DR-A-0101 Rev C02', body_preview: 'Noted. We are looking into this now. Can you confirm the exact location of the drainage run? We may need to issue a site query.', sent_at: '2026-03-06T10:00:00Z', has_attachment: false },
+  { id: 'de9', workflow_id: 'diw4', direction: 'inbound', from_name: 'Mark Thomas', from_email: 'm.thomas@westfield.co.uk', to_name: 'Sarah Mitchell', to_email: 'sarah@studiomitchell.co.uk', subject: 'RE: RE: RE: Drawing Issue C02 — URGENT', body_preview: 'We have now opened up the floor and confirmed the 150mm foul drain runs directly under the proposed partition at grid D4. Works are on hold pending your response.', sent_at: '2026-03-10T08:30:00Z', has_attachment: true, attachment_names: ['Site-Photo-DrainClash.jpg'] },
+  { id: 'de10', workflow_id: 'diw3', direction: 'outbound', from_name: 'Sarah Mitchell', from_email: 'sarah@studiomitchell.co.uk', to_name: 'Mark Thomas', to_email: 'm.thomas@westfield.co.uk', subject: 'Drawing Issue: P3-SM-XX-00-DR-A-0100 Rev C01', body_preview: 'Construction issue drawings for Ground Floor Demolition. Please confirm receipt and review against existing conditions survey.', sent_at: '2026-01-15T09:00:00Z', has_attachment: true, attachment_names: ['P3-SM-XX-00-DR-A-0100-C01.pdf'] },
+  { id: 'de11', workflow_id: 'diw3', direction: 'inbound', from_name: 'Mark Thomas', from_email: 'm.thomas@westfield.co.uk', to_name: 'Sarah Mitchell', to_email: 'sarah@studiomitchell.co.uk', subject: 'RE: Drawing Issue: P3-SM-XX-00-DR-A-0100 Rev C01', body_preview: 'Received and reviewed. Demolition sequence confirmed as acceptable. We will proceed as drawn. One note: please confirm asbestos clearance certificate before strip-out commences.', sent_at: '2026-01-25T14:00:00Z', has_attachment: false },
+]
+
+// ── Phase 4 Wave 3: Helper Functions ─────────────────────────
+
+export function getProjectComplianceStatements(projectId: string): ComplianceStatement[] {
+  return COMPLIANCE_STATEMENTS.filter(cs => cs.project_id === projectId)
+    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+}
+
+export function getComplianceStatement(id: string): ComplianceStatement | undefined {
+  return COMPLIANCE_STATEMENTS.find(cs => cs.id === id)
+}
+
+export function getProjectBRPDRequirements(projectId: string): BRPDRequirement[] {
+  return BRPD_REQUIREMENTS.filter(r => r.project_id === projectId)
+    .sort((a, b) => a.gateway_number - b.gateway_number || a.requirement_ref.localeCompare(b.requirement_ref))
+}
+
+export function getGatewayRequirements(projectId: string, gatewayNumber: 1 | 2 | 3): BRPDRequirement[] {
+  return BRPD_REQUIREMENTS.filter(r => r.project_id === projectId && r.gateway_number === gatewayNumber)
+    .sort((a, b) => a.requirement_ref.localeCompare(b.requirement_ref))
+}
+
+export function getProjectChangelog(projectId: string): BRPDChangelogEntry[] {
+  return BRPD_CHANGELOG.filter(c => c.project_id === projectId)
+    .sort((a, b) => new Date(b.changed_at).getTime() - new Date(a.changed_at).getTime())
+}
+
+export function getDrawingIssueWorkflows(projectId: string): DrawingIssueWorkflow[] {
+  return DRAWING_ISSUE_WORKFLOWS.filter(w => w.project_id === projectId)
+    .sort((a, b) => new Date(b.issued_date).getTime() - new Date(a.issued_date).getTime())
+}
+
+export function getDrawingIssueWorkflow(id: string): DrawingIssueWorkflow | undefined {
+  return DRAWING_ISSUE_WORKFLOWS.find(w => w.id === id)
+}
+
+export function getWorkflowEmails(workflowId: string): DrawingEmail[] {
+  return DRAWING_EMAILS.filter(e => e.workflow_id === workflowId)
+    .sort((a, b) => new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime())
+}
+
+export function getActiveDrawingWorkflows(projectId: string): DrawingIssueWorkflow[] {
+  return DRAWING_ISSUE_WORKFLOWS.filter(w =>
+    w.project_id === projectId && !['closed', 'draft'].includes(w.status)
+  )
+}
+
+export function getEscalatedWorkflows(projectId: string): DrawingIssueWorkflow[] {
+  return DRAWING_ISSUE_WORKFLOWS.filter(w => w.project_id === projectId && w.escalated_flag)
 }

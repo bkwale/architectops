@@ -957,6 +957,97 @@ export interface ProjectSummary {
   health: HealthStatus
 }
 
+// ── Phase 4 Wave 3: BRPD Compliance & Drawing Workflow Types ─
+
+export type ComplianceStatementStatus = 'draft' | 'under_review' | 'approved' | 'expired' | 'rejected'
+export type BRPDRequirementStatus = 'not_started' | 'in_progress' | 'evidenced' | 'verified' | 'non_compliant'
+export type BRPDChangeType = 'dutyholder_change' | 'gateway_update' | 'compliance_update' | 'document_revision' | 'requirement_update' | 'evidence_upload'
+export type DrawingWorkflowStatus = 'draft' | 'issued' | 'queried' | 'responded' | 'closed' | 'escalated'
+export type DrawingEmailDirection = 'outbound' | 'inbound'
+
+export interface ComplianceStatement {
+  id: string
+  project_id: string
+  title: string
+  description: string
+  regulation_ref: string
+  responsible_dutyholder_id: string
+  status: ComplianceStatementStatus
+  evidence_document_ids: string[]
+  due_date: string
+  submitted_date?: string
+  approved_date?: string
+  approved_by_user_id?: string
+  notes?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface BRPDRequirement {
+  id: string
+  project_id: string
+  gateway_number: 1 | 2 | 3
+  requirement_ref: string
+  title: string
+  description: string
+  status: BRPDRequirementStatus
+  assigned_dutyholder_id?: string
+  evidence_notes?: string
+  target_date: string
+  completed_date?: string
+  verified_by_user_id?: string
+  category: 'design' | 'safety' | 'fire' | 'structural' | 'accessibility' | 'environmental'
+}
+
+export interface BRPDChangelogEntry {
+  id: string
+  project_id: string
+  change_type: BRPDChangeType
+  title: string
+  description: string
+  reference_id?: string
+  previous_value?: string
+  new_value?: string
+  changed_by_user_id: string
+  changed_at: string
+  approved_flag: boolean
+  approved_by_user_id?: string
+}
+
+export interface DrawingIssueWorkflow {
+  id: string
+  project_id: string
+  drawing_issue_id: string
+  drawing_ref: string
+  drawing_title: string
+  status: DrawingWorkflowStatus
+  issued_to_name: string
+  issued_to_email: string
+  issued_date: string
+  response_due_date: string
+  response_received_date?: string
+  closed_date?: string
+  escalated_flag: boolean
+  escalated_to_user_id?: string
+  query_count: number
+  created_by_user_id: string
+}
+
+export interface DrawingEmail {
+  id: string
+  workflow_id: string
+  direction: DrawingEmailDirection
+  from_name: string
+  from_email: string
+  to_name: string
+  to_email: string
+  subject: string
+  body_preview: string
+  sent_at: string
+  has_attachment: boolean
+  attachment_names?: string[]
+}
+
 // ── RIBA Stage Info ─────────────────────────────────────────
 
 export const RIBA_STAGES: Record<RIBAStage, string> = {

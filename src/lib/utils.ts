@@ -1,4 +1,4 @@
-import { HealthStatus, TaskStatus, RiskSeverity, ApprovalStatus, IssueStatus, ChangeStatus, RiskRegisterStatus, ActionStatus, RiskProbability, RiskImpact, MeetingType, DesignRiskReviewStatus, ContractEventStatus, TenderStatus, SiteQueryStatus, BuildingRegStatus, InspectionStatus, ComplianceStatus, DocumentStatus, KnowledgeCategory, DutyholderRole, DrawingIssueType, CommercialHealthFlag, UtilisationStatus, FeeQuoteStatus, OpportunityStatus, IntegrationStatus, QuoteSectionType, FeeQuoteRecord, HealthAlertSeverity, HealthAlertCategory } from './types'
+import { HealthStatus, TaskStatus, RiskSeverity, ApprovalStatus, IssueStatus, ChangeStatus, RiskRegisterStatus, ActionStatus, RiskProbability, RiskImpact, MeetingType, DesignRiskReviewStatus, ContractEventStatus, TenderStatus, SiteQueryStatus, BuildingRegStatus, InspectionStatus, ComplianceStatus, DocumentStatus, KnowledgeCategory, DutyholderRole, DrawingIssueType, CommercialHealthFlag, UtilisationStatus, FeeQuoteStatus, OpportunityStatus, IntegrationStatus, QuoteSectionType, FeeQuoteRecord, HealthAlertSeverity, HealthAlertCategory, ComplianceStatementStatus, BRPDRequirementStatus, BRPDChangeType, DrawingWorkflowStatus, DrawingEmailDirection } from './types'
 
 export function cn(...classes: (string | undefined | false | null)[]): string {
   return classes.filter(Boolean).join(' ')
@@ -628,5 +628,123 @@ export function varianceColor(variance: number): string {
 
 export function formatBurnRatio(ratio: number): string {
   return ratio.toFixed(2) + 'x'
+}
+
+// ── Phase 4 Wave 3: BRPD Compliance & Drawing Workflow Utils ─
+
+export function complianceStatementStatusColor(status: ComplianceStatementStatus): string {
+  switch (status) {
+    case 'draft': return 'bg-slate-100 text-slate-700'
+    case 'under_review': return 'bg-blue-100 text-blue-700'
+    case 'approved': return 'bg-emerald-100 text-emerald-700'
+    case 'expired': return 'bg-amber-100 text-amber-700'
+    case 'rejected': return 'bg-red-100 text-red-700'
+  }
+}
+
+export function complianceStatementStatusLabel(status: ComplianceStatementStatus): string {
+  switch (status) {
+    case 'draft': return 'Draft'
+    case 'under_review': return 'Under Review'
+    case 'approved': return 'Approved'
+    case 'expired': return 'Expired'
+    case 'rejected': return 'Rejected'
+  }
+}
+
+export function brpdRequirementStatusColor(status: BRPDRequirementStatus): string {
+  switch (status) {
+    case 'not_started': return 'bg-slate-100 text-slate-700'
+    case 'in_progress': return 'bg-blue-100 text-blue-700'
+    case 'evidenced': return 'bg-cyan-100 text-cyan-700'
+    case 'verified': return 'bg-emerald-100 text-emerald-700'
+    case 'non_compliant': return 'bg-red-100 text-red-700'
+  }
+}
+
+export function brpdRequirementStatusLabel(status: BRPDRequirementStatus): string {
+  switch (status) {
+    case 'not_started': return 'Not Started'
+    case 'in_progress': return 'In Progress'
+    case 'evidenced': return 'Evidenced'
+    case 'verified': return 'Verified'
+    case 'non_compliant': return 'Non-Compliant'
+  }
+}
+
+export function brpdChangeTypeLabel(changeType: BRPDChangeType): string {
+  switch (changeType) {
+    case 'dutyholder_change': return 'Dutyholder'
+    case 'gateway_update': return 'Gateway'
+    case 'compliance_update': return 'Compliance'
+    case 'document_revision': return 'Document'
+    case 'requirement_update': return 'Requirement'
+    case 'evidence_upload': return 'Evidence'
+  }
+}
+
+export function brpdChangeTypeColor(changeType: BRPDChangeType): string {
+  switch (changeType) {
+    case 'dutyholder_change': return 'bg-purple-100 text-purple-700'
+    case 'gateway_update': return 'bg-blue-100 text-blue-700'
+    case 'compliance_update': return 'bg-emerald-100 text-emerald-700'
+    case 'document_revision': return 'bg-amber-100 text-amber-700'
+    case 'requirement_update': return 'bg-cyan-100 text-cyan-700'
+    case 'evidence_upload': return 'bg-slate-100 text-slate-700'
+  }
+}
+
+export function drawingWorkflowStatusColor(status: DrawingWorkflowStatus): string {
+  switch (status) {
+    case 'draft': return 'bg-slate-100 text-slate-700'
+    case 'issued': return 'bg-blue-100 text-blue-700'
+    case 'queried': return 'bg-amber-100 text-amber-700'
+    case 'responded': return 'bg-cyan-100 text-cyan-700'
+    case 'closed': return 'bg-emerald-100 text-emerald-700'
+    case 'escalated': return 'bg-red-100 text-red-700'
+  }
+}
+
+export function drawingWorkflowStatusLabel(status: DrawingWorkflowStatus): string {
+  switch (status) {
+    case 'draft': return 'Draft'
+    case 'issued': return 'Issued'
+    case 'queried': return 'Queried'
+    case 'responded': return 'Responded'
+    case 'closed': return 'Closed'
+    case 'escalated': return 'Escalated'
+  }
+}
+
+export function drawingEmailDirectionLabel(direction: DrawingEmailDirection): string {
+  return direction === 'outbound' ? 'Sent' : 'Received'
+}
+
+export function drawingEmailDirectionColor(direction: DrawingEmailDirection): string {
+  return direction === 'outbound' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
+}
+
+export function requirementCategoryLabel(category: string): string {
+  switch (category) {
+    case 'design': return 'Design'
+    case 'safety': return 'Safety'
+    case 'fire': return 'Fire'
+    case 'structural': return 'Structural'
+    case 'accessibility': return 'Accessibility'
+    case 'environmental': return 'Environmental'
+    default: return category
+  }
+}
+
+export function requirementCategoryColor(category: string): string {
+  switch (category) {
+    case 'design': return 'bg-indigo-100 text-indigo-700'
+    case 'safety': return 'bg-red-100 text-red-700'
+    case 'fire': return 'bg-orange-100 text-orange-700'
+    case 'structural': return 'bg-slate-100 text-slate-700'
+    case 'accessibility': return 'bg-purple-100 text-purple-700'
+    case 'environmental': return 'bg-green-100 text-green-700'
+    default: return 'bg-slate-100 text-slate-700'
+  }
 }
 
